@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/screens/home/home_screen.dart';
+import 'package:gemstore_frontend/config/router.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Product Management App',
+      title: 'Gemstore UIT',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto',
       ),
-      home: const HomeScreen(),
+      routerConfig: router,
     );
   }
 }
