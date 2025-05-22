@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -65,7 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               const Spacer(),
                               IconButton(
                                 icon: const Icon(Icons.settings),
-                                onPressed: () {},
+                                onPressed: () {
+                                  _onSettingsPressed();
+                                },
                               ),
                             ],
                           ),
@@ -409,5 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
     }
+  }
+
+  void _onSettingsPressed() {
+    GoRouter.of(context).go('/settings');
   }
 }

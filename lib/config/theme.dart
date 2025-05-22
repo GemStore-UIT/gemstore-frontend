@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 class CustomeTheme {
   static const Color backgroundColor = Color(0xFF1A1A1A);
   static const Color primaryColor = Color(0xFF1A1A1A);
@@ -23,4 +25,7 @@ class CustomeTheme {
   static const Color warningColor = Color(0xFF1A1A1A);
   static const Color infoColor = Color(0xFF1A1A1A);
   
+
+  
 }
+
