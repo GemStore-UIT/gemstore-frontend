@@ -1,4 +1,3 @@
-import 'package:gemstore_frontend/config/theme.dart';
 import 'package:gemstore_frontend/screens/auth/login_screen.dart';
 import 'package:gemstore_frontend/screens/home/home_screen.dart';
 import 'package:gemstore_frontend/screens/home/setting_screen.dart';
