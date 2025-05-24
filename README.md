@@ -32,7 +32,7 @@ Just giúp chạy ứng dụng một cách đơn giản và tiện lợi hơn. S
 ```bash
 just --version
 ```
-Sau khi đã có just thì có thể khởi động ứng dụng bằng: 
+  Sau khi đã có just thì có thể khởi động ứng dụng bằng: 
 ```bash
 just
 ```
