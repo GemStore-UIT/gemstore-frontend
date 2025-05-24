@@ -1,4 +1,3 @@
-import 'package:gemstore_frontend/config/theme.dart';
 import 'package:gemstore_frontend/screens/auth/login_screen.dart';
 import 'package:gemstore_frontend/screens/home/home_screen.dart';
 import 'package:gemstore_frontend/screens/home/setting_screen.dart';
@@ -7,8 +6,7 @@ import 'package:go_router/go_router.dart';
 class RouteName {
   static const String home = '/home';
   static const String login = '/login';
-  static const String settings = '/settings';
-  
+  static const String settings = '/settings';  
 }
 
 
