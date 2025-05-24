@@ -71,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            GoRouter.of(context).go('/home');
           },
         ),
       ),

@@ -6,8 +6,7 @@ import 'package:go_router/go_router.dart';
 class RouteName {
   static const String home = '/home';
   static const String login = '/login';
-  static const String settings = '/settings';
-  
+  static const String settings = '/settings';  
 }
 
 
