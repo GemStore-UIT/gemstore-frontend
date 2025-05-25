@@ -14,14 +14,14 @@ class SupplierModel {
   });
 }
 
-class SupplierScreen extends StatefulWidget {
-  const SupplierScreen({super.key});
+class NhaCungCapScreen extends StatefulWidget {
+  const NhaCungCapScreen({super.key});
 
   @override
-  _SupplierScreenState createState() => _SupplierScreenState();
+  _NhaCungCapScreenState createState() => _NhaCungCapScreenState();
 }
 
-class _SupplierScreenState extends State<SupplierScreen> {
+class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   final TextEditingController _idSearchController = TextEditingController();
   final TextEditingController _nameSearchController = TextEditingController();
   final TextEditingController _addressSearchController = TextEditingController();
@@ -166,7 +166,307 @@ class _SupplierScreenState extends State<SupplierScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text('Đóng'),
             ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showEditSupplierDialog(supplier);
+              },
+              icon: Icon(Icons.edit),
+              label: Text('Chỉnh sửa'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+              ),
+            ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showEditSupplierDialog(SupplierModel supplier) {
+    final TextEditingController nameController = TextEditingController(text: supplier.name);
+    final TextEditingController addressController = TextEditingController(text: supplier.address);
+    final TextEditingController phoneController = TextEditingController(text: supplier.phone);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 500,
+            height: 600,
+            child: Column(
+              children: [
+                // Fixed Header
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Colors.orange[700]),
+                      SizedBox(width: 8),
+                      Text(
+                        'Chỉnh sửa thông tin nhà cung cấp',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Scrollable Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Read-only Supplier Code
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mã nhà cung cấp',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(Icons.lock, size: 16, color: Colors.grey[600]),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    supplier.id,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Mã nhà cung cấp không thể thay đổi',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[500],
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        
+                        // Editable Name Field
+                        TextField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Tên nhà cung cấp *',
+                            hintText: 'Nhập tên nhà cung cấp',
+                            prefixIcon: Icon(Icons.business),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
+                          maxLines: null,
+                          minLines: 1,
+                        ),
+                        SizedBox(height: 16),
+                        
+                        // Editable Address Field
+                        TextField(
+                          controller: addressController,
+                          decoration: InputDecoration(
+                            labelText: 'Địa chỉ *',
+                            hintText: 'Nhập địa chỉ nhà cung cấp',
+                            prefixIcon: Icon(Icons.location_on),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
+                          maxLines: null,
+                          minLines: 2,
+                        ),
+                        SizedBox(height: 16),
+                        
+                        // Editable Phone Field
+                        TextField(
+                          controller: phoneController,
+                          decoration: InputDecoration(
+                            labelText: 'Số điện thoại *',
+                            hintText: 'Nhập số điện thoại',
+                            prefixIcon: Icon(Icons.phone),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
+                          keyboardType: TextInputType.phone,
+                          maxLines: 1,
+                        ),
+                        SizedBox(height: 12),
+                        
+                        // Info message
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.orange[50],
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.orange[200]!),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.info_outline, color: Colors.orange[700], size: 16),
+                              SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  'Các trường có dấu (*) là bắt buộc',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.orange[700],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Fixed Footer with Action Buttons
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                    ),
+                    border: Border(
+                      top: BorderSide(color: Colors.grey[200]!),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('Hủy'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey[600],
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (nameController.text.trim().isNotEmpty &&
+                              addressController.text.trim().isNotEmpty &&
+                              phoneController.text.trim().isNotEmpty) {
+                            
+                            // Check if any changes were made
+                            bool hasChanges = nameController.text.trim() != supplier.name ||
+                                             addressController.text.trim() != supplier.address ||
+                                             phoneController.text.trim() != supplier.phone;
+                            
+                            if (!hasChanges) {
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Không có thay đổi nào được thực hiện'),
+                                  backgroundColor: Colors.grey[600],
+                                ),
+                              );
+                              return;
+                            }
+
+                            // Update supplier information
+                            setState(() {
+                              int index = _allSuppliers.indexWhere((s) => s.id == supplier.id);
+                              if (index != -1) {
+                                _allSuppliers[index] = SupplierModel(
+                                  id: supplier.id, // Keep the same ID
+                                  name: nameController.text.trim(),
+                                  address: addressController.text.trim(),
+                                  phone: phoneController.text.trim(),
+                                );
+                                _filterSuppliers(); // Refresh the filtered list
+                              }
+                            });
+                            
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(Icons.check_circle, color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text('Đã cập nhật thông tin nhà cung cấp thành công!'),
+                                  ],
+                                ),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Vui lòng điền đầy đủ thông tin bắt buộc!'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.save),
+                        label: Text('Cập nhật'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -576,6 +876,12 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                     tooltip: 'Xem chi tiết',
                                   ),
                                   IconButton(
+                                    onPressed: () => _showEditSupplierDialog(supplier),
+                                    icon: Icon(Icons.edit),
+                                    color: Colors.orange,
+                                    tooltip: 'Chỉnh sửa',
+                                  ),
+                                  IconButton(
                                     onPressed: () => _deleteSupplier(supplier.id),
                                     icon: Icon(Icons.delete),
                                     color: Colors.red,
@@ -585,6 +891,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
                               ),
                             ],
                           ),
+                          
                         ),
                       );
                     },

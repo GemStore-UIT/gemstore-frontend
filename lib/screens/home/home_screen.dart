@@ -322,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Return specific UI based on the selected function
     switch (selectedFunction) {
       case 'supplier_management':
-        return SupplierScreen();
+        return NhaCungCapScreen();
       case 'unit_management':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
