@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/advanced_search_widget.dart';
 
 class SupplierModel {
   final String id;
@@ -29,7 +30,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   
   List<SupplierModel> _allSuppliers = [];
   List<SupplierModel> _filteredSuppliers = [];
-  bool _isAdvancedSearch = false;
 
   @override
   void initState() {
@@ -99,15 +99,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
         // All non-empty search criteria must match (AND logic)
         return matchesId && matchesName && matchesAddress && matchesPhone;
       }).toList();
-    });
-  }
-
-  void _clearSearch() {
-    setState(() {
-      _idSearchController.clear();
-      _nameSearchController.clear();
-      _addressSearchController.clear();
-      _phoneSearchController.clear();
     });
   }
 
@@ -590,171 +581,35 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           // Advanced Search Container
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Toggle Advanced Search
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tìm kiếm nâng cao',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[800],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        if (_idSearchController.text.isNotEmpty ||
-                            _nameSearchController.text.isNotEmpty ||
-                            _addressSearchController.text.isNotEmpty ||
-                            _phoneSearchController.text.isNotEmpty)
-                          TextButton.icon(
-                            onPressed: _clearSearch,
-                            icon: Icon(Icons.clear, size: 16),
-                            label: Text('Xóa tất cả'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                          ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _isAdvancedSearch = !_isAdvancedSearch;
-                            });
-                          },
-                          icon: Icon(
-                            _isAdvancedSearch ? Icons.expand_less : Icons.expand_more,
-                            color: Colors.blue[800],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                
-                // Advanced Search Fields
-                if (_isAdvancedSearch) ...[
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _idSearchController,
-                          decoration: InputDecoration(
-                            labelText: 'Mã nhà cung cấp',
-                            hintText: 'VD: NCC001',
-                            prefixIcon: Icon(Icons.tag, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _nameSearchController,
-                          decoration: InputDecoration(
-                            labelText: 'Tên nhà cung cấp',
-                            hintText: 'VD: Công ty ABC',
-                            prefixIcon: Icon(Icons.business, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _addressSearchController,
-                          decoration: InputDecoration(
-                            labelText: 'Địa chỉ',
-                            hintText: 'VD: Quận 1, TP.HCM',
-                            prefixIcon: Icon(Icons.location_on, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _phoneSearchController,
-                          decoration: InputDecoration(
-                            labelText: 'Số điện thoại',
-                            hintText: 'VD: 0123456789',
-                            prefixIcon: Icon(Icons.phone, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            isDense: true,
-                          ),
-                          keyboardType: TextInputType.phone,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.blue[700], size: 16),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Nhập vào các trường để tìm kiếm kết hợp. VD: Tên="ABC" và SĐT="0123" sẽ tìm các NCC có tên chứa "ABC" và SĐT chứa "0123"',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue[700],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
+          AdvancedSearchWidget(
+            count: 5, 
+            searchTerms: [
+              'Mã NCC',
+              'Tên nhà cung cấp',
+              'Địa chỉ',
+              'Số điện thoại',
+              'Tất cả'
+            ], 
+            iconTerms: [
+              Icons.code,
+              Icons.business,
+              Icons.location_on,
+              Icons.phone,
+              Icons.search
+            ], 
+            controllers: [
+              _idSearchController,
+              _nameSearchController,
+              _addressSearchController,
+              _phoneSearchController,
+              TextEditingController(), // Placeholder for "Tất cả"
+            ]
           ),
-          
+
           // Supplier List
           Expanded(
             child: _filteredSuppliers.isEmpty
@@ -776,16 +631,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           Text(
                             'Thử điều chỉnh bộ lọc tìm kiếm',
                             style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                          ),
-                          SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _clearSearch,
-                            icon: Icon(Icons.clear),
-                            label: Text('Xóa bộ lọc'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              foregroundColor: Colors.grey[700],
-                            ),
                           ),
                         ],
                       ],
@@ -891,7 +736,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                               ),
                             ],
                           ),
-                          
+
                         ),
                       );
                     },
