@@ -21,12 +21,18 @@ class AdvancedSearchWidget extends StatefulWidget {
 class _AdvancedSearchWidgetState extends State<AdvancedSearchWidget> {
   bool _isAdvancedSearch = false;
 
+  void toggleAdvancedSearch() {
+    setState(() {
+      _isAdvancedSearch = !_isAdvancedSearch;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white, 
+        color: Colors.white,
         border: Border(
           bottom: BorderSide(
             color: Colors.grey.shade300,
@@ -44,47 +50,46 @@ class _AdvancedSearchWidgetState extends State<AdvancedSearchWidget> {
       child: Column(
         children: [
           // Toggle Advanced Search
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Tìm kiếm nâng cao',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
+          InkWell(
+            onTap: toggleAdvancedSearch,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Tìm kiếm nâng cao',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[800],
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  if (widget.controllers.any((controller) => controller.text.isNotEmpty))
-                    TextButton.icon(
-                      onPressed: () {
-                        for (var controller in widget.controllers) {
-                          controller.clear();
-                        }
-                      },
-                      icon: Icon(Icons.clear, size: 16),
-                      label: Text('Xóa tất cả'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(horizontal: 8),
+                Row(
+                  children: [
+                    if (widget.controllers.any((controller) => controller.text.isNotEmpty))
+                      TextButton.icon(
+                        onPressed: () {
+                          for (var controller in widget.controllers) {
+                            controller.clear();
+                          }
+                        },
+                        icon: Icon(Icons.clear, size: 16),
+                        label: Text('Xóa tất cả'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                    IconButton(
+                      onPressed: toggleAdvancedSearch,
+                      icon: Icon(
+                        _isAdvancedSearch ? Icons.expand_less : Icons.expand_more,
+                        color: Colors.blue[800],
                       ),
                     ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isAdvancedSearch = !_isAdvancedSearch;
-                      });                      
-                    },
-                    icon: Icon(
-                      _isAdvancedSearch ? Icons.expand_less : Icons.expand_more,
-                      color: Colors.blue[800],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
 
           // Advanced Search Fields
