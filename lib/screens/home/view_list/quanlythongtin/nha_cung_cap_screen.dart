@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/screens/reusable_widgets/advanced_search_widget.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class SupplierModel {
   final String id;
@@ -19,26 +19,44 @@ class NhaCungCapScreen extends StatefulWidget {
   const NhaCungCapScreen({super.key});
 
   @override
-  _NhaCungCapScreenState createState() => _NhaCungCapScreenState();
+  State<NhaCungCapScreen> createState() => _NhaCungCapScreenState();
 }
 
 class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
-  final TextEditingController _idSearchController = TextEditingController();
-  final TextEditingController _nameSearchController = TextEditingController();
-  final TextEditingController _addressSearchController = TextEditingController();
-  final TextEditingController _phoneSearchController = TextEditingController();
-  
   List<SupplierModel> _allSuppliers = [];
-  List<SupplierModel> _filteredSuppliers = [];
+  final List<TableColumn> _columns = [
+    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
+    TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
+    TableColumn(
+      key: 'phone',
+      header: 'Số điện thoại',
+      width: 2,
+      validator:
+          (value) => (value.trim().length < 10 || value.trim().length > 15) ? false : true,
+      errorMessage: 'Số điện thoại phải từ 10 đến 15 ký tự',
+    ),
+  ];
+  List<TableRowData> _data = [];
+
+  void convertToTableData() {
+    _data =
+        _allSuppliers.map((supplier) {
+          return TableRowData(
+            id: supplier.id,
+            data: {
+              'name': supplier.name,
+              'address': supplier.address,
+              'phone': supplier.phone,
+            },
+          );
+        }).toList();
+  }
 
   @override
   void initState() {
     super.initState();
     _initializeSuppliers();
-    _idSearchController.addListener(_filterSuppliers);
-    _nameSearchController.addListener(_filterSuppliers);
-    _addressSearchController.addListener(_filterSuppliers);
-    _phoneSearchController.addListener(_filterSuppliers);
+    convertToTableData();
   }
 
   void _initializeSuppliers() {
@@ -74,409 +92,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
         phone: '0258147369',
       ),
     ];
-    _filteredSuppliers = List.from(_allSuppliers);
-  }
-
-  void _filterSuppliers() {
-    setState(() {
-      String idSearch = _idSearchController.text.toLowerCase().trim();
-      String nameSearch = _nameSearchController.text.toLowerCase().trim();
-      String addressSearch = _addressSearchController.text.toLowerCase().trim();
-      String phoneSearch = _phoneSearchController.text.toLowerCase().trim();
-
-      // If all search fields are empty, show all suppliers
-      if (idSearch.isEmpty && nameSearch.isEmpty && addressSearch.isEmpty && phoneSearch.isEmpty) {
-        _filteredSuppliers = List.from(_allSuppliers);
-        return;
-      }
-
-      _filteredSuppliers = _allSuppliers.where((supplier) {
-        bool matchesId = idSearch.isEmpty || supplier.id.toLowerCase().contains(idSearch);
-        bool matchesName = nameSearch.isEmpty || supplier.name.toLowerCase().contains(nameSearch);
-        bool matchesAddress = addressSearch.isEmpty || supplier.address.toLowerCase().contains(addressSearch);
-        bool matchesPhone = phoneSearch.isEmpty || supplier.phone.toLowerCase().contains(phoneSearch);
-        
-        // All non-empty search criteria must match (AND logic)
-        return matchesId && matchesName && matchesAddress && matchesPhone;
-      }).toList();
-    });
-  }
-
-  void _deleteSupplier(String id) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Xác nhận xóa'),
-          content: Text('Bạn có chắc chắn muốn xóa nhà cung cấp này?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Hủy'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _allSuppliers.removeWhere((supplier) => supplier.id == id);
-                  _filterSuppliers();
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Đã xóa nhà cung cấp thành công!')),
-                );
-              },
-              child: Text('Xóa', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showSupplierDetails(SupplierModel supplier) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Chi tiết nhà cung cấp'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow('Mã NCC:', supplier.id),
-              SizedBox(height: 8),
-              _buildDetailRow('Tên:', supplier.name),
-              SizedBox(height: 8),
-              _buildDetailRow('Địa chỉ:', supplier.address),
-              SizedBox(height: 8),
-              _buildDetailRow('Số điện thoại:', supplier.phone),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Đóng'),
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showEditSupplierDialog(supplier);
-              },
-              icon: Icon(Icons.edit),
-              label: Text('Chỉnh sửa'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showEditSupplierDialog(SupplierModel supplier) {
-    final TextEditingController nameController = TextEditingController(text: supplier.name);
-    final TextEditingController addressController = TextEditingController(text: supplier.address);
-    final TextEditingController phoneController = TextEditingController(text: supplier.phone);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            width: 500,
-            height: 600,
-            child: Column(
-              children: [
-                // Fixed Header
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      topRight: Radius.circular(4),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, color: Colors.orange[700]),
-                      SizedBox(width: 8),
-                      Text(
-                        'Chỉnh sửa thông tin nhà cung cấp',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Scrollable Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Read-only Supplier Code
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey[300]!),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Mã nhà cung cấp',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(Icons.lock, size: 16, color: Colors.grey[600]),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    supplier.id,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[700],
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Mã nhà cung cấp không thể thay đổi',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[500],
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        
-                        // Editable Name Field
-                        TextField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            labelText: 'Tên nhà cung cấp *',
-                            hintText: 'Nhập tên nhà cung cấp',
-                            prefixIcon: Icon(Icons.business),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.orange, width: 2),
-                            ),
-                          ),
-                          maxLines: null,
-                          minLines: 1,
-                        ),
-                        SizedBox(height: 16),
-                        
-                        // Editable Address Field
-                        TextField(
-                          controller: addressController,
-                          decoration: InputDecoration(
-                            labelText: 'Địa chỉ *',
-                            hintText: 'Nhập địa chỉ nhà cung cấp',
-                            prefixIcon: Icon(Icons.location_on),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.orange, width: 2),
-                            ),
-                          ),
-                          maxLines: null,
-                          minLines: 2,
-                        ),
-                        SizedBox(height: 16),
-                        
-                        // Editable Phone Field
-                        TextField(
-                          controller: phoneController,
-                          decoration: InputDecoration(
-                            labelText: 'Số điện thoại *',
-                            hintText: 'Nhập số điện thoại',
-                            prefixIcon: Icon(Icons.phone),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.orange, width: 2),
-                            ),
-                          ),
-                          keyboardType: TextInputType.phone,
-                          maxLines: 1,
-                        ),
-                        SizedBox(height: 12),
-                        
-                        // Info message
-                        Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.orange[50],
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.orange[200]!),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.info_outline, color: Colors.orange[700], size: 16),
-                              SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  'Các trường có dấu (*) là bắt buộc',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.orange[700],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                
-                // Fixed Footer with Action Buttons
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(4),
-                      bottomRight: Radius.circular(4),
-                    ),
-                    border: Border(
-                      top: BorderSide(color: Colors.grey[200]!),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text('Hủy'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey[600],
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          if (nameController.text.trim().isNotEmpty &&
-                              addressController.text.trim().isNotEmpty &&
-                              phoneController.text.trim().isNotEmpty) {
-                            
-                            // Check if any changes were made
-                            bool hasChanges = nameController.text.trim() != supplier.name ||
-                                             addressController.text.trim() != supplier.address ||
-                                             phoneController.text.trim() != supplier.phone;
-                            
-                            if (!hasChanges) {
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Không có thay đổi nào được thực hiện'),
-                                  backgroundColor: Colors.grey[600],
-                                ),
-                              );
-                              return;
-                            }
-
-                            // Update supplier information
-                            setState(() {
-                              int index = _allSuppliers.indexWhere((s) => s.id == supplier.id);
-                              if (index != -1) {
-                                _allSuppliers[index] = SupplierModel(
-                                  id: supplier.id, // Keep the same ID
-                                  name: nameController.text.trim(),
-                                  address: addressController.text.trim(),
-                                  phone: phoneController.text.trim(),
-                                );
-                                _filterSuppliers(); // Refresh the filtered list
-                              }
-                            });
-                            
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    Icon(Icons.check_circle, color: Colors.white),
-                                    SizedBox(width: 8),
-                                    Text('Đã cập nhật thông tin nhà cung cấp thành công!'),
-                                  ],
-                                ),
-                                backgroundColor: Colors.green,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Vui lòng điền đầy đủ thông tin bắt buộc!'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                        icon: Icon(Icons.save),
-                        label: Text('Cập nhật'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        Text(
-          value,
-          style: TextStyle(fontSize: 14),
-        ),
-      ],
-    );
   }
 
   void _showAddSupplierDialog() {
@@ -541,9 +156,10 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                     nameController.text.isNotEmpty &&
                     addressController.text.isNotEmpty &&
                     phoneController.text.isNotEmpty) {
-                  
                   // Check if ID already exists
-                  bool idExists = _allSuppliers.any((s) => s.id == idController.text);
+                  bool idExists = _allSuppliers.any(
+                    (s) => s.id == idController.text,
+                  );
                   if (idExists) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Mã nhà cung cấp đã tồn tại!')),
@@ -552,13 +168,14 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                   }
 
                   setState(() {
-                    _allSuppliers.add(SupplierModel(
-                      id: idController.text,
-                      name: nameController.text,
-                      address: addressController.text,
-                      phone: phoneController.text,
-                    ));
-                    _filterSuppliers();
+                    _allSuppliers.add(
+                      SupplierModel(
+                        id: idController.text,
+                        name: nameController.text,
+                        address: addressController.text,
+                        phone: phoneController.text,
+                      ),
+                    );
                   });
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -578,173 +195,48 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     );
   }
 
+  Future<void> _onUpdateSupplier(
+    String id,
+    Map<String, dynamic> updatedData,
+  ) async {
+    try {
+      // Call API by repository to update supplier
+      // Simulate API call with a delay
+      await Future.delayed(Duration(seconds: 1));
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> _onDeleteSupplier(String id) async {
+    try {
+      // Call API by repository to delete supplier
+      // Simulate API call with a delay
+      await Future.delayed(Duration(seconds: 1));
+      setState(() {
+        _allSuppliers.removeWhere((supplier) => supplier.id == id);
+        convertToTableData();
+      });
+    } catch (e) {
+      return;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Advanced Search Container
-          AdvancedSearchWidget(
-            count: 5, 
-            searchTerms: [
-              'Mã NCC',
-              'Tên nhà cung cấp',
-              'Địa chỉ',
-              'Số điện thoại',
-              'Tất cả'
-            ], 
-            iconTerms: [
-              Icons.code,
-              Icons.business,
-              Icons.location_on,
-              Icons.phone,
-              Icons.search
-            ], 
-            controllers: [
-              _idSearchController,
-              _nameSearchController,
-              _addressSearchController,
-              _phoneSearchController,
-              TextEditingController(), // Placeholder for "Tất cả"
-            ]
-          ),
-
-          // Supplier List
-          Expanded(
-            child: _filteredSuppliers.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'Không tìm thấy nhà cung cấp nào',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        if (_idSearchController.text.isNotEmpty ||
-                            _nameSearchController.text.isNotEmpty ||
-                            _addressSearchController.text.isNotEmpty ||
-                            _phoneSearchController.text.isNotEmpty) ...[
-                          SizedBox(height: 8),
-                          Text(
-                            'Thử điều chỉnh bộ lọc tìm kiếm',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: _filteredSuppliers.length,
-                    itemBuilder: (context, index) {
-                      final supplier = _filteredSuppliers[index];
-                      return Card(
-                        margin: EdgeInsets.only(bottom: 12),
-                        elevation: 2,
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              // Supplier Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue[100],
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            supplier.id,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue[800],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      supplier.name,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      supplier.address,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[600],
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.phone, size: 16, color: Colors.grey[600]),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          supplier.phone,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              
-                              // Action Buttons
-                              Column(
-                                children: [
-                                  IconButton(
-                                    onPressed: () => _showSupplierDetails(supplier),
-                                    icon: Icon(Icons.visibility),
-                                    color: Colors.blue,
-                                    tooltip: 'Xem chi tiết',
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _showEditSupplierDialog(supplier),
-                                    icon: Icon(Icons.edit),
-                                    color: Colors.orange,
-                                    tooltip: 'Chỉnh sửa',
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _deleteSupplier(supplier.id),
-                                    icon: Icon(Icons.delete),
-                                    color: Colors.red,
-                                    tooltip: 'Xóa',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                        ),
-                      );
-                    },
-                  ),
+          ReusableTableWidget(
+            title: 'Nhà Cung Cấp',
+            data: _data,
+            columns: _columns,
+            onUpdate: _onUpdateSupplier,
+            onDelete: _onDeleteSupplier,
           ),
         ],
       ),
-      
+
       // Add Button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddSupplierDialog,
@@ -758,10 +250,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
 
   @override
   void dispose() {
-    _idSearchController.dispose();
-    _nameSearchController.dispose();
-    _addressSearchController.dispose();
-    _phoneSearchController.dispose();
     super.dispose();
   }
 }
