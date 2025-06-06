@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/screens/reusable_widgets/advanced_search_widget.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/advanced_search_widgets.dart';
+
+// Ensure the file 'advanced_search_widget.dart' exists and contains the definition for AdvancedSearchWidget.
 
 class SupplierModel {
   final String id;
@@ -27,7 +29,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   final TextEditingController _nameSearchController = TextEditingController();
   final TextEditingController _addressSearchController = TextEditingController();
   final TextEditingController _phoneSearchController = TextEditingController();
-  
+
   List<SupplierModel> _allSuppliers = [];
   List<SupplierModel> _filteredSuppliers = [];
 
@@ -95,7 +97,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
         bool matchesName = nameSearch.isEmpty || supplier.name.toLowerCase().contains(nameSearch);
         bool matchesAddress = addressSearch.isEmpty || supplier.address.toLowerCase().contains(addressSearch);
         bool matchesPhone = phoneSearch.isEmpty || supplier.phone.toLowerCase().contains(phoneSearch);
-        
+
         // All non-empty search criteria must match (AND logic)
         return matchesId && matchesName && matchesAddress && matchesPhone;
       }).toList();
@@ -184,7 +186,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          child: Container(
+          child: SizedBox(
             width: 500,
             height: 600,
             child: Column(
@@ -214,7 +216,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                     ],
                   ),
                 ),
-                
+
                 // Scrollable Content
                 Expanded(
                   child: SingleChildScrollView(
@@ -270,7 +272,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        
+
                         // Editable Name Field
                         TextField(
                           controller: nameController,
@@ -290,7 +292,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           minLines: 1,
                         ),
                         SizedBox(height: 16),
-                        
+
                         // Editable Address Field
                         TextField(
                           controller: addressController,
@@ -310,7 +312,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           minLines: 2,
                         ),
                         SizedBox(height: 16),
-                        
+
                         // Editable Phone Field
                         TextField(
                           controller: phoneController,
@@ -330,7 +332,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           maxLines: 1,
                         ),
                         SizedBox(height: 12),
-                        
+
                         // Info message
                         Container(
                           padding: EdgeInsets.all(8),
@@ -359,7 +361,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Fixed Footer with Action Buttons
                 Container(
                   padding: EdgeInsets.all(20),
@@ -378,11 +380,11 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text('Hủy'),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey[600],
                           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
+                        child: Text('Hủy'),
                       ),
                       SizedBox(width: 12),
                       ElevatedButton.icon(
@@ -390,12 +392,12 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                           if (nameController.text.trim().isNotEmpty &&
                               addressController.text.trim().isNotEmpty &&
                               phoneController.text.trim().isNotEmpty) {
-                            
+
                             // Check if any changes were made
                             bool hasChanges = nameController.text.trim() != supplier.name ||
                                              addressController.text.trim() != supplier.address ||
                                              phoneController.text.trim() != supplier.phone;
-                            
+
                             if (!hasChanges) {
                               Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -414,13 +416,13 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                                 _allSuppliers[index] = SupplierModel(
                                   id: supplier.id, // Keep the same ID
                                   name: nameController.text.trim(),
-                                  address: addressController.text.trim(),
+                                 address: addressController.text.trim(),
                                   phone: phoneController.text.trim(),
                                 );
                                 _filterSuppliers(); // Refresh the filtered list
                               }
                             });
-                            
+
                             Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -541,7 +543,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                     nameController.text.isNotEmpty &&
                     addressController.text.isNotEmpty &&
                     phoneController.text.isNotEmpty) {
-                  
+
                   // Check if ID already exists
                   bool idExists = _allSuppliers.any((s) => s.id == idController.text);
                   if (idExists) {
@@ -586,21 +588,21 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
         children: [
           // Advanced Search Container
           AdvancedSearchWidget(
-            count: 5, 
+            count: 5,
             searchTerms: [
               'Mã NCC',
               'Tên nhà cung cấp',
               'Địa chỉ',
               'Số điện thoại',
               'Tất cả'
-            ], 
+            ],
             iconTerms: [
               Icons.code,
               Icons.business,
               Icons.location_on,
               Icons.phone,
               Icons.search
-            ], 
+            ],
             controllers: [
               _idSearchController,
               _nameSearchController,
@@ -710,7 +712,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
                                   ],
                                 ),
                               ),
-                              
+
                               // Action Buttons
                               Column(
                                 children: [
@@ -744,7 +746,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
           ),
         ],
       ),
-      
+
       // Add Button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddSupplierDialog,
