@@ -406,3 +406,4 @@ class _HomeScreenState extends State<HomeScreen> {
     GoRouter.of(context).go('/settings');
   }
 }
+
