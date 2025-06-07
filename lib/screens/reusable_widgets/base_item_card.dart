@@ -18,7 +18,7 @@ class BaseItemCard extends StatelessWidget {
   final bool isDense;
 
   const BaseItemCard({
-    Key? key,
+    super.key,
     required this.id,
     required this.title,
     this.subtitles,
@@ -34,7 +34,7 @@ class BaseItemCard extends StatelessWidget {
     this.statusColor,
     this.backgroundColor,
     this.isDense = false,
-  }) : super(key: key);
+  });
 
   Widget _buildDefaultTrailing() {
     return Row(

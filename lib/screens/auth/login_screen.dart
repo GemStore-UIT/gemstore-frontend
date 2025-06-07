@@ -93,12 +93,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 32),
-                        
+
                         // Username Field
                         TextFormField(
                           controller: _usernameController,
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             labelText: 'Tên đăng nhập',
                             hintText: 'Nhập tên đăng nhập',
@@ -122,13 +124,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _handleLogin(),
                           decoration: InputDecoration(
                             labelText: 'Mật khẩu',
                             hintText: 'Nhập mật khẩu',
@@ -167,9 +171,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Remember Me and Forgot Password
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,9 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Login Button
                         SizedBox(
                           height: 50,
@@ -234,9 +238,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Demo Login Info
                         Container(
                           padding: const EdgeInsets.all(12),
