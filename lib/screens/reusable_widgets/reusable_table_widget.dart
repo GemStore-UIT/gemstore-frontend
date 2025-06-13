@@ -31,24 +31,16 @@ class UpdateDialog extends StatefulWidget {
 
 class _UpdateDialogState extends State<UpdateDialog> {
   bool _isLoading = false;
-  bool _disposed = false;
 
   @override
   void dispose() {
-    _disposed = true;
     super.dispose();
-  }
-
-  void _safeSetState(VoidCallback fn) {
-    if (!_disposed && mounted) {
-      setState(fn);
-    }
   }
 
   Future<void> _handleUpdate() async {
     if (!widget.formKey.currentState!.validate()) return;
 
-    _safeSetState(() {
+    setState(() {
       _isLoading = true;
     });
 
@@ -60,15 +52,18 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
       await widget.onUpdate(updatedData);
 
-      if (!_disposed && mounted) {
+      if (mounted) {
         Navigator.of(context).pop();
       }
     } catch (error) {
-      if (!_disposed && mounted) {}
-    } finally {
-      _safeSetState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating data: $error')));
+      }
     }
   }
 
@@ -119,7 +114,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 _isLoading
                     ? null
                     : () {
-                      if (!_disposed && mounted) {
+                      if (mounted) {
                         Navigator.of(context).pop();
                       }
                     },
