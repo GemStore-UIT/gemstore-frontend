@@ -153,40 +153,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 12),
 
             // // Dark Mode Toggle
-            // Card(
-            //   child: ListTile(
-            //     leading: Container(
-            //       padding: const EdgeInsets.all(8),
-            //       decoration: BoxDecoration(
-            //         color: Colors.purple.withOpacity(0.1),
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //       child: Icon(
-            //         widget.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-            //         color: Colors.purple,
-            //         size: 24,
-            //       ),
-            //     ),
-            //     title: const Text(
-            //       'Chế độ tối',
-            //       style: TextStyle(fontWeight: FontWeight.w500),
-            //     ),
-            //     subtitle: Text(
-            //       widget.isDarkMode 
-            //           ? 'Đang sử dụng giao diện tối' 
-            //           : 'Đang sử dụng giao diện sáng',
-            //     ),
-            //     trailing: Switch(
-            //       value: widget.isDarkMode,
-            //       onChanged: (value) {
-            //         widget.onThemeChanged(value);
-            //       },
-            //       activeColor: theme.primaryColor,
-            //     ),
-            //   ),
-            // ),
+            Card(
+              child: ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    // widget.isDarkMode ? Icons.dark_mode : 
+                    Icons.light_mode,
+                    color: Colors.purple,
+                    size: 24,
+                  ),
+                ),
+                title: const Text(
+                  'Chế độ tối',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  // widget.isDarkMode 
+                  //     ? 'Đang sử dụng giao diện tối' 
+                  //     : 
+                      'Đang sử dụng giao diện sáng',
+                ),
+                trailing: Switch(
+                  value: false,//widget.isDarkMode,
+                  onChanged: (value) {
+                    // widget.onThemeChanged(value);
+                  },
+                  activeColor: theme.primaryColor,
+                ),
+              ),
+            ),
 
-            // const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
             // Language Setting (Placeholder)
             Card(

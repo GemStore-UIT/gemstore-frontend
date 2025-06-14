@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      //backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,14 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Return specific UI based on the selected function
     switch (selectedFunction) {
       case 'supplier_management':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.business, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Nhà cung cấp Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
-          ],
-        );
+        return NhaCungCapScreen();
       case 'unit_management':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
