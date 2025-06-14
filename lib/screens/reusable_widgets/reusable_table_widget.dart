@@ -166,7 +166,7 @@ class ReusableTableWidget extends StatefulWidget {
   final String title;
   final List<TableRowData> data;
   final List<TableColumn> columns;
-  final Function(String id, Map<String, dynamic> updatedData)? onUpdate;
+  final Function(TableRowData updatedData)? onUpdate;
   final Function(String id)? onDelete;
   final double? height;
   final EdgeInsets? padding;
@@ -213,7 +213,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
             formKey: formKey,
             onUpdate: (updatedData) async {
               if (widget.onUpdate != null) {
-                await widget.onUpdate!(rowData.id, updatedData);
+                await widget.onUpdate!(rowData);
               }
             },
           ),

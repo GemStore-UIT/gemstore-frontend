@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/features/home/data/nha_cung_cap_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_bloc.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class NhaCungCapScreen extends StatefulWidget {
@@ -10,7 +13,6 @@ class NhaCungCapScreen extends StatefulWidget {
 }
 
 class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
-  List<NhaCungCapModel> _items = [];
   final List<TableColumn> _columns = [
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
@@ -26,76 +28,14 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
       errorMessage: 'Số điện thoại phải từ 10 đến 15 ký tự',
     ),
   ];
-  List<TableRowData> _data = [];
   bool _isLoading = false;
-
-  void convertToTableData() {
-    _data =
-        _items.map((supplier) {
-          return TableRowData(
-            id: supplier.id,
-            data: {
-              'name': supplier.name,
-              'address': supplier.address,
-              'phone': supplier.phone,
-            },
-          );
-        }).toList();
-  }
 
   @override
   void initState() {
     super.initState();
-    _initializeItems();
-  }
-
-  Future<void> _initializeItems() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      // Simulate a network call to fetch suppliers      await Future.delayed(Duration(seconds: 1));
-      _items = [
-        NhaCungCapModel(
-          id: 'NCC001',
-          name: 'Công ty TNHH ABC',
-          address: '123 Đường Nguyễn Văn A, Quận 1, TP.HCM',
-          phone: '0123456789',
-        ),
-        NhaCungCapModel(
-          id: 'NCC002',
-          name: 'Công ty Cổ phần DEF',
-          address: '456 Đường Lê Văn B, Quận 2, TP.HCM',
-          phone: '0987654321',
-        ),
-        NhaCungCapModel(
-          id: 'NCC003',
-          name: 'Doanh nghiệp GHI',
-          address: '789 Đường Trần Văn C, Quận 3, TP.HCM',
-          phone: '0369852147',
-        ),
-        NhaCungCapModel(
-          id: 'NCC004',
-          name: 'Công ty XYZ Ltd',
-          address: '321 Đường Phạm Văn D, Quận 4, TP.HCM',
-          phone: '0741258963',
-        ),
-        NhaCungCapModel(
-          id: 'NCC005',
-          name: 'Nhà cung cấp MNO',
-          address: '654 Đường Hoàng Văn E, Quận 5, TP.HCM',
-          phone: '0258147369',
-        ),
-      ];
-      // Convert items to table data after loading
-      convertToTableData();
-    } catch (e) {
-      // Handle error
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchData();
+    });
   }
 
   void _showAddSupplierDialog() {
@@ -156,38 +96,11 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (idController.text.isNotEmpty &&
-                    nameController.text.isNotEmpty &&
-                    addressController.text.isNotEmpty &&
-                    phoneController.text.isNotEmpty) {
-                  // Check if ID already exists
-                  bool idExists = _items.any((s) => s.id == idController.text);
-                  if (idExists) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Mã nhà cung cấp đã tồn tại!')),
-                    );
-                    return;
-                  }
-                  setState(() {
-                    _items.add(
-                      NhaCungCapModel(
-                        id: idController.text,
-                        name: nameController.text,
-                        address: addressController.text,
-                        phone: phoneController.text,
-                      ),
-                    );
-                    convertToTableData();
-                  });
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã thêm nhà cung cấp thành công!')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vui lòng điền đầy đủ thông tin!')),
-                  );
-                }
+                _onAddNhaCungCap(
+                  nameController.text,
+                  addressController.text,
+                  phoneController.text,
+                );
               },
               child: Text('Thêm'),
             ),
@@ -197,80 +110,45 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     );
   }
 
-  Future<void> _onUpdateNhaCungCap(
-    String id,
-    Map<String, dynamic> updatedData,
-  ) async {
-    try {
-      // Call API by repository to update supplier
-      // Simulate API call with a delay
-      setState(() {
-        _isLoading = true;
-      });
-      await Future.delayed(Duration(seconds: 1));
-
-      // Update the local data
-      final index = _items.indexWhere((item) => item.id == id);
-      if (index != -1) {
-        setState(() {
-          _items[index] = NhaCungCapModel(
-            id: id,
-            name: updatedData['name'] as String,
-            address: updatedData['address'] as String,
-            phone: updatedData['phone'] as String,
-          );
-          convertToTableData();
-        });
-      }
-    } catch (e) {
-      return;
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _onDeleteNhaCungCap(String id) async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      // Call API by repository to delete supplier
-      // Simulate API call with a delay
-      await Future.delayed(Duration(seconds: 1));
-      setState(() {
-        _items.removeWhere((supplier) => supplier.id == id);
-        convertToTableData();
-      });
-    } catch (e) {
-      return;
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _onAddNhaCungCap() async {
-    // This function is not used in the current implementation
-    // It can be used to add a new supplier if needed
-  }
   @override
   Widget build(BuildContext context) {
+    final nhacungcapState = context.watch<NhaCungCapBloc>().state;
+    var nhacungcapScreen = (switch (nhacungcapState) {
+      NhaCungCapInitial() => Container(),
+      NhaCungCapLoading() => Container(),
+      NhaCungCapFetchingSuccess() => ReusableTableWidget(
+        title: 'Nhà Cung Cấp',
+        data: nhacungcapState.data,
+        columns: _columns,
+        onUpdate: _onUpdateNhaCungCap,
+        onDelete: _onDeleteNhaCungCap,
+      ),
+      NhaCungCapFetchingFailure() => Center(child: Text('Lỗi khi tải dữ liệu: ${nhacungcapState.error}')),
+    });    
+    nhacungcapScreen = BlocListener<NhaCungCapBloc, NhaCungCapState>(
+      listener: (context, state) {
+        switch (state) {
+          case NhaCungCapLoading():
+            setState(() {
+              _isLoading = true;
+            });
+            break;
+          default:
+            setState(() {
+              _isLoading = false;
+            });
+            break;
+        }
+      },
+      child: nhacungcapScreen,
+    );
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
           Stack(
             children: [
-              ReusableTableWidget(
-                title: 'Nhà Cung Cấp',
-                data: _data,
-                columns: _columns,
-                onUpdate: _onUpdateNhaCungCap,
-                onDelete: _onDeleteNhaCungCap,
-              ),
+              nhacungcapScreen,
               if (_isLoading)
                 Positioned.fill(
                   child: Container(
@@ -297,5 +175,30 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onUpdateNhaCungCap(TableRowData row) {
+    context.read<NhaCungCapBloc>().add(
+      NhaCungCapEventUpdate(
+        maNCC: row.id,
+        tenNCC: row.data['name'],
+        diaChi: row.data['address'],
+        sdt: row.data['phone'],
+      ),
+    );
+  }
+
+  void _onDeleteNhaCungCap(String id) {
+    context.read<NhaCungCapBloc>().add(NhaCungCapEventDelete(maNCC: id));
+  }
+
+  void _fetchData() {
+    context.read<NhaCungCapBloc>().add(NhaCungCapEventGetAll());
+  }
+
+  void _onAddNhaCungCap(String tenNCC, String diaChi, String sdt) {
+    context.read<NhaCungCapBloc>().add(
+      NhaCungCapEventAdd(tenNCC: tenNCC, diaChi: diaChi, sdt: sdt),
+    );
   }
 }
