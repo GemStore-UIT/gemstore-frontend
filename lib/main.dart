@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/config/http_client.dart';
 import 'package:gemstore_frontend/config/router.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/don_vi_tinh_api.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/don_vi_tinh_repository.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_bloc.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap_api.dart';
@@ -21,6 +25,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(
           create: (context) => NhaCungCapRepository(NhaCungCapApi(dio)),
         ),
+        RepositoryProvider(
+          create: (context) => DonViTinhRepository(DonViTinhApi(dio)),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -28,6 +35,10 @@ class MyApp extends StatelessWidget {
             create:
                 (context) =>
                     NhaCungCapBloc(context.read<NhaCungCapRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) => DonViTinhBloc(context.read<DonViTinhRepository>()),
           ),
         ],
         child: AppContent(),
@@ -48,6 +59,7 @@ class _AppContentState extends State<AppContent> {
   void initState() {
     super.initState();
     context.read<NhaCungCapBloc>().add(NhaCungCapEventStart());
+    context.read<DonViTinhBloc>().add(DonViTinhEventStart());
   }
 
   @override

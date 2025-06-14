@@ -20,7 +20,7 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
     Emitter<NhaCungCapState> emit,
   ) {
     emit(NhaCungCapInitial());
-  } 
+  }
 
   void _onAdd(
     NhaCungCapEventAdd event,
