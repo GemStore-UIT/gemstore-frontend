@@ -112,56 +112,43 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final nhacungcapState = context.watch<NhaCungCapBloc>().state;
-    var nhacungcapScreen = (switch (nhacungcapState) {
-      NhaCungCapInitial() => Container(),
-      NhaCungCapLoading() => Container(),
-      NhaCungCapFetchingSuccess() => ReusableTableWidget(
-        title: 'Nhà Cung Cấp',
-        data: nhacungcapState.data,
-        columns: _columns,
-        onUpdate: _onUpdateNhaCungCap,
-        onDelete: _onDeleteNhaCungCap,
-      ),
-      NhaCungCapFetchingFailure() => Center(child: Text('Lỗi khi tải dữ liệu: ${nhacungcapState.error}')),
-    });    
-    nhacungcapScreen = BlocListener<NhaCungCapBloc, NhaCungCapState>(
-      listener: (context, state) {
-        switch (state) {
-          case NhaCungCapLoading():
-            setState(() {
-              _isLoading = true;
-            });
-            break;
-          default:
-            setState(() {
-              _isLoading = false;
-            });
-            break;
-        }
-      },
-      child: nhacungcapScreen,
-    );
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Stack(
+      body: BlocConsumer<NhaCungCapBloc, NhaCungCapState>(
+        listener: (context, state) {
+          setState(() {
+            _isLoading = state is NhaCungCapLoading;
+          });
+        },
+        builder: (context, state) {
+          return Stack(
             children: [
-              nhacungcapScreen,
+              switch (state) {
+                NhaCungCapInitial() => Center(child: Text('Khởi tạo...')),
+                NhaCungCapLoading() => Container(), // or some placeholder
+                NhaCungCapFetchingSuccess() => ReusableTableWidget(
+                  title: 'Nhà Cung Cấp',
+                  data: state.data,
+                  columns: _columns,
+                  onUpdate: _onUpdateNhaCungCap,
+                  onDelete: _onDeleteNhaCungCap,
+                ),
+                NhaCungCapFetchingFailure() => Center(
+                  child: Text('Lỗi khi tải dữ liệu: ${state.error}'),
+                ),
+              },
+              // Loading overlay
               if (_isLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black54,
-                    child: Center(child: CircularProgressIndicator()),
+                Container(
+                  color: Colors.black12,
+                  child: Center(
+                    child: CircularProgressIndicator(color: Colors.white),
                   ),
                 ),
             ],
-          ),
-        ],
+          );
+        },
       ),
-
-      // Add Button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddSupplierDialog,
         icon: Icon(Icons.add),
