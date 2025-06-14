@@ -14,6 +14,7 @@ class DonViTinhScreen extends StatefulWidget {
 
 class _DonViTinhScreenState extends State<DonViTinhScreen> {
   final List<TableColumn> _columns = [
+    TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 1),
     TableColumn(key: 'name', header: 'Đơn vị tính', width: 2),
   ];
   bool _isLoading = false;
