@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -74,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        
+
                         // Main Content Area
                         Expanded(
                           child: Padding(
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ] : [],
                                 ),
                                 const SizedBox(height: 16.0),
-                                
+
                                 // Import Export Section
                                 _buildExpandableSection(
                                   title: 'Phiếu nhập xuất',
@@ -115,11 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ] : [],
                                 ),
                                 const SizedBox(height: 16.0),
-                                
+
                                 // Product List Section
                                 _buildMenuItemWithDot('Danh sách sản phẩm', 'product_list'),
                                 const SizedBox(height: 16.0),
-                                
+
                                 // Reports Section
                                 _buildMenuItemWithDot('Báo cáo', 'reports'),
                               ],
@@ -129,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  
+
                   // Right side - Function screen
                   if (selectedFunction != null)
                     Expanded(
@@ -161,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            
+
                             // Function screen content
                             Expanded(
                               child: Center(
@@ -182,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildExpandableSection({
-    required String title, 
+    required String title,
     required List<Widget> items,
     required bool isExpanded,
     required VoidCallback onTap,
@@ -211,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 4.0),
                 Icon(
-                  isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, 
+                  isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                   size: 20.0
                 ),
               ],
@@ -233,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuItem(String title, String functionId) {
     final isSelected = selectedFunction == functionId;
     final dotSize = 12.0;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -275,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuItemWithDot(String title, String functionId) {
     final isSelected = selectedFunction == functionId;
     final dotSize = 12.0;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -288,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(20.0),
-          border: isSelected 
-              ? Border.all(color: Colors.blue, width: 2.0) 
+          border: isSelected
+              ? Border.all(color: Colors.blue, width: 2.0)
               : null,
         ),
         child: Row(
@@ -317,21 +318,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Widget _buildFunctionScreen() {
     // Return specific UI based on the selected function
     switch (selectedFunction) {
       case 'supplier_management':
         return NhaCungCapScreen();
       case 'unit_management':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.straighten, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Đơn vị tính Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
-          ],
-        );
+        return DonViTinhScreen();
       case 'product_type_management':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.touch_app, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Select a function from the menu', 
+            Text('Select a function from the menu',
                 style: TextStyle(fontSize: 20, color: Colors.grey[600])),
           ],
         );
