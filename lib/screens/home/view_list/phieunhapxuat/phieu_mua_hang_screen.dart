@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/bill_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuMuaHangScreen extends StatefulWidget {
@@ -14,8 +15,8 @@ class PhieuMuaHangScreen extends StatefulWidget {
 
 class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã phiếu mua hàng', width: 2),
-    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
+    TableColumn(key: 'id', header: 'Mã phiếu mua hàng', width: 3),
+    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
     TableColumn(key: 'date', header: 'Ngày lập', width: 2),
     TableColumn(key: 'total', header: 'Tổng tiền', width: 2),
   ];
@@ -31,107 +32,10 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   }
 
   void _showAddPhieuMuaHangDialog() {
-    String? selectedSP;
-    String? tenLSP;
-    String? donViTinhSP;
-    String? donGiaMuaSP;
-
-    final TextEditingController maNCCController = TextEditingController();
-    final TextEditingController ngayLapController = TextEditingController();
-    final TextEditingController thanhTienController = TextEditingController();
-    final TextEditingController soLuongController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thêm Phiếu Mua Hàng'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: maNCCController,
-                  decoration: InputDecoration(labelText: 'Mã Nhà Cung Cấp'),
-                ),
-                TextField(
-                  controller: ngayLapController,
-                  decoration: InputDecoration(labelText: 'Ngày Lập'),
-                ),
-                TextField(
-                  controller: thanhTienController,
-                  decoration: InputDecoration(labelText: 'Thành Tiền'),
-                ),
-                DropdownButtonFormField<String>(
-                  value: selectedSP,
-                  hint: Text('Chọn Sản Phẩm'),
-                  items:
-                      _listSanPham.map((sp) {
-                        return DropdownMenuItem<String>(
-                          value: sp['maSanPham'],
-                          child: Text(sp['tenSanPham']),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSP = value;
-                      tenLSP =
-                          _listSanPham.firstWhere(
-                            (sp) => sp['maSanPham'] == value,
-                            orElse: () => {},
-                          )['loaiSanPham'];
-                      donViTinhSP =
-                          _listSanPham.firstWhere(
-                            (sp) => sp['maSanPham'] == value,
-                            orElse: () => {},
-                          )['donViTinh'];
-                      donGiaMuaSP =
-                          _listSanPham
-                              .firstWhere(
-                                (sp) => sp['maSanPham'] == value,
-                                orElse: () => {},
-                              )['donGia']
-                              .toString();
-                    });
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Loại Sản Phẩm'),
-                  readOnly: true,
-                  controller: TextEditingController(text: tenLSP ?? ''),
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Đơn Vị Tính'),
-                  readOnly: true,
-                  controller: TextEditingController(text: donViTinhSP ?? ''),
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Đơn Giá Mua'),
-                  readOnly: true,
-                  controller: TextEditingController(text: donGiaMuaSP ?? ''),
-                ),
-                TextField(
-                  controller: soLuongController,
-                  decoration: InputDecoration(labelText: 'Số Lượng'),
-                  keyboardType: TextInputType.number,
-                ),                
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Thêm phiếu mua hàng'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Hủy'),
-            ),
-          ],
-        );
+        return BillCreateDialog(title: "Thêm Phiếu Mua Hàng", listSanPham: _listSanPham, onCreate: _onAddPhieuMuaHang);
       },
     );
   }
@@ -191,7 +95,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddPhieuMuaHangDialog,
         icon: Icon(Icons.add),
-        label: Text('Thêm Phieu Mua Hang'),
+        label: Text('Thêm Phiếu Mua Hàng'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
@@ -224,12 +128,6 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
         thanhTien: thanhTien,
         sanPhamMua: sanPhamMua,
       ),
-    );
-  }
-
-  void _onGetById(String maPhieu) {
-    context.read<PhieuMuaHangBloc>().add(
-      PhieuMuaHangEventGetById(maPhieu: maPhieu),
     );
   }
 }

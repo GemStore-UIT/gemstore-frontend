@@ -1,24 +1,27 @@
-import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap.dart';
-
 class PhieuMuaHang {
   String soPhieuMH;
   String ngayLap;
-  NhaCungCap nhaCungCap;
+  String tenNhaCungCap;
   int tongTien;
+  List<SanPhamMua> chiTiet;
 
   PhieuMuaHang({
     required this.soPhieuMH,
     required this.ngayLap,
-    required this.nhaCungCap,
+    required this.tenNhaCungCap,
     required this.tongTien,
+    required this.chiTiet,
   });
 
   factory PhieuMuaHang.fromJson(Map<String, dynamic> json) {
     return PhieuMuaHang(
       soPhieuMH: json['soPhieuMH'],
       ngayLap: json['ngayLap'],
-      nhaCungCap: NhaCungCap.fromJson(json['nhaCungCap']),
+      tenNhaCungCap: json['tenNhaCungCap'],
       tongTien: json['tongTien'],
+      chiTiet: (json['chiTiet'] as List)
+          .map((item) => SanPhamMua.fromJson(item))
+          .toList(),
     );
   }
 }
@@ -27,13 +30,13 @@ class SanPhamMua {
   String maSanPham;
   String tenSanPham;
   int soLuong;
-  int donGia;
+  int thanhTien;
 
   SanPhamMua({
     required this.maSanPham,
     required this.tenSanPham,
     required this.soLuong,
-    required this.donGia,
+    required this.thanhTien,
   });
 
   factory SanPhamMua.fromJson(Map<String, dynamic> json) {
@@ -41,7 +44,7 @@ class SanPhamMua {
       maSanPham: json['maSanPham'],
       tenSanPham: json['tenSanPham'],
       soLuong: json['soLuong'],
-      donGia: json['donGia'],
+      thanhTien: json['thanhTien'],
     );
   }
 }

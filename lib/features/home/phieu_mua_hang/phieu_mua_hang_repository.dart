@@ -37,7 +37,7 @@ class PhieuMuaHangRepository {
       return TableRowData(
         id: phieu.soPhieuMH,
         data: {
-          'name': phieu.nhaCungCap.tenNCC,
+          'name': phieu.tenNhaCungCap,
           'date': phieu.ngayLap,
           'total': MoneyFormat.format(phieu.tongTien),
         },
