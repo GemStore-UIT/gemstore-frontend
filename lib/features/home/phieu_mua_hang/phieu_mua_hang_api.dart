@@ -39,5 +39,20 @@ class PhieuMuaHangApi {
       throw Exception('Failed to create phieu mua hang: $e');
     }
   }
+
+  Future<List<Map<String, dynamic>>> getListSanPham() async {
+    try {
+      final response = await dio.get('/api/sanpham');
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+      } else {
+        throw Exception('Failed to load products');
+      }
+    } catch (e) {
+      throw Exception('API Error: $e');
+    }
+  }
   
 }

@@ -4,7 +4,8 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_repository.dart';
 
 class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
-  PhieuMuaHangBloc(this.phieuMuaHangRepository) : super(PhieuMuaHangStateInitial()) {
+  PhieuMuaHangBloc(this.phieuMuaHangRepository)
+    : super(PhieuMuaHangStateInitial()) {
     on<PhieuMuaHangEventStart>(_onStart);
     on<PhieuMuaHangEventAdd>(_onAdd);
     on<PhieuMuaHangEventGetAll>(_onGetAll);
@@ -13,10 +14,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
 
   final PhieuMuaHangRepository phieuMuaHangRepository;
 
-  void _onStart(
-    PhieuMuaHangEventStart event,
-    Emitter<PhieuMuaHangState> emit,
-  ) {
+  void _onStart(PhieuMuaHangEventStart event, Emitter<PhieuMuaHangState> emit) {
     emit(PhieuMuaHangStateInitial());
   }
 
@@ -33,7 +31,13 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
         event.sanPhamMua,
       );
       final data = await phieuMuaHangRepository.getAll();
-      emit(PhieuMuaHangStateSuccess(phieuMuaHangRepository.convertToTableRowData(data)));
+      final listSanPham = await phieuMuaHangRepository.getListSanPham();
+      emit(
+        PhieuMuaHangStateSuccess(
+          phieuMuaHangRepository.convertToTableRowData(data),
+          listSanPham,
+        ),
+      );
     } catch (e) {
       emit(PhieuMuaHangStateFailure(e.toString()));
     }
@@ -46,7 +50,13 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     try {
       emit(PhieuMuaHangStateLoading());
       final data = await phieuMuaHangRepository.getAll();
-      emit(PhieuMuaHangStateSuccess(phieuMuaHangRepository.convertToTableRowData(data)));
+      final listSanPham = await phieuMuaHangRepository.getListSanPham();
+      emit(
+        PhieuMuaHangStateSuccess(
+          phieuMuaHangRepository.convertToTableRowData(data),
+          listSanPham,
+        ),
+      );
     } catch (e) {
       emit(PhieuMuaHangStateFailure(e.toString()));
     }
@@ -64,6 +74,4 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       emit(PhieuMuaHangStateGetDetailFailure(e.toString()));
     }
   }
-
-  
 }

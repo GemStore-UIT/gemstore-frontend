@@ -24,6 +24,14 @@ class PhieuMuaHangRepository {
     return await phieuMuaHangApi.getById(maPhieu);
   }
 
+  Future<List<Map<String, dynamic>>> getListSanPham() async {
+    try {
+      return await phieuMuaHangApi.getListSanPham();
+    } catch (e) {
+      throw Exception('Repository Error: $e');
+    }
+  }
+
   List<TableRowData> convertToTableRowData(List<PhieuMuaHang> data) {
     return data.map((phieu) {
       return TableRowData(

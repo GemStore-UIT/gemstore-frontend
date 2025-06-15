@@ -20,6 +20,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     TableColumn(key: 'total', header: 'Tổng tiền', width: 2),
   ];
   bool _isLoading = false;
+  final List<Map<String, dynamic>> _listSanPham = [];
 
   @override
   void initState() {
@@ -30,76 +31,109 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   }
 
   void _showAddPhieuMuaHangDialog() {
-    // final TextEditingController maNCCController = TextEditingController();
-    // final TextEditingController ngayLapController = TextEditingController();
-    // final TextEditingController thanhTienController = TextEditingController();
-    // final List<Map<String, dynamic>> sanPhamMua = [];
+    String? selectedSP;
+    String? tenLSP;
+    String? donViTinhSP;
+    String? donGiaMuaSP;
 
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //       title: Text('Thêm nhà cung cấp mới'),
-    //       content: SingleChildScrollView(
-    //         child: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             TextField(
-    //               controller: idController,
-    //               decoration: InputDecoration(
-    //                 labelText: 'Mã nhà cung cấp',
-    //                 border: OutlineInputBorder(),
-    //               ),
-    //             ),
-    //             SizedBox(height: 16),
-    //             TextField(
-    //               controller: nameController,
-    //               decoration: InputDecoration(
-    //                 labelText: 'Tên nhà cung cấp',
-    //                 border: OutlineInputBorder(),
-    //               ),
-    //             ),
-    //             SizedBox(height: 16),
-    //             TextField(
-    //               controller: addressController,
-    //               decoration: InputDecoration(
-    //                 labelText: 'Địa chỉ',
-    //                 border: OutlineInputBorder(),
-    //               ),
-    //               maxLines: 2,
-    //             ),
-    //             SizedBox(height: 16),
-    //             TextField(
-    //               controller: phoneController,
-    //               decoration: InputDecoration(
-    //                 labelText: 'Số điện thoại',
-    //                 border: OutlineInputBorder(),
-    //               ),
-    //               keyboardType: TextInputType.phone,
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //       actions: [
-    //         TextButton(
-    //           onPressed: () => Navigator.of(context).pop(),
-    //           child: Text('Hủy'),
-    //         ),
-    //         ElevatedButton(
-    //           onPressed: () {
-    //             _onAddNhaCungCap(
-    //               nameController.text,
-    //               addressController.text,
-    //               phoneController.text,
-    //             );
-    //           },
-    //           child: Text('Thêm'),
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
-  
+    final TextEditingController maNCCController = TextEditingController();
+    final TextEditingController ngayLapController = TextEditingController();
+    final TextEditingController thanhTienController = TextEditingController();
+    final TextEditingController soLuongController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Thêm Phiếu Mua Hàng'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: maNCCController,
+                  decoration: InputDecoration(labelText: 'Mã Nhà Cung Cấp'),
+                ),
+                TextField(
+                  controller: ngayLapController,
+                  decoration: InputDecoration(labelText: 'Ngày Lập'),
+                ),
+                TextField(
+                  controller: thanhTienController,
+                  decoration: InputDecoration(labelText: 'Thành Tiền'),
+                ),
+                DropdownButtonFormField<String>(
+                  value: selectedSP,
+                  hint: Text('Chọn Sản Phẩm'),
+                  items:
+                      _listSanPham.map((sp) {
+                        return DropdownMenuItem<String>(
+                          value: sp['maSanPham'],
+                          child: Text(sp['tenSanPham']),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSP = value;
+                      tenLSP =
+                          _listSanPham.firstWhere(
+                            (sp) => sp['maSanPham'] == value,
+                            orElse: () => {},
+                          )['loaiSanPham'];
+                      donViTinhSP =
+                          _listSanPham.firstWhere(
+                            (sp) => sp['maSanPham'] == value,
+                            orElse: () => {},
+                          )['donViTinh'];
+                      donGiaMuaSP =
+                          _listSanPham
+                              .firstWhere(
+                                (sp) => sp['maSanPham'] == value,
+                                orElse: () => {},
+                              )['donGia']
+                              .toString();
+                    });
+                  },
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Loại Sản Phẩm'),
+                  readOnly: true,
+                  controller: TextEditingController(text: tenLSP ?? ''),
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Đơn Vị Tính'),
+                  readOnly: true,
+                  controller: TextEditingController(text: donViTinhSP ?? ''),
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Đơn Giá Mua'),
+                  readOnly: true,
+                  controller: TextEditingController(text: donGiaMuaSP ?? ''),
+                ),
+                TextField(
+                  controller: soLuongController,
+                  decoration: InputDecoration(labelText: 'Số Lượng'),
+                  keyboardType: TextInputType.number,
+                ),                
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Thêm phiếu mua hàng'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Hủy'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -110,14 +144,21 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
         listener: (context, state) {
           setState(() {
             _isLoading = state is PhieuMuaHangStateLoading;
+            if (state is PhieuMuaHangStateSuccess) {
+              _listSanPham.clear();
+              _listSanPham.addAll(state.listSanPham);
+            }
           });
         },
         builder: (context, state) {
           return Stack(
             children: [
               switch (state) {
-                PhieuMuaHangStateInitial() => Center(child: Text('Khởi tạo...')),
-                PhieuMuaHangStateLoading() => Container(), // or some placeholder
+                PhieuMuaHangStateInitial() => Center(
+                  child: Text('Khởi tạo...'),
+                ),
+                PhieuMuaHangStateLoading() =>
+                  Container(), // or some placeholder
                 PhieuMuaHangStateSuccess() => ReusableTableWidget(
                   title: 'Phiếu Mua Hàng',
                   data: state.phieuMuaHangs,
@@ -162,18 +203,20 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     super.dispose();
   }
 
-  void _onUpdatePhieuMuaHang(TableRowData row) {
+  void _onUpdatePhieuMuaHang(TableRowData row) {}
 
-  }
-
-  void _onDeletePhieuMuaHang(String id) {
-  }
+  void _onDeletePhieuMuaHang(String id) {}
 
   void _onGetAll() {
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
   }
 
-  void _onAddPhieuMuaHang(String maNCC, String ngayLap, double thanhTien, List<Map<String, dynamic>> sanPhamMua) {
+  void _onAddPhieuMuaHang(
+    String maNCC,
+    String ngayLap,
+    double thanhTien,
+    List<Map<String, dynamic>> sanPhamMua,
+  ) {
     context.read<PhieuMuaHangBloc>().add(
       PhieuMuaHangEventAdd(
         maNCC: maNCC,
@@ -185,6 +228,8 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   }
 
   void _onGetById(String maPhieu) {
-    context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetById(maPhieu: maPhieu));
+    context.read<PhieuMuaHangBloc>().add(
+      PhieuMuaHangEventGetById(maPhieu: maPhieu),
+    );
   }
 }

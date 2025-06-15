@@ -9,8 +9,26 @@ class PhieuMuaHangStateLoading extends PhieuMuaHangState {}
 
 class PhieuMuaHangStateSuccess extends PhieuMuaHangState {
   final List<TableRowData> phieuMuaHangs;
-
-  PhieuMuaHangStateSuccess(this.phieuMuaHangs);
+  final List<Map<String, dynamic>> listSanPham;
+  /*
+  [
+    {
+      "maSanPham": "SP001",
+      "tenSanPham": "Sản phẩm 1",
+      "loaiSanPham": "Loại 1",
+      "donViTinh": "Cái",
+      "donGia": 10000
+    },
+    {
+      "maSanPham": "SP002",
+      "tenSanPham": "Sản phẩm 2",
+      "loaiSanPham": "Loại 2",
+      "donViTinh": "Cái",
+      "donGia": 20000
+    }
+  ]
+  */
+  PhieuMuaHangStateSuccess(this.phieuMuaHangs, this.listSanPham);
 }
 
 class PhieuMuaHangStateFailure extends PhieuMuaHangState {

@@ -22,3 +22,26 @@ class PhieuMuaHang {
     );
   }
 }
+
+class SanPhamMua {
+  String maSanPham;
+  String tenSanPham;
+  int soLuong;
+  int donGia;
+
+  SanPhamMua({
+    required this.maSanPham,
+    required this.tenSanPham,
+    required this.soLuong,
+    required this.donGia,
+  });
+
+  factory SanPhamMua.fromJson(Map<String, dynamic> json) {
+    return SanPhamMua(
+      maSanPham: json['maSanPham'],
+      tenSanPham: json['tenSanPham'],
+      soLuong: json['soLuong'],
+      donGia: json['donGia'],
+    );
+  }
+}
