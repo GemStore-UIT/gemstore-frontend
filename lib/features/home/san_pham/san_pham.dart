@@ -18,14 +18,4 @@ class SanPham {
     required this.donGia,
     required this.tonKho,
   });
-
-  Map<String, dynamic> toPhieuMuaHang() {
-    return {
-      'maSanPham': maSanPham,
-      'tenSanPham': tenSanPham,
-      'maLSP': maLSP,
-      'maDVT': maDVT,
-      'donGia': donGia,
-    };
-  }
 }
