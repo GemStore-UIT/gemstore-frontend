@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -354,14 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       case 'purchase_invoice':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.shopping_cart, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Phiếu mua hàng Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
-          ],
-        );
+        return PhieuMuaHangScreen();
       case 'service_invoice':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
