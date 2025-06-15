@@ -1,13 +1,15 @@
+import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap.dart';
+
 class PhieuMuaHang {
   String soPhieuMH;
   String ngayLap;
-  String maNCC;
-  double tongTien;
+  NhaCungCap nhaCungCap;
+  int tongTien;
 
   PhieuMuaHang({
     required this.soPhieuMH,
     required this.ngayLap,
-    required this.maNCC,
+    required this.nhaCungCap,
     required this.tongTien,
   });
 
@@ -15,7 +17,7 @@ class PhieuMuaHang {
     return PhieuMuaHang(
       soPhieuMH: json['soPhieuMH'],
       ngayLap: json['ngayLap'],
-      maNCC: json['maNCC'],
+      nhaCungCap: NhaCungCap.fromJson(json['nhaCungCap']),
       tongTien: json['tongTien'],
     );
   }

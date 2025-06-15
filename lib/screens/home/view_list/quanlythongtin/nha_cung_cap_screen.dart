@@ -14,13 +14,13 @@ class NhaCungCapScreen extends StatefulWidget {
 
 class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã nhà cung cấp', width: 1),
+    TableColumn(key: 'id', header: 'Mã nhà cung cấp', width: 2),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
     TableColumn(
       key: 'phone',
       header: 'Số điện thoại',
-      width: 2,
+      width: 1,
       validator:
           (value) =>
               (value.trim().length < 10 || value.trim().length > 15)

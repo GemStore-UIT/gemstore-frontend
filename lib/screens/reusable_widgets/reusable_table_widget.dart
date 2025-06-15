@@ -383,10 +383,6 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      Expanded(child: Container(
-                                        alignment: Alignment.centerLeft,
-                                        child: _buildCell(widget.columns.first, rowData.id, false)
-                                      )),
                                       ...widget.columns.map(
                                         (column) => Expanded(
                                           flex: column.width?.toInt() ?? 1,
@@ -394,7 +390,9 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                                             alignment: Alignment.centerLeft,
                                             child: _buildCell(
                                               column,
-                                              rowData.data[column.key],
+                                                widget.columns.indexOf(column) == 0
+                                                  ? rowData.id
+                                                  : rowData.data[column.key],
                                               false,
                                             ),
                                           ),

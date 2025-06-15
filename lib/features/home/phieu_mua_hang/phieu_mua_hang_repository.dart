@@ -1,3 +1,4 @@
+import 'package:gemstore_frontend/config/money_format.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_api.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
@@ -8,7 +9,11 @@ class PhieuMuaHangRepository {
   PhieuMuaHangRepository(this.phieuMuaHangApi);
 
   Future<List<PhieuMuaHang>> getAll() async {
-    return await phieuMuaHangApi.getAll();
+    try {
+      return await phieuMuaHangApi.getAll();
+    } catch (e) {
+      throw Exception('Repository Error: $e');
+    }
   }
 
   Future<void> create(String maNCC, String ngayLap, double thanhTien, List<Map<String, dynamic>> sanPhamMua) async {
@@ -24,9 +29,9 @@ class PhieuMuaHangRepository {
       return TableRowData(
         id: phieu.soPhieuMH,
         data: {
-          'maNCC': phieu.maNCC,
-          'ngayLap': phieu.ngayLap,
-          'tongTien': phieu.tongTien.toString(),
+          'name': phieu.nhaCungCap.tenNCC,
+          'date': phieu.ngayLap,
+          'total': MoneyFormat.format(phieu.tongTien),
         },
       );
     }).toList();

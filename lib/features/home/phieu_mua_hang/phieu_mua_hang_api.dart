@@ -8,18 +8,18 @@ class PhieuMuaHangApi {
 
   Future<List<PhieuMuaHang>> getAll() async {
     try {
-      final response = await dio.get('/phieumuahang');
+      final response = await dio.get('/api/phieumuahang');
       return (response.data as List)
           .map((item) => PhieuMuaHang.fromJson(item))
           .toList();
     } catch (e) {
-      throw Exception('Failed to load phieu mua hang: $e');
+      throw Exception('API Error: $e');
     }
   }
 
   Future<PhieuMuaHang> getById(String maPhieu) async {
     try {
-      final response = await dio.get('/phieumuahang/$maPhieu');
+      final response = await dio.get('/api/phieumuahang/$maPhieu');
       return PhieuMuaHang.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to load phieu mua hang by id: $e');
@@ -28,7 +28,7 @@ class PhieuMuaHangApi {
 
   Future<Response> create(String maNCC, String ngayLap, double thanhTien, List<Map<String, dynamic>> sanPhamMua) async {
     try {
-      final response = await dio.post('/phieumuahang', data:  {
+      final response = await dio.post('/api/phieumuahang', data:  {
         'maNCC': maNCC,
         'ngayLap': ngayLap,
         'thanhTien': thanhTien,
