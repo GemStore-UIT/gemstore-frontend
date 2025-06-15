@@ -4,7 +4,7 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_repository.dart';
 
 class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
-  PhieuMuaHangBloc(this.phieuMuaHangRepository) : super(PhieuMuaHangInitial()) {
+  PhieuMuaHangBloc(this.phieuMuaHangRepository) : super(PhieuMuaHangStateInitial()) {
     on<PhieuMuaHangEventStart>(_onStart);
     on<PhieuMuaHangEventAdd>(_onAdd);
     on<PhieuMuaHangEventGetAll>(_onGetAll);
@@ -17,7 +17,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     PhieuMuaHangEventStart event,
     Emitter<PhieuMuaHangState> emit,
   ) {
-    emit(PhieuMuaHangInitial());
+    emit(PhieuMuaHangStateInitial());
   }
 
   void _onAdd(
@@ -33,7 +33,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
         event.sanPhamMua,
       );
       final data = await phieuMuaHangRepository.getAll();
-      emit(PhieuMuaHangStateSuccess(data));
+      emit(PhieuMuaHangStateSuccess(phieuMuaHangRepository.convertToTableRowData(data)));
     } catch (e) {
       emit(PhieuMuaHangStateFailure(e.toString()));
     }
@@ -46,7 +46,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     try {
       emit(PhieuMuaHangStateLoading());
       final data = await phieuMuaHangRepository.getAll();
-      emit(PhieuMuaHangStateSuccess(data));
+      emit(PhieuMuaHangStateSuccess(phieuMuaHangRepository.convertToTableRowData(data)));
     } catch (e) {
       emit(PhieuMuaHangStateFailure(e.toString()));
     }

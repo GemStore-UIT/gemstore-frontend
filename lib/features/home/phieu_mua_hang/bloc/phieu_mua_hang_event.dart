@@ -7,7 +7,9 @@ class PhieuMuaHangEventGetAll extends PhieuMuaHangEvent {}
 class PhieuMuaHangEventGetById extends PhieuMuaHangEvent {
   final String maPhieu;
 
-  PhieuMuaHangEventGetById(this.maPhieu);
+  PhieuMuaHangEventGetById({
+    required this.maPhieu,
+  });
 }
 
 class PhieuMuaHangEventAdd extends PhieuMuaHangEvent {

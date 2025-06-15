@@ -1,13 +1,14 @@
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 sealed class PhieuMuaHangState {}
 
-class PhieuMuaHangInitial extends PhieuMuaHangState {}
+class PhieuMuaHangStateInitial extends PhieuMuaHangState {}
 
 class PhieuMuaHangStateLoading extends PhieuMuaHangState {}
 
 class PhieuMuaHangStateSuccess extends PhieuMuaHangState {
-  final List<PhieuMuaHang> phieuMuaHangs;
+  final List<TableRowData> phieuMuaHangs;
 
   PhieuMuaHangStateSuccess(this.phieuMuaHangs);
 }
