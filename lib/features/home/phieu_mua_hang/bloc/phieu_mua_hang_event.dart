@@ -22,3 +22,11 @@ class PhieuMuaHangEventAdd extends PhieuMuaHangEvent {
   });
 }
 
+class PhieuMuaHangEventDelete extends PhieuMuaHangEvent {
+  final String maPhieu;
+
+  PhieuMuaHangEventDelete({
+    required this.maPhieu,
+  });
+}
+

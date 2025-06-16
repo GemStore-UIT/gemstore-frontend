@@ -40,6 +40,14 @@ class PhieuMuaHangRepository {
     }
   }
 
+  Future<void> delete(String maPhieu) async {
+    try {
+      await phieuMuaHangApi.delete(maPhieu);
+    } catch (e) {
+      throw Exception('Repository Error: $e');
+    }
+  }
+
   List<TableRowData> convertToTableRowData(List<PhieuMuaHang> data) {
     return data.map((phieu) {
       return TableRowData(

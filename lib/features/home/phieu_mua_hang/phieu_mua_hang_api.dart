@@ -86,4 +86,12 @@ class PhieuMuaHangApi {
       throw Exception('API Error for getListNhaCungCap: $e');
     }
   }
+
+  Future<void> delete(String maPhieu) async {
+    try {
+      await dio.delete('/api/phieumuahang/$maPhieu');
+    } catch (e) {
+      throw Exception('Failed to delete phieu mua hang: $e');
+    }
+  }
 }

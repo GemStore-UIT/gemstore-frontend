@@ -10,6 +10,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     on<PhieuMuaHangEventAdd>(_onAdd);
     on<PhieuMuaHangEventGetAll>(_onGetAll);
     on<PhieuMuaHangEventGetById>(_onGetById);
+    on<PhieuMuaHangEventDelete>(_onDelete);
   }
 
   final PhieuMuaHangRepository phieuMuaHangRepository;
@@ -29,17 +30,13 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
         event.sanPhamMua,
       );
       final data = await phieuMuaHangRepository.getAll();
-      final listSanPham = await phieuMuaHangRepository.getListSanPham();
-      final listNhaCungCap = await phieuMuaHangRepository.getListNhaCungCap();
       emit(
-        PhieuMuaHangStateSuccess(
+        PhieuMuaHangStateUpdated(
           phieuMuaHangRepository.convertToTableRowData(data),
-          listSanPham,
-          listNhaCungCap,
         ),
       );
     } catch (e) {
-      emit(PhieuMuaHangStateFailure(e.toString()));
+      emit(PhieuMuaHangStateCreateFailure(e.toString()));
     }
   }
 
@@ -53,14 +50,14 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       final listSanPham = await phieuMuaHangRepository.getListSanPham();
       final listNhaCungCap = await phieuMuaHangRepository.getListNhaCungCap();
       emit(
-        PhieuMuaHangStateSuccess(
+        PhieuMuaHangStateInitialSuccess(
           phieuMuaHangRepository.convertToTableRowData(data),
           listSanPham,
           listNhaCungCap,
         ),
       );
     } catch (e) {
-      emit(PhieuMuaHangStateFailure(e.toString()));
+      emit(PhieuMuaHangStateInitialFailure(e.toString()));
     }
   }
 
@@ -74,6 +71,24 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       emit(PhieuMuaHangStateGetDetailSuccess(data));
     } catch (e) {
       emit(PhieuMuaHangStateGetDetailFailure(e.toString()));
+    }
+  }
+
+  void _onDelete(
+    PhieuMuaHangEventDelete event,
+    Emitter<PhieuMuaHangState> emit,
+  ) async {
+    try {
+      emit(PhieuMuaHangStateLoading());
+      await phieuMuaHangRepository.delete(event.maPhieu);
+      final data = await phieuMuaHangRepository.getAll();
+      emit(
+        PhieuMuaHangStateUpdated(
+          phieuMuaHangRepository.convertToTableRowData(data),
+        ),
+      );
+    } catch (e) {
+      emit(PhieuMuaHangStateDeleteFailure(e.toString()));
     }
   }
 }

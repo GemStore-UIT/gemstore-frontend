@@ -7,18 +7,36 @@ class PhieuMuaHangStateInitial extends PhieuMuaHangState {}
 
 class PhieuMuaHangStateLoading extends PhieuMuaHangState {}
 
-class PhieuMuaHangStateSuccess extends PhieuMuaHangState {
+class PhieuMuaHangStateInitialSuccess extends PhieuMuaHangState {
   final List<TableRowData> phieuMuaHangs;
   final List<Map<String, dynamic>> listSanPham;
   final List<Map<String, dynamic>> listNhaCungCap;
 
-  PhieuMuaHangStateSuccess(this.phieuMuaHangs, this.listSanPham, this.listNhaCungCap);
+  PhieuMuaHangStateInitialSuccess(this.phieuMuaHangs, this.listSanPham, this.listNhaCungCap);
 }
 
-class PhieuMuaHangStateFailure extends PhieuMuaHangState {
+class PhieuMuaHangStateInitialFailure extends PhieuMuaHangState {
   final String error;
 
-  PhieuMuaHangStateFailure(this.error);
+  PhieuMuaHangStateInitialFailure(this.error);
+}
+
+class PhieuMuaHangStateUpdated extends PhieuMuaHangState {
+  final List<TableRowData> phieuMuaHangs;
+
+  PhieuMuaHangStateUpdated(this.phieuMuaHangs);
+}
+
+class PhieuMuaHangStateCreateFailure extends PhieuMuaHangState {
+  final String error;
+
+  PhieuMuaHangStateCreateFailure(this.error);
+}
+
+class PhieuMuaHangStateDeleteFailure extends PhieuMuaHangState {
+  final String error;
+
+  PhieuMuaHangStateDeleteFailure(this.error);
 }
 
 class PhieuMuaHangStateGetDetailSuccess extends PhieuMuaHangState {
