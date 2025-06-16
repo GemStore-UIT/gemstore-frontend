@@ -11,14 +11,16 @@ class TableRowData {
 // Update Dialog Widget
 class UpdateDialog extends StatefulWidget {
   final String title;
+  final String id;
   final List<TableColumn> columns;
   final Map<String, TextEditingController> controllers;
   final GlobalKey<FormState> formKey;
-  final Future<void> Function(Map<String, dynamic>) onUpdate;
+  final void Function(Map<String, dynamic>) onUpdate;
 
   const UpdateDialog({
     super.key,
     required this.title,
+    required this.id,
     required this.columns,
     required this.controllers,
     required this.formKey,
@@ -30,8 +32,6 @@ class UpdateDialog extends StatefulWidget {
 }
 
 class _UpdateDialogState extends State<UpdateDialog> {
-  bool _isLoading = false;
-
   @override
   void dispose() {
     super.dispose();
@@ -39,46 +39,74 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   Future<void> _handleUpdate() async {
     if (!widget.formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final updatedData = <String, dynamic>{};
-      for (final entry in widget.controllers.entries) {
-        updatedData[entry.key] = entry.value.text;
-      }
-
-      await widget.onUpdate(updatedData);
-
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error updating data: $error')));
-      }
+    final updatedData = <String, dynamic>{};
+    for (final entry in widget.controllers.entries) {
+      updatedData[entry.key] = entry.value.text;
+    }
+    widget.onUpdate(updatedData);
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: !_isLoading,
       child: AlertDialog(
-        title: Text(widget.title),
+        title: Text("Cập nhật ${widget.title}"),
         content: SingleChildScrollView(
           child: Form(
             key: widget.formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Mã ${widget.title}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.lock, size: 16, color: Colors.grey[600]),
+                          SizedBox(width: 8),
+                          Text(
+                            widget.id,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Mã ${widget.title} không thể thay đổi',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[500],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),            
                 ...widget.columns.map((column) {
                   final controller = widget.controllers[column.key]!;
                   return Padding(
@@ -88,7 +116,6 @@ class _UpdateDialogState extends State<UpdateDialog> {
                       decoration: InputDecoration(
                         labelText: column.header,
                         border: const OutlineInputBorder(),
-                        enabled: !_isLoading,
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -110,30 +137,12 @@ class _UpdateDialogState extends State<UpdateDialog> {
         ),
         actions: [
           TextButton(
-            onPressed:
-                _isLoading
-                    ? null
-                    : () {
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _handleUpdate,
-            child:
-                _isLoading
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                    : const Text('Update'),
-          ),
+          ElevatedButton(onPressed: _handleUpdate, child: const Text('Update')),
         ],
       ),
     );
@@ -207,13 +216,14 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
       barrierDismissible: false,
       builder:
           (dialogContext) => UpdateDialog(
-            title: 'Cập nhật ${widget.title}',
+            title: widget.title,
+            id: rowData.id,
             columns: widget.columns.where((col) => col.editable).toList(),
             controllers: controllers,
             formKey: formKey,
-            onUpdate: (updatedData) async {
+            onUpdate: (updatedData) {
               if (widget.onUpdate != null) {
-                await widget.onUpdate!(rowData);
+                widget.onUpdate!(rowData);
               }
             },
           ),
@@ -234,12 +244,12 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
       context: context,
       builder:
           (dialogContext) => AlertDialog(
-            title: const Text('Confirm Delete'),
-            content: const Text('Are you sure you want to delete this item?'),
+            title: const Text('Xác nhận xóa'),
+            content: const Text('Bạn có chắc chắn muốn xóa mục này không?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Cancel'),
+                child: const Text('Hủy'),
               ),
               TextButton(
                 onPressed: () {
@@ -249,7 +259,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                   }
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Delete'),
+                child: const Text('Xóa'),
               ),
             ],
           ),
@@ -390,7 +400,8 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                                             alignment: Alignment.centerLeft,
                                             child: _buildCell(
                                               column,
-                                                widget.columns.indexOf(column) == 0
+                                              widget.columns.indexOf(column) ==
+                                                      0
                                                   ? rowData.id
                                                   : rowData.data[column.key],
                                               false,

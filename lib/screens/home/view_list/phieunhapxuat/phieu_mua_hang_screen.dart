@@ -16,7 +16,7 @@ class PhieuMuaHangScreen extends StatefulWidget {
 
 class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã phiếu mua hàng', width: 3),
+    TableColumn(key: 'id', header: 'Mã phiếu mua hàng', width: 3, editable: false),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
     TableColumn(key: 'date', header: 'Ngày lập', width: 2),
     TableColumn(key: 'total', header: 'Tổng tiền', width: 2),

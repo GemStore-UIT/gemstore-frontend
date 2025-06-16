@@ -96,7 +96,7 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
                 DonViTinhInitial() => Center(child: Text('Khởi tạo...')),
                 DonViTinhLoading() => Container(), // or some placeholder
                 DonViTinhFetchingSuccess() => ReusableTableWidget(
-                  title: 'Nhà Cung Cấp',
+                  title: 'Đơn vị tính',
                   data: state.data,
                   columns: _columns,
                   onUpdate: _onUpdateDonViTinhScreen,
