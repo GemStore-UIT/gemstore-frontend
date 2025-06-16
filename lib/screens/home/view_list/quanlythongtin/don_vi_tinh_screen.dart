@@ -134,14 +134,8 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
     super.dispose();
   }
 
-  void _onUpdateDonViTinhScreen(TableRowData row) {
-    context.read<DonViTinhBloc>().add(
-      DonViTinhEventUpdate(
-        maDonVi: row.id,
-        tenDonVi: row.data['name'] as String,
-      ),
-    );
-  }
+  dynamic _onUpdateDonViTinhScreen(TableRowData row, Map<String, dynamic> updatedData) {  }
+
 
   void _onDeleteDonViTinhScreen(String id) {
     context.read<DonViTinhBloc>().add(DonViTinhEventDelete(maDonVi: id));

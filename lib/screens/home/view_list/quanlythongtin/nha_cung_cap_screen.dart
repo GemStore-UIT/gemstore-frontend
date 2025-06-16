@@ -165,16 +165,8 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     super.dispose();
   }
 
-  void _onUpdateNhaCungCap(TableRowData row) {
-    context.read<NhaCungCapBloc>().add(
-      NhaCungCapEventUpdate(
-        maNCC: row.id,
-        tenNCC: row.data['name'],
-        diaChi: row.data['address'],
-        sdt: row.data['phone'],
-      ),
-    );
-  }
+  dynamic _onUpdateNhaCungCap(TableRowData row, Map<String, dynamic> updatedData) {  }
+
 
   void _onDeleteNhaCungCap(String id) {
     context.read<NhaCungCapBloc>().add(NhaCungCapEventDelete(maNCC: id));

@@ -117,7 +117,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     super.dispose();
   }
 
-  void _onUpdatePhieuMuaHang(TableRowData row) {}
+  dynamic _onUpdatePhieuMuaHang(TableRowData row, Map<String, dynamic> updatedData) {  }
 
   void _onDeletePhieuMuaHang(String id) {
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventDelete(maPhieu: id));
