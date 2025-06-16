@@ -26,16 +26,16 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       emit(PhieuMuaHangStateLoading());
       await phieuMuaHangRepository.create(
         event.maNCC,
-        event.ngayLap,
-        event.thanhTien,
         event.sanPhamMua,
       );
       final data = await phieuMuaHangRepository.getAll();
       final listSanPham = await phieuMuaHangRepository.getListSanPham();
+      final listNhaCungCap = await phieuMuaHangRepository.getListNhaCungCap();
       emit(
         PhieuMuaHangStateSuccess(
           phieuMuaHangRepository.convertToTableRowData(data),
           listSanPham,
+          listNhaCungCap,
         ),
       );
     } catch (e) {
@@ -51,10 +51,12 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       emit(PhieuMuaHangStateLoading());
       final data = await phieuMuaHangRepository.getAll();
       final listSanPham = await phieuMuaHangRepository.getListSanPham();
+      final listNhaCungCap = await phieuMuaHangRepository.getListNhaCungCap();
       emit(
         PhieuMuaHangStateSuccess(
           phieuMuaHangRepository.convertToTableRowData(data),
           listSanPham,
+          listNhaCungCap,
         ),
       );
     } catch (e) {

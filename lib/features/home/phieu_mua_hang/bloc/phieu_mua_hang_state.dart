@@ -10,8 +10,9 @@ class PhieuMuaHangStateLoading extends PhieuMuaHangState {}
 class PhieuMuaHangStateSuccess extends PhieuMuaHangState {
   final List<TableRowData> phieuMuaHangs;
   final List<Map<String, dynamic>> listSanPham;
+  final List<Map<String, dynamic>> listNhaCungCap;
 
-  PhieuMuaHangStateSuccess(this.phieuMuaHangs, this.listSanPham);
+  PhieuMuaHangStateSuccess(this.phieuMuaHangs, this.listSanPham, this.listNhaCungCap);
 }
 
 class PhieuMuaHangStateFailure extends PhieuMuaHangState {

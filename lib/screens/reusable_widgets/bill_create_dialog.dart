@@ -4,12 +4,14 @@ import 'package:gemstore_frontend/config/money_format.dart';
 class BillCreateDialog extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> listSanPham;
-  final void Function(String, String, double, List<Map<String, dynamic>>) onCreate;
+  final List<Map<String, dynamic>> listNhaCungCap;
+  final void Function(String, List<Map<String, dynamic>>) onCreate;
 
   const BillCreateDialog({
     super.key,
     required this.title,
     required this.listSanPham,
+    required this.listNhaCungCap,
     required this.onCreate,
   });
 
@@ -18,22 +20,24 @@ class BillCreateDialog extends StatefulWidget {
 }
 
 class _BillCreateDialogState extends State<BillCreateDialog> {
-  final TextEditingController maNCCController = TextEditingController();
-  final TextEditingController ngayLapController = TextEditingController();
   final TextEditingController thanhTienController = TextEditingController();
   final TextEditingController soLuongController = TextEditingController();
 
+  String? selectedNCC;
   String? selectedSP;
   String? tenLSP;
   String? donViTinhSP;
   String? donGiaMuaSP;
   
   List<Map<String, dynamic>> addedItems = [];
-
   @override
   void initState() {
     super.initState();
-    // Initialize any necessary data here
+    soLuongController.addListener(() {
+      setState(() {
+        // This will trigger a rebuild when the text changes
+      });
+    });
   }
 
   void _addItem() {
@@ -143,41 +147,73 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                            children: [
                             const Text(
                               'Thông Tin Cơ Bản',
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: maNCCController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Mã Nhà Cung Cấp',
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.business),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: TextField(
-                                    controller: ngayLapController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Ngày Lập',
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.calendar_today),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            DropdownButtonFormField<String>(
+                              value: selectedNCC,
+                              hint: const Text('Chọn Nhà Cung Cấp'),
+                              decoration: InputDecoration(
+                              labelText: 'Nhà Cung Cấp',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.business),
+                              ),
+                              items: widget.listNhaCungCap.map((ncc) {
+                              return DropdownMenuItem<String>(
+                                value: ncc['maNhaCungCap'],
+                                child: Text(ncc['tenNhaCungCap']),
+                              );
+                              }).toList(),
+                              onChanged: (value) {
+                              setState(() {
+                                selectedNCC = value;
+                              });
+                              },
                             ),
+                            if (selectedNCC != null)
+                              Builder(
+                              builder: (context) {
+                                final ncc = widget.listNhaCungCap.firstWhere(
+                                (n) => n['maNhaCungCap'] == selectedNCC,
+                                orElse: () => {},
+                                );
+                                return Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                  Row(
+                                    children: [
+                                    const Icon(Icons.phone, size: 18, color: Colors.grey),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Số điện thoại: ${ncc['soDienThoai'] ?? ''}',
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                    ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                    const Icon(Icons.location_on, size: 18, color: Colors.grey),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Địa chỉ: ${ncc['diaChi'] ?? ''}',
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                    ),
+                                    ],
+                                  ),
+                                  ],
+                                ),
+                                );
+                              },
+                              ),
                           ],
                         ),
                       ),
@@ -268,18 +304,25 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton.icon(
-                                        onPressed: _addItem,
-                                        icon: const Icon(Icons.add),
-                                        label: const Text('Thêm Sản Phẩm'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green,
-                                          foregroundColor: Colors.white,
-                                        ),
-                                      ),
+                                    const SizedBox(height: 12),                                    ValueListenableBuilder<TextEditingValue>(
+                                      valueListenable: soLuongController,
+                                      builder: (context, value, child) {
+                                        final isEnabled = value.text.isNotEmpty;
+                                        return SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton.icon(
+                                            onPressed: isEnabled ? _addItem : null,
+                                            icon: const Icon(Icons.add),
+                                            label: const Text('Thêm Sản Phẩm'),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: isEnabled
+                                                ? Colors.green
+                                                : Colors.grey,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
@@ -376,11 +419,9 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
-                  onPressed: addedItems.isNotEmpty ? () {
+                  onPressed: (addedItems.isNotEmpty && selectedNCC != null) ? () {
                     widget.onCreate(
-                      maNCCController.text,
-                      ngayLapController.text,
-                      _calculateTotal(),
+                      selectedNCC!,
                       addedItems,
                     );
                     Navigator.of(context).pop();
@@ -402,8 +443,6 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
 
   @override
   void dispose() {
-    maNCCController.dispose();
-    ngayLapController.dispose();
     thanhTienController.dispose();
     soLuongController.dispose();
     super.dispose();

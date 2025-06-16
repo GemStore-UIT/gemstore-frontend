@@ -22,6 +22,10 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   ];
   bool _isLoading = false;
   final List<Map<String, dynamic>> _listSanPham = [];
+  final List<Map<String, dynamic>> _listNhaCungCap = [
+    {'maNhaCungCap': 'NCC001', 'tenNhaCungCap': 'Nhà Cung Cấp 1'},
+    {'maNhaCungCap': 'NCC002', 'tenNhaCungCap': 'Nhà Cung Cấp 2'},
+  ];
 
   @override
   void initState() {
@@ -35,7 +39,12 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return BillCreateDialog(title: "Thêm Phiếu Mua Hàng", listSanPham: _listSanPham, onCreate: _onAddPhieuMuaHang);
+        return BillCreateDialog(
+          title: "Thêm Phiếu Mua Hàng",
+          listSanPham: _listSanPham,
+          listNhaCungCap: _listNhaCungCap,
+          onCreate: _onAddPhieuMuaHang,
+        );
       },
     );
   }
@@ -51,6 +60,8 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
             if (state is PhieuMuaHangStateSuccess) {
               _listSanPham.clear();
               _listSanPham.addAll(state.listSanPham);
+              _listNhaCungCap.clear();
+              _listNhaCungCap.addAll(state.listNhaCungCap);
             }
           });
         },
@@ -115,19 +126,9 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
   }
 
-  void _onAddPhieuMuaHang(
-    String maNCC,
-    String ngayLap,
-    double thanhTien,
-    List<Map<String, dynamic>> sanPhamMua,
-  ) {
+  void _onAddPhieuMuaHang(String maNCC, List<Map<String, dynamic>> sanPhamMua) {
     context.read<PhieuMuaHangBloc>().add(
-      PhieuMuaHangEventAdd(
-        maNCC: maNCC,
-        ngayLap: ngayLap,
-        thanhTien: thanhTien,
-        sanPhamMua: sanPhamMua,
-      ),
+      PhieuMuaHangEventAdd(maNCC: maNCC, sanPhamMua: sanPhamMua),
     );
   }
 }

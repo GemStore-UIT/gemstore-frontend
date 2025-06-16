@@ -16,8 +16,8 @@ class PhieuMuaHangRepository {
     }
   }
 
-  Future<void> create(String maNCC, String ngayLap, double thanhTien, List<Map<String, dynamic>> sanPhamMua) async {
-    await phieuMuaHangApi.create(maNCC, ngayLap, thanhTien, sanPhamMua);
+  Future<void> create(String maNCC, List<Map<String, dynamic>> sanPhamMua) async {
+    await phieuMuaHangApi.create(maNCC, sanPhamMua);
   }
 
   Future<PhieuMuaHang> getById(String maPhieu) async {
@@ -27,6 +27,14 @@ class PhieuMuaHangRepository {
   Future<List<Map<String, dynamic>>> getListSanPham() async {
     try {
       return await phieuMuaHangApi.getListSanPham();
+    } catch (e) {
+      throw Exception('Repository Error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getListNhaCungCap() async {
+    try {
+      return await phieuMuaHangApi.getListNhaCungCap();
     } catch (e) {
       throw Exception('Repository Error: $e');
     }
