@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -244,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Container(
+        child: SizedBox(
           height: 24.0,
           child: Row(
             children: [
@@ -327,23 +329,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'unit_management':
         return DonViTinhScreen();
       case 'product_type_management':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.category, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Loại sản phẩm Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
-          ],
-        );
+        return LoaiSanPhamScreen();
       case 'service_type_management':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.miscellaneous_services, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Loại dịch vụ Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
-          ],
-        );
+        return LoaiDichVuScreen();
       case 'sales_invoice':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,

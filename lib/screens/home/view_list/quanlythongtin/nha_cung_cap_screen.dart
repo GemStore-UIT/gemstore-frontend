@@ -14,8 +14,8 @@ class NhaCungCapScreen extends StatefulWidget {
 
 class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã nhà cung cấp', width: 1),
-    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
+    TableColumn(key: 'id', header: 'Mã nhà cung cấp', width: 2),
+    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
     TableColumn(
       key: 'phone',
@@ -168,7 +168,7 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   void _onUpdateNhaCungCap(TableRowData row) {
     context.read<NhaCungCapBloc>().add(
       NhaCungCapEventUpdate(
-        maNCC: row.id,
+        maNCC: row.data['id'],
         tenNCC: row.data['name'],
         diaChi: row.data['address'],
         sdt: row.data['phone'],

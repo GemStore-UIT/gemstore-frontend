@@ -15,7 +15,7 @@ class DonViTinhScreen extends StatefulWidget {
 class _DonViTinhScreenState extends State<DonViTinhScreen> {
   final List<TableColumn> _columns = [
     TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 1),
-    TableColumn(key: 'name', header: 'Đơn vị tính', width: 2),
+    TableColumn(key: 'name', header: 'Đơn vị tính', width: 3),
   ];
   bool _isLoading = false;
 
@@ -99,8 +99,8 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
                   title: 'Nhà Cung Cấp',
                   data: state.data,
                   columns: _columns,
-                  onUpdate: _onUpdateDonViTinhScreen,
-                  onDelete: _onDeleteDonViTinhScreen,
+                  onUpdate: _onUpdateDonViTinh,
+                  onDelete: _onDeleteDonViTinh,
                 ),
                 DonViTinhFetchingFailure() => Center(
                   child: Text('Lỗi khi tải dữ liệu: ${state.error}'),
@@ -134,16 +134,16 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
     super.dispose();
   }
 
-  void _onUpdateDonViTinhScreen(TableRowData row) {
+  void _onUpdateDonViTinh(TableRowData row) {
     context.read<DonViTinhBloc>().add(
       DonViTinhEventUpdate(
-        maDonVi: row.id,
+        maDonVi: row.data['id'],
         tenDonVi: row.data['name'] as String,
       ),
     );
   }
 
-  void _onDeleteDonViTinhScreen(String id) {
+  void _onDeleteDonViTinh(String id) {
     context.read<DonViTinhBloc>().add(DonViTinhEventDelete(maDonVi: id));
   }
 
