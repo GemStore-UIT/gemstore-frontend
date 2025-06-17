@@ -1,3 +1,5 @@
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+
 class PhieuMuaHang {
   String soPhieuMH;
   String ngayLap;
@@ -24,6 +26,35 @@ class PhieuMuaHang {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'soPhieuMH': soPhieuMH,
+      'ngayLap': ngayLap,
+      'tenNhaCungCap': tenNhaCungCap,
+      'tongTien': tongTien,
+      'chiTiet': chiTiet.map((item) => item.toJson()).toList(),
+    };
+  }
+
+  static List<PhieuMuaHang> fromJsonList(List<dynamic> jsonList) {
+    return jsonList
+        .map((json) => PhieuMuaHang.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  static List<TableRowData> convertToTableRowData(List<PhieuMuaHang> data) {
+    return data.map((phieu) {
+      return TableRowData(
+        id: phieu.soPhieuMH,
+        data: {
+          'name': phieu.tenNhaCungCap,
+          'date': phieu.ngayLap,
+          'total': phieu.tongTien,
+        },
+      );
+    }).toList();
+  }
 }
 
 class SanPhamMua {
@@ -46,5 +77,14 @@ class SanPhamMua {
       soLuong: json['soLuong'],
       thanhTien: json['thanhTien'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'maSanPham': maSanPham,
+      'tenSanPham': tenSanPham,
+      'soLuong': soLuong,
+      'thanhTien': thanhTien,
+    };
   }
 }

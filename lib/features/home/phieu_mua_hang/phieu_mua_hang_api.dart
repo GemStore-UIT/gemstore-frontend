@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 
 class PhieuMuaHangApi {
   final Dio dio;

@@ -1,21 +1,17 @@
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+
 class NhaCungCapEvent {}
 
 class NhaCungCapEventStart extends NhaCungCapEvent {}
 
 class NhaCungCapEventGetAll extends NhaCungCapEvent {}
 
-class NhaCungCapEventGetById extends NhaCungCapEvent {
-  final String maNCC;
-
-  NhaCungCapEventGetById(this.maNCC);
-}
-
-class NhaCungCapEventAdd extends NhaCungCapEvent {
+class NhaCungCapEventCreate extends NhaCungCapEvent {
   final String tenNCC;
   final String diaChi;
   final String sdt;
 
-  NhaCungCapEventAdd({
+  NhaCungCapEventCreate({
     required this.tenNCC,
     required this.diaChi,
     required this.sdt,
@@ -23,23 +19,13 @@ class NhaCungCapEventAdd extends NhaCungCapEvent {
 }
 
 class NhaCungCapEventUpdate extends NhaCungCapEvent {
-  final String maNCC;
-  final String tenNCC;
-  final String diaChi;
-  final String sdt;
+  final NhaCungCap nhaCungCap;
 
-  NhaCungCapEventUpdate({
-    required this.maNCC,
-    required this.tenNCC,
-    required this.diaChi,
-    required this.sdt,
-  });
+  NhaCungCapEventUpdate({required this.nhaCungCap});
 }
 
 class NhaCungCapEventDelete extends NhaCungCapEvent {
   final String maNCC;
 
-  NhaCungCapEventDelete({
-    required this.maNCC,
-  });
+  NhaCungCapEventDelete({required this.maNCC});
 }

@@ -1,19 +1,19 @@
-import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 
 sealed class DonViTinhState {}
 
-class DonViTinhInitial extends DonViTinhState {}
+class DonViTinhStateInitial extends DonViTinhState {}
 
-class DonViTinhLoading extends DonViTinhState {}
+class DonViTinhStateLoading extends DonViTinhState {}
 
-class DonViTinhFetchingSuccess extends DonViTinhState {
-  final List<TableRowData> data;
+class DonViTinhStateUpdated extends DonViTinhState {
+  final List<DonViTinh> data;
 
-  DonViTinhFetchingSuccess(this.data);
+  DonViTinhStateUpdated(this.data);
 }
 
-class DonViTinhFetchingFailure extends DonViTinhState {
+class DonViTinhStateFailure extends DonViTinhState {
   final String error;
 
-  DonViTinhFetchingFailure(this.error);
+  DonViTinhStateFailure(this.error);
 }

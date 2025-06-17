@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap.dart';
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 
 class NhaCungCapApi {
   final Dio dio;

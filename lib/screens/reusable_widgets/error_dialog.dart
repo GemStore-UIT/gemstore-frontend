@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ErrorDialog extends StatelessWidget {
   final String title;
-  final String message;
+  final List<String> message;
   final VoidCallback? onClose;
 
   const ErrorDialog({
@@ -31,9 +31,16 @@ class ErrorDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: Text(
-        message,
-        style: const TextStyle(fontSize: 16),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: message
+            .map(
+              (msg) => Text(
+                "- $msg",
+                style: const TextStyle(fontSize: 16),
+              ),
+            )
+            .toList(),
       ),
       actions: [
         ElevatedButton(

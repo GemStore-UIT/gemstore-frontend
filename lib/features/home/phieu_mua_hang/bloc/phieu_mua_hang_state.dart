@@ -1,5 +1,4 @@
-import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
-import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 
 sealed class PhieuMuaHangState {}
 
@@ -7,46 +6,16 @@ class PhieuMuaHangStateInitial extends PhieuMuaHangState {}
 
 class PhieuMuaHangStateLoading extends PhieuMuaHangState {}
 
-class PhieuMuaHangStateInitialSuccess extends PhieuMuaHangState {
-  final List<TableRowData> phieuMuaHangs;
-  final List<Map<String, dynamic>> listSanPham;
-  final List<Map<String, dynamic>> listNhaCungCap;
-
-  PhieuMuaHangStateInitialSuccess(this.phieuMuaHangs, this.listSanPham, this.listNhaCungCap);
-}
-
-class PhieuMuaHangStateInitialFailure extends PhieuMuaHangState {
-  final String error;
-
-  PhieuMuaHangStateInitialFailure(this.error);
-}
-
+// Success state
 class PhieuMuaHangStateUpdated extends PhieuMuaHangState {
-  final List<TableRowData> phieuMuaHangs;
+  final List<PhieuMuaHang> data;
 
-  PhieuMuaHangStateUpdated(this.phieuMuaHangs);
+  PhieuMuaHangStateUpdated(this.data);
 }
 
-class PhieuMuaHangStateCreateFailure extends PhieuMuaHangState {
+// Failure state
+class PhieuMuaHangStateFailure extends PhieuMuaHangState {
   final String error;
 
-  PhieuMuaHangStateCreateFailure(this.error);
-}
-
-class PhieuMuaHangStateDeleteFailure extends PhieuMuaHangState {
-  final String error;
-
-  PhieuMuaHangStateDeleteFailure(this.error);
-}
-
-class PhieuMuaHangStateGetDetailSuccess extends PhieuMuaHangState {
-  final PhieuMuaHang phieuMuaHang;
-
-  PhieuMuaHangStateGetDetailSuccess(this.phieuMuaHang);
-}
-
-class PhieuMuaHangStateGetDetailFailure extends PhieuMuaHangState {
-  final String error;
-
-  PhieuMuaHangStateGetDetailFailure(this.error);
+  PhieuMuaHangStateFailure(this.error);
 }

@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_bloc.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class NhaCungCapScreen extends StatefulWidget {
-  const NhaCungCapScreen({super.key});
+  final List<NhaCungCap> data;
+  const NhaCungCapScreen({super.key, required this.data});
 
   @override
   State<NhaCungCapScreen> createState() => _NhaCungCapScreenState();
@@ -14,7 +16,12 @@ class NhaCungCapScreen extends StatefulWidget {
 
 class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã nhà cung cấp', width: 2, editable: false),
+    TableColumn(
+      key: 'id',
+      header: 'Mã nhà cung cấp',
+      width: 2,
+      editable: false,
+    ),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
     TableColumn(
@@ -34,9 +41,6 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchData();
-    });
   }
 
   void _showAddSupplierDialog() {
@@ -118,26 +122,19 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
       body: BlocConsumer<NhaCungCapBloc, NhaCungCapState>(
         listener: (context, state) {
           setState(() {
-            _isLoading = state is NhaCungCapLoading;
+            _isLoading = state is NhaCungCapStateLoading;
           });
         },
         builder: (context, state) {
           return Stack(
             children: [
-              switch (state) {
-                NhaCungCapInitial() => Center(child: Text('Khởi tạo...')),
-                NhaCungCapLoading() => Container(), // or some placeholder
-                NhaCungCapFetchingSuccess() => ReusableTableWidget(
+              ReusableTableWidget(
                   title: 'Nhà Cung Cấp',
-                  data: state.data,
+                  data: NhaCungCap.convertToTableRowData(widget.data),
                   columns: _columns,
                   onUpdate: _onUpdateNhaCungCap,
                   onDelete: _onDeleteNhaCungCap,
                 ),
-                NhaCungCapFetchingFailure() => Center(
-                  child: Text('Lỗi khi tải dữ liệu: ${state.error}'),
-                ),
-              },
               // Loading overlay
               if (_isLoading)
                 Container(
@@ -165,20 +162,18 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     super.dispose();
   }
 
-  dynamic _onUpdateNhaCungCap(TableRowData row, Map<String, dynamic> updatedData) {  }
-
+  dynamic _onUpdateNhaCungCap(
+    TableRowData row,
+    Map<String, dynamic> updatedData,
+  ) {}
 
   void _onDeleteNhaCungCap(String id) {
     context.read<NhaCungCapBloc>().add(NhaCungCapEventDelete(maNCC: id));
   }
 
-  void _fetchData() {
-    context.read<NhaCungCapBloc>().add(NhaCungCapEventGetAll());
-  }
-
   void _onAddNhaCungCap(String tenNCC, String diaChi, String sdt) {
     context.read<NhaCungCapBloc>().add(
-      NhaCungCapEventAdd(tenNCC: tenNCC, diaChi: diaChi, sdt: sdt),
+      NhaCungCapEventCreate(tenNCC: tenNCC, diaChi: diaChi, sdt: sdt),
     );
   }
 }

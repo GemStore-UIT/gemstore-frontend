@@ -1,5 +1,5 @@
 import 'package:gemstore_frontend/config/money_format.dart';
-import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_api.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 

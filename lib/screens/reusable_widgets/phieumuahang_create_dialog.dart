@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gemstore_frontend/config/money_format.dart';
 
-class BillCreateDialog extends StatefulWidget {
+class PhieumuahangCreateDialog extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> listSanPham;
   final List<Map<String, dynamic>> listNhaCungCap;
   final void Function(String, List<Map<String, dynamic>>) onCreate;
 
-  const BillCreateDialog({
+  const PhieumuahangCreateDialog({
     super.key,
     required this.title,
     required this.listSanPham,
@@ -16,10 +16,10 @@ class BillCreateDialog extends StatefulWidget {
   });
 
   @override
-  State<BillCreateDialog> createState() => _BillCreateDialogState();
+  State<PhieumuahangCreateDialog> createState() => _PhieumuahangCreateDialogState();
 }
 
-class _BillCreateDialogState extends State<BillCreateDialog> {
+class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
   final TextEditingController thanhTienController = TextEditingController();
   final TextEditingController soLuongController = TextEditingController();
 
@@ -171,8 +171,8 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                               items:
                                   widget.listNhaCungCap.map((ncc) {
                                     return DropdownMenuItem<String>(
-                                      value: ncc['maNhaCungCap'],
-                                      child: Text(ncc['tenNhaCungCap']),
+                                      value: ncc['maNCC'],
+                                      child: Text(ncc['tenNCC']),
                                     );
                                   }).toList(),
                               onChanged: (value) {
@@ -185,7 +185,7 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                               Builder(
                                 builder: (context) {
                                   final ncc = widget.listNhaCungCap.firstWhere(
-                                    (n) => n['maNhaCungCap'] == selectedNCC,
+                                    (n) => n['maNCC'] == selectedNCC,
                                     orElse: () => {},
                                   );
                                   return Padding(
@@ -203,7 +203,7 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                             ),
                                             const SizedBox(width: 6),
                                             Text(
-                                              'Số điện thoại: ${ncc['soDienThoai'] ?? ''}',
+                                              'Số điện thoại: ${ncc['sdt'] ?? ''}',
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w500,
                                               ),
@@ -277,8 +277,8 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                         (sp) => sp['maSanPham'] == value,
                                         orElse: () => {},
                                       );
-                                  tenLSP = selectedProduct['loaiSanPham'];
-                                  donViTinhSP = selectedProduct['donViTinh'];
+                                  tenLSP = selectedProduct['loaiSanPham']['tenLSP'];
+                                  donViTinhSP = selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
                                   donGiaMuaSP =
                                       selectedProduct['donGia'].toString();
                                 });

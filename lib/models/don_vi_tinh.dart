@@ -1,3 +1,5 @@
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+
 class DonViTinh {
   String maDonVi;
   String tenDonVi;
@@ -23,6 +25,17 @@ class DonViTinh {
 
   static List<DonViTinh> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => DonViTinh.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  static List<TableRowData> convertToTableRowData(List<DonViTinh> data) {
+    return data.map((dvt) {
+      return TableRowData(
+        id: dvt.maDonVi,
+        data: {
+          'name': dvt.tenDonVi,
+        },
+      );
+    }).toList();
   }
 }
 

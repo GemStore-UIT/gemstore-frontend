@@ -1,19 +1,19 @@
-import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 
 sealed class NhaCungCapState {}
 
-class NhaCungCapInitial extends NhaCungCapState {}
+class NhaCungCapStateInitial extends NhaCungCapState {}
 
-class NhaCungCapLoading extends NhaCungCapState {}
+class NhaCungCapStateLoading extends NhaCungCapState {}
 
-class NhaCungCapFetchingSuccess extends NhaCungCapState {
-  final List<TableRowData> data;
+class NhaCungCapStateUpdated extends NhaCungCapState {
+  final List<NhaCungCap> data;
 
-  NhaCungCapFetchingSuccess(this.data);
+  NhaCungCapStateUpdated(this.data);
 }
 
-class NhaCungCapFetchingFailure extends NhaCungCapState {
+class NhaCungCapStateFailure extends NhaCungCapState {
   final String error;
 
-  NhaCungCapFetchingFailure(this.error);
+  NhaCungCapStateFailure(this.error);
 }
