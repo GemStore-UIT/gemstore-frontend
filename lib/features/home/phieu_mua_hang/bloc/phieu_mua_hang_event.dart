@@ -1,28 +1,34 @@
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
+
 class PhieuMuaHangEvent {}
 
 class PhieuMuaHangEventStart extends PhieuMuaHangEvent {}
 
 class PhieuMuaHangEventGetAll extends PhieuMuaHangEvent {}
 
-class PhieuMuaHangEventGetById extends PhieuMuaHangEvent {
+class PhieuMuaHangEventCreate extends PhieuMuaHangEvent {
+  final String maNCC;
+  final List<Map<String, dynamic>> sanPhamMua;
+
+  PhieuMuaHangEventCreate({
+    required this.maNCC,
+    required this.sanPhamMua,
+  });
+}
+
+class PhieuMuaHangEventDelete extends PhieuMuaHangEvent {
   final String maPhieu;
 
-  PhieuMuaHangEventGetById({
+  PhieuMuaHangEventDelete({
     required this.maPhieu,
   });
 }
 
-class PhieuMuaHangEventAdd extends PhieuMuaHangEvent {
-  final String maNCC;
-  final String ngayLap;
-  double thanhTien;
-  final List<Map<String, dynamic>> sanPhamMua;
+class PhieuMuaHangEventUpdate extends PhieuMuaHangEvent {
+  final PhieuMuaHang phieuMuaHang;
 
-  PhieuMuaHangEventAdd({
-    required this.maNCC,
-    required this.ngayLap,
-    required this.thanhTien,
-    required this.sanPhamMua,
+  PhieuMuaHangEventUpdate({
+    required this.phieuMuaHang,
   });
 }
 

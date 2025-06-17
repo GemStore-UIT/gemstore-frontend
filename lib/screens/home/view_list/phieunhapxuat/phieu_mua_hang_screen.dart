@@ -3,11 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
-import 'package:gemstore_frontend/screens/reusable_widgets/bill_create_dialog.dart';
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieumuahang_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuMuaHangScreen extends StatefulWidget {
-  const PhieuMuaHangScreen({super.key});
+  final List<PhieuMuaHang> data;
+  final List<NhaCungCap> listNhaCungCap;
+  final List<SanPham> listSanPham;
+  const PhieuMuaHangScreen({
+    super.key,
+    required this.data,
+    required this.listNhaCungCap,
+    required this.listSanPham,
+  });
 
   @override
   State<PhieuMuaHangScreen> createState() => _PhieuMuaHangScreenState();
@@ -15,90 +26,84 @@ class PhieuMuaHangScreen extends StatefulWidget {
 
 class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã phiếu mua hàng', width: 3),
+    TableColumn(
+      key: 'id',
+      header: 'Mã phiếu mua hàng',
+      width: 3,
+      editable: false,
+    ),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
     TableColumn(key: 'date', header: 'Ngày lập', width: 2),
     TableColumn(key: 'total', header: 'Tổng tiền', width: 2),
   ];
   bool _isLoading = false;
   final List<Map<String, dynamic>> _listSanPham = [];
+  final List<Map<String, dynamic>> _listNhaCungCap = [];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _onGetAll();
-    });
+    _listSanPham.addAll(
+      widget.listSanPham.map((sp) => sp.toJson()).toList(),
+    );
+    _listNhaCungCap.addAll(
+      widget.listNhaCungCap.map((ncc) => ncc.toJson()).toList(),
+    );
   }
 
   void _showAddPhieuMuaHangDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return BillCreateDialog(title: "Thêm Phiếu Mua Hàng", listSanPham: _listSanPham, onCreate: _onAddPhieuMuaHang);
+        return PhieumuahangCreateDialog(
+          title: "Thêm Phiếu Mua Hàng",
+          listSanPham: _listSanPham,
+          listNhaCungCap: _listNhaCungCap,
+          onCreate: _onAddPhieuMuaHang,
+        );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocConsumer<PhieuMuaHangBloc, PhieuMuaHangState>(
-        listener: (context, state) {
-          setState(() {
-            _isLoading = state is PhieuMuaHangStateLoading;
-            if (state is PhieuMuaHangStateSuccess) {
-              _listSanPham.clear();
-              _listSanPham.addAll(state.listSanPham);
-            }
-          });
-        },
-        builder: (context, state) {
-          return Stack(
-            children: [
-              switch (state) {
-                PhieuMuaHangStateInitial() => Center(
-                  child: Text('Khởi tạo...'),
+    return BlocConsumer<PhieuMuaHangBloc, PhieuMuaHangState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is PhieuMuaHangStateLoading;          
+        });
+      },
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.white,
+              body: ReusableTableWidget(
+                title: 'Phiếu Mua Hàng',
+                data: PhieuMuaHang.convertToTableRowData(widget.data),
+                columns: _columns,
+                onUpdate: _onUpdatePhieuMuaHang,
+                onDelete: _onDeletePhieuMuaHang,
+              ),
+              floatingActionButton: FloatingActionButton.extended(
+                onPressed: _showAddPhieuMuaHangDialog,
+                icon: Icon(Icons.add),
+                label: Text('Thêm Phiếu Mua Hàng'),
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            // Loading overlay
+            if (_isLoading)
+              Container(
+                color: Colors.black12,
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
-                PhieuMuaHangStateLoading() =>
-                  Container(), // or some placeholder
-                PhieuMuaHangStateSuccess() => ReusableTableWidget(
-                  title: 'Phiếu Mua Hàng',
-                  data: state.phieuMuaHangs,
-                  columns: _columns,
-                  onUpdate: _onUpdatePhieuMuaHang,
-                  onDelete: _onDeletePhieuMuaHang,
-                ),
-                PhieuMuaHangStateFailure() => Center(
-                  child: Text('Lỗi khi tải dữ liệu: ${state.error}'),
-                ),
-                PhieuMuaHangStateGetDetailSuccess() => Center(
-                  child: Text('Chi tiết phiếu mua hàng: ${state.phieuMuaHang}'),
-                ),
-                PhieuMuaHangStateGetDetailFailure() => Center(
-                  child: Text('Lỗi khi lấy chi tiết: ${state.error}'),
-                ),
-              },
-              // Loading overlay
-              if (_isLoading)
-                Container(
-                  color: Colors.black12,
-                  child: Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddPhieuMuaHangDialog,
-        icon: Icon(Icons.add),
-        label: Text('Thêm Phiếu Mua Hàng'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -107,27 +112,18 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     super.dispose();
   }
 
-  void _onUpdatePhieuMuaHang(TableRowData row) {}
+  dynamic _onUpdatePhieuMuaHang(
+    TableRowData row,
+    Map<String, dynamic> updatedData,
+  ) {}
 
-  void _onDeletePhieuMuaHang(String id) {}
-
-  void _onGetAll() {
-    context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
+  void _onDeletePhieuMuaHang(String id) {
+    context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventDelete(maPhieu: id));
   }
 
-  void _onAddPhieuMuaHang(
-    String maNCC,
-    String ngayLap,
-    double thanhTien,
-    List<Map<String, dynamic>> sanPhamMua,
-  ) {
+  void _onAddPhieuMuaHang(String maNCC, List<Map<String, dynamic>> sanPhamMua) {
     context.read<PhieuMuaHangBloc>().add(
-      PhieuMuaHangEventAdd(
-        maNCC: maNCC,
-        ngayLap: ngayLap,
-        thanhTien: thanhTien,
-        sanPhamMua: sanPhamMua,
-      ),
+      PhieuMuaHangEventCreate(maNCC: maNCC, sanPhamMua: sanPhamMua),
     );
   }
 }

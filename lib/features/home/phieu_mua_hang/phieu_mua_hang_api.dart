@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 
 class PhieuMuaHangApi {
   final Dio dio;
@@ -28,18 +28,14 @@ class PhieuMuaHangApi {
 
   Future<Response> create(
     String maNCC,
-    String ngayLap,
-    double thanhTien,
     List<Map<String, dynamic>> sanPhamMua,
   ) async {
     try {
       final response = await dio.post(
-        '/api/phieumuahang',
+        '/api/phieumuahang/full',
         data: {
-          'maNCC': maNCC,
-          'ngayLap': ngayLap,
-          'thanhTien': thanhTien,
-          'sanPhamMua': sanPhamMua,
+          'nhaCungCap': maNCC,
+          'chiTiet': sanPhamMua,
         },
       );
       return response;
@@ -67,6 +63,35 @@ class PhieuMuaHangApi {
       }
     } catch (e) {
       throw Exception('API Error for getListSanPham: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getListNhaCungCap() async {
+    try {
+      final response = await dio.get('/api/nhacungcap');
+      if (response.statusCode == 200) {
+        return (response.data as List).map((item) {
+          final mapItem = item as Map<String, dynamic>;
+          return {
+            'maNhaCungCap': mapItem['maNCC'],
+            'tenNhaCungCap': mapItem['tenNCC'],
+            'diaChi': mapItem['diaChi'],
+            'soDienThoai': mapItem['sdt'],
+          };
+        }).toList();
+      } else {
+        throw Exception('Failed to load suppliers');
+      }
+    } catch (e) {
+      throw Exception('API Error for getListNhaCungCap: $e');
+    }
+  }
+
+  Future<void> delete(String maPhieu) async {
+    try {
+      await dio.delete('/api/phieumuahang/$maPhieu');
+    } catch (e) {
+      throw Exception('Failed to delete phieu mua hang: $e');
     }
   }
 }

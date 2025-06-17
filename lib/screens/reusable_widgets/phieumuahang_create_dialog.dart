@@ -1,39 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:gemstore_frontend/config/money_format.dart';
 
-class BillCreateDialog extends StatefulWidget {
+class PhieumuahangCreateDialog extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> listSanPham;
-  final void Function(String, String, double, List<Map<String, dynamic>>) onCreate;
+  final List<Map<String, dynamic>> listNhaCungCap;
+  final void Function(String, List<Map<String, dynamic>>) onCreate;
 
-  const BillCreateDialog({
+  const PhieumuahangCreateDialog({
     super.key,
     required this.title,
     required this.listSanPham,
+    required this.listNhaCungCap,
     required this.onCreate,
   });
 
   @override
-  State<BillCreateDialog> createState() => _BillCreateDialogState();
+  State<PhieumuahangCreateDialog> createState() => _PhieumuahangCreateDialogState();
 }
 
-class _BillCreateDialogState extends State<BillCreateDialog> {
-  final TextEditingController maNCCController = TextEditingController();
-  final TextEditingController ngayLapController = TextEditingController();
+class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
   final TextEditingController thanhTienController = TextEditingController();
   final TextEditingController soLuongController = TextEditingController();
 
+  String? selectedNCC;
   String? selectedSP;
   String? tenLSP;
   String? donViTinhSP;
   String? donGiaMuaSP;
-  
-  List<Map<String, dynamic>> addedItems = [];
 
+  List<Map<String, dynamic>> addedItems = [];
   @override
   void initState() {
     super.initState();
-    // Initialize any necessary data here
+    soLuongController.addListener(() {
+      setState(() {
+        // This will trigger a rebuild when the text changes
+      });
+    });
   }
 
   void _addItem() {
@@ -42,22 +46,22 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
         (sp) => sp['maSanPham'] == selectedSP,
         orElse: () => {},
       );
-      
+
       final quantity = int.tryParse(soLuongController.text) ?? 0;
       final donGia = double.tryParse(donGiaMuaSP ?? '0') ?? 0.0;
-      
+
       setState(() {
         // Check if product already exists in the list
         final existingIndex = addedItems.indexWhere(
           (item) => item['maSanPham'] == selectedSP,
         );
-        
+
         if (existingIndex != -1) {
           // Product exists, update quantity and total
           final existingItem = addedItems[existingIndex];
           final newQuantity = existingItem['soLuong'] + quantity;
           final newThanhTien = newQuantity * donGia;
-          
+
           addedItems[existingIndex] = {
             ...existingItem,
             'soLuong': newQuantity,
@@ -76,7 +80,7 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
             'thanhTien': thanhTien,
           });
         }
-        
+
         // Clear selection
         selectedSP = null;
         tenLSP = null;
@@ -94,7 +98,10 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
   }
 
   double _calculateTotal() {
-    return addedItems.fold(0.0, (sum, item) => sum + (item['thanhTien'] ?? 0.0));
+    return addedItems.fold(
+      0.0,
+      (sum, item) => sum + (item['thanhTien'] ?? 0.0),
+    );
   }
 
   @override
@@ -129,7 +136,7 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
               ],
             ),
             const Divider(thickness: 2),
-            
+
             // Form Content
             Expanded(
               child: SingleChildScrollView(
@@ -153,38 +160,84 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: maNCCController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Mã Nhà Cung Cấp',
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.business),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: TextField(
-                                    controller: ngayLapController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Ngày Lập',
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.calendar_today),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            DropdownButtonFormField<String>(
+                              value: selectedNCC,
+                              hint: const Text('Chọn Nhà Cung Cấp'),
+                              decoration: InputDecoration(
+                                labelText: 'Nhà Cung Cấp',
+                                border: OutlineInputBorder(),
+                                prefixIcon: Icon(Icons.business),
+                              ),
+                              items:
+                                  widget.listNhaCungCap.map((ncc) {
+                                    return DropdownMenuItem<String>(
+                                      value: ncc['maNCC'],
+                                      child: Text(ncc['tenNCC']),
+                                    );
+                                  }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedNCC = value;
+                                });
+                              },
                             ),
+                            if (selectedNCC != null)
+                              Builder(
+                                builder: (context) {
+                                  final ncc = widget.listNhaCungCap.firstWhere(
+                                    (n) => n['maNCC'] == selectedNCC,
+                                    orElse: () => {},
+                                  );
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 12.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.phone,
+                                              size: 18,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Số điện thoại: ${ncc['sdt'] ?? ''}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.location_on,
+                                              size: 18,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Địa chỉ: ${ncc['diaChi'] ?? ''}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                           ],
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Product Selection Section
                     Card(
                       elevation: 2,
@@ -209,26 +262,29 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                 border: OutlineInputBorder(),
                                 prefixIcon: Icon(Icons.inventory),
                               ),
-                              items: widget.listSanPham.map((sp) {
-                                return DropdownMenuItem<String>(
-                                  value: sp['maSanPham'],
-                                  child: Text(sp['tenSanPham']),
-                                );
-                              }).toList(),
+                              items:
+                                  widget.listSanPham.map((sp) {
+                                    return DropdownMenuItem<String>(
+                                      value: sp['maSanPham'],
+                                      child: Text(sp['tenSanPham']),
+                                    );
+                                  }).toList(),
                               onChanged: (value) {
                                 setState(() {
                                   selectedSP = value;
-                                  final selectedProduct = widget.listSanPham.firstWhere(
-                                    (sp) => sp['maSanPham'] == value,
-                                    orElse: () => {},
-                                  );
-                                  tenLSP = selectedProduct['loaiSanPham'];
-                                  donViTinhSP = selectedProduct['donViTinh'];
-                                  donGiaMuaSP = selectedProduct['donGia'].toString();
+                                  final selectedProduct = widget.listSanPham
+                                      .firstWhere(
+                                        (sp) => sp['maSanPham'] == value,
+                                        orElse: () => {},
+                                      );
+                                  tenLSP = selectedProduct['loaiSanPham']['tenLSP'];
+                                  donViTinhSP = selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
+                                  donGiaMuaSP =
+                                      selectedProduct['donGia'].toString();
                                 });
                               },
                             ),
-                            
+
                             if (selectedSP != null) ...[
                               const SizedBox(height: 16),
                               Container(
@@ -243,14 +299,27 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text('Loại Sản Phẩm: $tenLSP', 
-                                                style: const TextStyle(fontWeight: FontWeight.w500)),
-                                              Text('Đơn Vị Tính: $donViTinhSP',
-                                                style: const TextStyle(fontWeight: FontWeight.w500)),
-                                              Text('Đơn Giá: ${MoneyFormat.format(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
-                                                style: const TextStyle(fontWeight: FontWeight.w500)),
+                                              Text(
+                                                'Loại Sản Phẩm: $tenLSP',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Đơn Vị Tính: $donViTinhSP',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Đơn Giá: ${MoneyFormat.format(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -269,17 +338,27 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                       ],
                                     ),
                                     const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton.icon(
-                                        onPressed: _addItem,
-                                        icon: const Icon(Icons.add),
-                                        label: const Text('Thêm Sản Phẩm'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green,
-                                          foregroundColor: Colors.white,
-                                        ),
-                                      ),
+                                    ValueListenableBuilder<TextEditingValue>(
+                                      valueListenable: soLuongController,
+                                      builder: (context, value, child) {
+                                        final isEnabled = value.text.isNotEmpty && int.tryParse(value.text) != null && int.parse(value.text) > 0;
+                                        return SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton.icon(
+                                            onPressed:
+                                                isEnabled ? _addItem : null,
+                                            icon: const Icon(Icons.add),
+                                            label: const Text('Thêm Sản Phẩm'),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  isEnabled
+                                                      ? Colors.green
+                                                      : Colors.grey,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
@@ -289,9 +368,9 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Added Items Section
                     if (addedItems.isNotEmpty) ...[
                       Card(
@@ -330,31 +409,41 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                                   margin: const EdgeInsets.only(bottom: 8),
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey[300]!),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
                                     children: [
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               item['tenSanPham'],
-                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                            Text('SL: ${item['soLuong']} ${item['donViTinh']} × ${MoneyFormat.format((item['donGia'] as double).toInt())} = ${MoneyFormat.format((item['thanhTien'] as double).toInt())}'),
+                                            Text(
+                                              'SL: ${item['soLuong']} ${item['donViTinh']} × ${MoneyFormat.format((item['donGia'] as double).toInt())} = ${MoneyFormat.format((item['thanhTien'] as double).toInt())}',
+                                            ),
                                           ],
                                         ),
                                       ),
                                       IconButton(
                                         onPressed: () => _removeItem(index),
-                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),
@@ -364,7 +453,7 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                 ),
               ),
             ),
-            
+
             // Action Buttons
             const Divider(thickness: 2),
             Row(
@@ -376,15 +465,13 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
-                  onPressed: addedItems.isNotEmpty ? () {
-                    widget.onCreate(
-                      maNCCController.text,
-                      ngayLapController.text,
-                      _calculateTotal(),
-                      addedItems,
-                    );
-                    Navigator.of(context).pop();
-                  } : null,
+                  onPressed:
+                      (addedItems.isNotEmpty && selectedNCC != null)
+                          ? () {
+                            widget.onCreate(selectedNCC!, addedItems);
+                            Navigator.of(context).pop();
+                          }
+                          : null,
                   icon: const Icon(Icons.save),
                   label: const Text('Tạo Hóa Đơn'),
                   style: ElevatedButton.styleFrom(
@@ -402,8 +489,6 @@ class _BillCreateDialogState extends State<BillCreateDialog> {
 
   @override
   void dispose() {
-    maNCCController.dispose();
-    ngayLapController.dispose();
     thanhTienController.dispose();
     soLuongController.dispose();
     super.dispose();

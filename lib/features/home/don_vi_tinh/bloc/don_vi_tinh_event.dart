@@ -4,16 +4,10 @@ class DonViTinhEventStart extends DonViTinhEvent {}
 
 class DonViTinhEventGetAll extends DonViTinhEvent {}
 
-class DonViTinhEventGetById extends DonViTinhEvent {
-  final String maDonVi;
-
-  DonViTinhEventGetById(this.maDonVi);
-}
-
-class DonViTinhEventAdd extends DonViTinhEvent {
+class DonViTinhEventCreate extends DonViTinhEvent {
   final String tenDonVi;
 
-  DonViTinhEventAdd({
+  DonViTinhEventCreate({
     required this.tenDonVi,
   });
 }

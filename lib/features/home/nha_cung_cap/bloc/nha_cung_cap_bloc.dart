@@ -4,13 +4,12 @@ import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_s
 import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap_repository.dart';
 
 class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
-  NhaCungCapBloc(this.nhaCungCapRepository) : super(NhaCungCapInitial()) {
+  NhaCungCapBloc(this.nhaCungCapRepository) : super(NhaCungCapStateInitial()) {
     on<NhaCungCapEventStart>(_onStart);
-    on<NhaCungCapEventAdd>(_onAdd);
+    on<NhaCungCapEventCreate>(_onCreate);
     on<NhaCungCapEventUpdate>(_onUpdate);
     on<NhaCungCapEventDelete>(_onDelete);
     on<NhaCungCapEventGetAll>(_onGetAll);
-    on<NhaCungCapEventGetById>(_onGetById);
   }
 
   final NhaCungCapRepository nhaCungCapRepository;
@@ -19,14 +18,14 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
     NhaCungCapEventStart event,
     Emitter<NhaCungCapState> emit,
   ) {
-    emit(NhaCungCapInitial());
+    emit(NhaCungCapStateInitial());
   }
 
-  void _onAdd(
-    NhaCungCapEventAdd event,
+  void _onCreate(
+    NhaCungCapEventCreate event,
     Emitter<NhaCungCapState> emit,
   ) {
-    // Implement add logic here
+    // Implement create logic here
   }
 
   void _onUpdate(
@@ -48,19 +47,11 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
     Emitter<NhaCungCapState> emit,
   ) async {
     try {
-      emit(NhaCungCapLoading());
+      emit(NhaCungCapStateLoading());
       final data = await nhaCungCapRepository.getAll();
-      emit(NhaCungCapFetchingSuccess(nhaCungCapRepository.convertToTableRowData(data)));
+      emit(NhaCungCapStateUpdated(data));
     } catch (e) {
-      emit(NhaCungCapFetchingFailure(e.toString()));
+      emit(NhaCungCapStateFailure(e.toString()));
     }
   }
-
-  void _onGetById(
-    NhaCungCapEventGetById event,
-    Emitter<NhaCungCapState> emit,
-  ) async {
-
-  }
-
 }

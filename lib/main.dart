@@ -14,6 +14,10 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_api.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_repository.dart';
+import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart';
+import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
+import 'package:gemstore_frontend/features/home/san_pham/san_pham_api.dart';
+import 'package:gemstore_frontend/features/home/san_pham/san_pham_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,6 +39,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(
           create: (context) => PhieuMuaHangRepository(PhieuMuaHangApi(dio)),
         ),
+        RepositoryProvider(
+          create: (context) => SanPhamRepository(SanPhamApi(dio)),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -48,8 +55,12 @@ class MyApp extends StatelessWidget {
                 (context) => DonViTinhBloc(context.read<DonViTinhRepository>()),
           ),
           BlocProvider(
-            create: (context) =>
-                PhieuMuaHangBloc(context.read<PhieuMuaHangRepository>()),
+            create:
+                (context) =>
+                    PhieuMuaHangBloc(context.read<PhieuMuaHangRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => SanPhamBloc(context.read<SanPhamRepository>()),
           ),
         ],
         child: AppContent(),
@@ -72,6 +83,7 @@ class _AppContentState extends State<AppContent> {
     context.read<NhaCungCapBloc>().add(NhaCungCapEventStart());
     context.read<DonViTinhBloc>().add(DonViTinhEventStart());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventStart());
+    context.read<SanPhamBloc>().add(SanPhamEventStart());
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
+
 class NhaCungCap {
   String maNCC;
   String tenNCC;
@@ -31,5 +33,18 @@ class NhaCungCap {
 
   static List<NhaCungCap> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => NhaCungCap.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  static List<TableRowData> convertToTableRowData(List<NhaCungCap> data) {
+    return data.map((ncc) {
+      return TableRowData(
+        id: ncc.maNCC,
+        data: {
+          'name': ncc.tenNCC,
+          'address': ncc.diaChi,
+          'phone': ncc.sdt,
+        },
+      );
+    }).toList();
   }
 }

@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
+import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
+import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart';
+import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
+import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_state.dart';
+import 'package:gemstore_frontend/models/don_vi_tinh.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_bloc.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
+import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
+import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/san_pham.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/error_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,178 +29,322 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+// Thêm biến để quản lý dialog state
 class _HomeScreenState extends State<HomeScreen> {
   String? selectedFunction;
   String? selectedTitle;
   bool isInfoManagementExpanded = true;
   bool isInvoiceManagementExpanded = true;
+  
+  // Thêm biến để quản lý error dialog
+  bool _isErrorDialogShowing = false;
+  final List<String> _pendingErrors = [];
+
+  List<NhaCungCap> _nhaCungCaps = [];
+  List<DonViTinh> _donViTinhs = [];
+  List<PhieuMuaHang> _phieuMuaHangs = [];
+  List<SanPham> _sanPhams = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchAllData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Home_Screen',
-                style: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 16,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<PhieuMuaHangBloc, PhieuMuaHangState>(
+          listener: (context, state) {
+            if (state is PhieuMuaHangStateUpdated) {
+              setState(() {
+                _phieuMuaHangs = state.data;
+              });
+            } else if (state is PhieuMuaHangStateFailure) {
+              _handleError("Lỗi phiếu mua hàng: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<NhaCungCapBloc, NhaCungCapState>(
+          listener: (context, state) {
+            if (state is NhaCungCapStateUpdated) {
+              setState(() {
+                _nhaCungCaps = state.data;
+              });
+            } else if (state is NhaCungCapStateFailure) {
+              _handleError("Lỗi nhà cung cấp: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<DonViTinhBloc, DonViTinhState>(
+          listener: (context, state) {
+            if (state is DonViTinhStateUpdated) {
+              setState(() {
+                _donViTinhs = state.data;
+              });
+            } else if (state is DonViTinhStateFailure) {
+              _handleError("Lỗi đơn vị tính: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<SanPhamBloc, SanPhamState>(
+          listener: (context, state) {
+            if (state is SanPhamStateUpdated) {
+              setState(() {
+                _sanPhams = state.data;
+              });
+            } else if (state is SanPhamStateFailure) {
+              _handleError("Lỗi sản phẩm: ${state.error}");
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Home_Screen',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 16),
                 ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left side - Menu
-                  Container(
-                    width: 260,
-                    margin: const EdgeInsets.only(left: 16.0, right: 8.0, bottom: 16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    child: Column(
-                      children: [
-                        // App Bar with Product Name and Settings
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.black12, width: 1.0),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left side - Menu
+                    Container(
+                      width: 260,
+                      margin: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 8.0,
+                        bottom: 16.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Column(
+                        children: [
+                          // App Bar with Product Name and Settings
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 12.0,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Product_name',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w500,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.black12,
+                                  width: 1.0,
                                 ),
                               ),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.settings),
-                                onPressed: () {
-                                  _onSettingsPressed();
-                                },
+                            ),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Product_name',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  icon: const Icon(Icons.settings),
+                                  onPressed: () {
+                                    _onSettingsPressed();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Main Content Area
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: ListView(
+                                children: [
+                                  // Information Management Section
+                                  _buildExpandableSection(
+                                    title: 'Quản lý thông tin',
+                                    isExpanded: isInfoManagementExpanded,
+                                    onTap: () {
+                                      setState(() {
+                                        isInfoManagementExpanded =
+                                            !isInfoManagementExpanded;
+                                      });
+                                    },
+                                    items: isInfoManagementExpanded
+                                        ? [
+                                            _buildMenuItem(
+                                              'Nhà cung cấp',
+                                              'supplier_management',
+                                            ),
+                                            _buildMenuItem(
+                                              'Đơn vị tính',
+                                              'unit_management',
+                                            ),
+                                            _buildMenuItem(
+                                              'Loại sản phẩm',
+                                              'product_type_management',
+                                            ),
+                                            _buildMenuItem(
+                                              'Loại dịch vụ',
+                                              'service_type_management',
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  const SizedBox(height: 16.0),
+
+                                  // Import Export Section
+                                  _buildExpandableSection(
+                                    title: 'Phiếu nhập xuất',
+                                    isExpanded: isInvoiceManagementExpanded,
+                                    onTap: () {
+                                      setState(() {
+                                        isInvoiceManagementExpanded =
+                                            !isInvoiceManagementExpanded;
+                                      });
+                                    },
+                                    items: isInvoiceManagementExpanded
+                                        ? [
+                                            _buildMenuItem(
+                                              'Phiếu bán hàng',
+                                              'sales_invoice',
+                                            ),
+                                            _buildMenuItem(
+                                              'Phiếu mua hàng',
+                                              'purchase_invoice',
+                                            ),
+                                            _buildMenuItem(
+                                              'Phiếu dịch vụ',
+                                              'service_invoice',
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  const SizedBox(height: 16.0),
+
+                                  // Product List Section
+                                  _buildMenuItemWithDot(
+                                    'Danh sách sản phẩm',
+                                    'product_list',
+                                  ),
+                                  const SizedBox(height: 16.0),
+
+                                  // Reports Section
+                                  _buildMenuItemWithDot('Báo cáo', 'reports'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Right side - Function screen
+                    if (selectedFunction != null)
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(
+                            right: 16.0,
+                            bottom: 16.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: Column(
+                            children: [
+                              // Function screen header
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 12.0,
+                                ),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.black12,
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      selectedTitle ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Function screen content
+                              Expanded(
+                                child: Center(child: _buildFunctionScreen()),
                               ),
                             ],
                           ),
                         ),
-
-                        // Main Content Area
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: ListView(
-                              children: [
-                                // Information Management Section
-                                _buildExpandableSection(
-                                  title: 'Quản lý thông tin',
-                                  isExpanded: isInfoManagementExpanded,
-                                  onTap: () {
-                                    setState(() {
-                                      isInfoManagementExpanded = !isInfoManagementExpanded;
-                                    });
-                                  },
-                                  items: isInfoManagementExpanded ? [
-                                    _buildMenuItem('Nhà cung cấp', 'supplier_management'),
-                                    _buildMenuItem('Đơn vị tính', 'unit_management'),
-                                    _buildMenuItem('Loại sản phẩm', 'product_type_management'),
-                                    _buildMenuItem('Loại dịch vụ', 'service_type_management'),
-                                  ] : [],
-                                ),
-                                const SizedBox(height: 16.0),
-
-                                // Import Export Section
-                                _buildExpandableSection(
-                                  title: 'Phiếu nhập xuất',
-                                  isExpanded: isInvoiceManagementExpanded,
-                                  onTap: () {
-                                    setState(() {
-                                      isInvoiceManagementExpanded = !isInvoiceManagementExpanded;
-                                    });
-                                  },
-                                  items: isInvoiceManagementExpanded ? [
-                                    _buildMenuItem('Phiếu bán hàng', 'sales_invoice'),
-                                    _buildMenuItem('Phiếu mua hàng', 'purchase_invoice'),
-                                    _buildMenuItem('Phiếu dịch vụ', 'service_invoice'),
-                                  ] : [],
-                                ),
-                                const SizedBox(height: 16.0),
-
-                                // Product List Section
-                                _buildMenuItemWithDot('Danh sách sản phẩm', 'product_list'),
-                                const SizedBox(height: 16.0),
-
-                                // Reports Section
-                                _buildMenuItemWithDot('Báo cáo', 'reports'),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Right side - Function screen
-                  if (selectedFunction != null)
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 16.0, bottom: 16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: Column(
-                          children: [
-                            // Function screen header
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(color: Colors.black12, width: 1.0),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    selectedTitle ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Function screen content
-                            Expanded(
-                              child: Center(
-                                child: _buildFunctionScreen(),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // Method để xử lý error một cách thông minh
+  void _handleError(String errorMessage) {
+    _pendingErrors.add(errorMessage);
+  
+  if (!_isErrorDialogShowing) {
+    _showAllErrorsInOneDialog();
+  }
+  }
+
+  // Hiển thị tất cả lỗi trong 1 dialog
+  void _showAllErrorsInOneDialog() {
+    if (_pendingErrors.isEmpty) return;
+
+    _isErrorDialogShowing = true;
+    final errorsToShow = List<String>.from(_pendingErrors);
+    _pendingErrors.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return ErrorDialog(
+          title: 'Lỗi (${errorsToShow.length} lỗi)',
+          message: errorsToShow,
+          onClose: () {
+            _isErrorDialogShowing = false;
+          },
+        );
+      },
+    ).then((_) {
+      _isErrorDialogShowing = false;
+    });
+  }
+
+  // Các methods khác giữ nguyên...
   Widget _buildExpandableSection({
     required String title,
     required List<Widget> items,
@@ -196,7 +358,10 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20.0),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(20.0),
@@ -213,8 +378,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 4.0),
                 Icon(
-                  isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  size: 20.0
+                  isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  size: 20.0,
                 ),
               ],
             ),
@@ -245,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Container(
+        child: SizedBox(
           height: 24.0,
           child: Row(
             children: [
@@ -254,7 +421,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   title,
                   style: TextStyle(
                     fontSize: 15.0,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected ? Colors.blue : Colors.black,
                   ),
                 ),
@@ -290,9 +458,8 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(20.0),
-          border: isSelected
-              ? Border.all(color: Colors.blue, width: 2.0)
-              : null,
+          border:
+              isSelected ? Border.all(color: Colors.blue, width: 2.0) : null,
         ),
         child: Row(
           children: [
@@ -324,25 +491,35 @@ class _HomeScreenState extends State<HomeScreen> {
     // Return specific UI based on the selected function
     switch (selectedFunction) {
       case 'supplier_management':
-        return NhaCungCapScreen();
+        return NhaCungCapScreen(data: _nhaCungCaps);
       case 'unit_management':
-        return DonViTinhScreen();
+        return DonViTinhScreen(data: _donViTinhs);
       case 'product_type_management':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.category, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Loại sản phẩm Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Loại sản phẩm Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       case 'service_type_management':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.miscellaneous_services, size: 64, color: Colors.grey[400]),
+            Icon(
+              Icons.miscellaneous_services,
+              size: 64,
+              color: Colors.grey[400],
+            ),
             const SizedBox(height: 16),
-            Text('Loại dịch vụ Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Loại dịch vụ Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       case 'sales_invoice':
@@ -351,18 +528,28 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Phiếu bán hàng Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Phiếu bán hàng Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       case 'purchase_invoice':
-        return PhieuMuaHangScreen();
+        return PhieuMuaHangScreen(
+          data: _phieuMuaHangs,
+          listNhaCungCap: _nhaCungCaps,
+          listSanPham: _sanPhams,
+        );
       case 'service_invoice':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.home_repair_service, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Phiếu dịch vụ Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Phiếu dịch vụ Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       case 'product_list':
@@ -371,7 +558,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.inventory_2, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Danh sách sản phẩm Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Danh sách sản phẩm Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       case 'reports':
@@ -380,7 +570,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.bar_chart, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Báo cáo Screen', style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Báo cáo Screen',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
       default:
@@ -389,8 +582,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.touch_app, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('Select a function from the menu',
-                style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            Text(
+              'Select a function from the menu',
+              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+            ),
           ],
         );
     }
@@ -398,5 +593,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onSettingsPressed() {
     GoRouter.of(context).go('/settings');
+  }
+
+  void _fetchAllData() {
+    context.read<NhaCungCapBloc>().add(NhaCungCapEventGetAll());
+    context.read<DonViTinhBloc>().add(DonViTinhEventGetAll());
+    context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
+    context.read<SanPhamBloc>().add(SanPhamEventGetAll());
   }
 }

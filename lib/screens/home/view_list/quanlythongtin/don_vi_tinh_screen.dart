@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
+import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class DonViTinhScreen extends StatefulWidget {
-  const DonViTinhScreen({super.key});
+  final List<DonViTinh> data;
+  const DonViTinhScreen({super.key, required this.data});
 
   @override
   State<DonViTinhScreen> createState() => _DonViTinhScreenState();
@@ -22,9 +24,6 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchData();
-    });
   }
 
   void _showAddUnitDialog() {
@@ -86,26 +85,19 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
       body: BlocConsumer<DonViTinhBloc, DonViTinhState>(
         listener: (context, state) {
           setState(() {
-            _isLoading = state is DonViTinhLoading;
+            _isLoading = state is DonViTinhStateLoading;
           });
         },
         builder: (context, state) {
           return Stack(
             children: [
-              switch (state) {
-                DonViTinhInitial() => Center(child: Text('Khởi tạo...')),
-                DonViTinhLoading() => Container(), // or some placeholder
-                DonViTinhFetchingSuccess() => ReusableTableWidget(
-                  title: 'Nhà Cung Cấp',
-                  data: state.data,
+              ReusableTableWidget(
+                  title: 'Đơn vị tính',
+                  data: DonViTinh.convertToTableRowData(widget.data),
                   columns: _columns,
                   onUpdate: _onUpdateDonViTinhScreen,
                   onDelete: _onDeleteDonViTinhScreen,
                 ),
-                DonViTinhFetchingFailure() => Center(
-                  child: Text('Lỗi khi tải dữ liệu: ${state.error}'),
-                ),
-              },
               // Loading overlay
               if (_isLoading)
                 Container(
@@ -134,26 +126,16 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
     super.dispose();
   }
 
-  void _onUpdateDonViTinhScreen(TableRowData row) {
-    context.read<DonViTinhBloc>().add(
-      DonViTinhEventUpdate(
-        maDonVi: row.id,
-        tenDonVi: row.data['name'] as String,
-      ),
-    );
-  }
+  dynamic _onUpdateDonViTinhScreen(TableRowData row, Map<String, dynamic> updatedData) {  }
+
 
   void _onDeleteDonViTinhScreen(String id) {
     context.read<DonViTinhBloc>().add(DonViTinhEventDelete(maDonVi: id));
   }
 
-  void _fetchData() {
-    context.read<DonViTinhBloc>().add(DonViTinhEventGetAll());
-  }
-
   void _onAddDonViTinhScreen(String tenDonVi) {
     context.read<DonViTinhBloc>().add(
-      DonViTinhEventAdd(tenDonVi: tenDonVi),
+      DonViTinhEventCreate(tenDonVi: tenDonVi),
     );
   }
 }

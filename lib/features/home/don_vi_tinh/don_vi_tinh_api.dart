@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:gemstore_frontend/features/home/don_vi_tinh/don_vi_tinh.dart';
+import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 
 class DonViTinhApi {
   final Dio dio;

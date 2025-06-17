@@ -7,9 +7,10 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
   PhieuMuaHangBloc(this.phieuMuaHangRepository)
     : super(PhieuMuaHangStateInitial()) {
     on<PhieuMuaHangEventStart>(_onStart);
-    on<PhieuMuaHangEventAdd>(_onAdd);
+    on<PhieuMuaHangEventCreate>(_onCreate);
     on<PhieuMuaHangEventGetAll>(_onGetAll);
-    on<PhieuMuaHangEventGetById>(_onGetById);
+    on<PhieuMuaHangEventDelete>(_onDelete);
+    on<PhieuMuaHangEventUpdate>(_onUpdate);
   }
 
   final PhieuMuaHangRepository phieuMuaHangRepository;
@@ -18,28 +19,17 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     emit(PhieuMuaHangStateInitial());
   }
 
-  void _onAdd(
-    PhieuMuaHangEventAdd event,
+  void _onCreate(
+    PhieuMuaHangEventCreate event,
     Emitter<PhieuMuaHangState> emit,
   ) async {
     try {
       emit(PhieuMuaHangStateLoading());
-      await phieuMuaHangRepository.create(
-        event.maNCC,
-        event.ngayLap,
-        event.thanhTien,
-        event.sanPhamMua,
-      );
+      await phieuMuaHangRepository.create(event.maNCC, event.sanPhamMua);
       final data = await phieuMuaHangRepository.getAll();
-      final listSanPham = await phieuMuaHangRepository.getListSanPham();
-      emit(
-        PhieuMuaHangStateSuccess(
-          phieuMuaHangRepository.convertToTableRowData(data),
-          listSanPham,
-        ),
-      );
+      emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
-      emit(PhieuMuaHangStateFailure(e.toString()));
+      emit(PhieuMuaHangStateFailure("Lỗi tạo phiếu mua hàng: ${e.toString()}"));
     }
   }
 
@@ -50,28 +40,41 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     try {
       emit(PhieuMuaHangStateLoading());
       final data = await phieuMuaHangRepository.getAll();
-      final listSanPham = await phieuMuaHangRepository.getListSanPham();
+      emit(PhieuMuaHangStateUpdated(data));
+    } catch (e) {
       emit(
-        PhieuMuaHangStateSuccess(
-          phieuMuaHangRepository.convertToTableRowData(data),
-          listSanPham,
+        PhieuMuaHangStateFailure(
+          "Lỗi tải danh sách phiếu mua hàng: ${e.toString()}",
         ),
       );
-    } catch (e) {
-      emit(PhieuMuaHangStateFailure(e.toString()));
     }
   }
 
-  void _onGetById(
-    PhieuMuaHangEventGetById event,
+  void _onDelete(
+    PhieuMuaHangEventDelete event,
     Emitter<PhieuMuaHangState> emit,
   ) async {
     try {
       emit(PhieuMuaHangStateLoading());
-      final data = await phieuMuaHangRepository.getById(event.maPhieu);
-      emit(PhieuMuaHangStateGetDetailSuccess(data));
+      await phieuMuaHangRepository.delete(event.maPhieu);
+      final data = await phieuMuaHangRepository.getAll();
+      emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
-      emit(PhieuMuaHangStateGetDetailFailure(e.toString()));
+      emit(PhieuMuaHangStateFailure("Lỗi xóa phiếu mua hàng: ${e.toString()}"));
+    }
+  }
+
+  void _onUpdate(
+    PhieuMuaHangEventUpdate event,
+    Emitter<PhieuMuaHangState> emit,
+  ) async {
+    try {
+      emit(PhieuMuaHangStateLoading());
+      //await phieuMuaHangRepository.update(event.phieuMuaHang);
+      final data = await phieuMuaHangRepository.getAll();
+      emit(PhieuMuaHangStateUpdated(data));
+    } catch (e) {
+      emit(PhieuMuaHangStateFailure("Lỗi cập nhật phiếu mua hàng: ${e.toString()}"));
     }
   }
 }

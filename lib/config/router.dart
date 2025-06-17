@@ -12,7 +12,7 @@ class RouteName {
 
 
 final router = GoRouter(
-  initialLocation: RouteName.login,
+  initialLocation: RouteName.home,
   routes: [
     GoRoute(
       path: RouteName.login,

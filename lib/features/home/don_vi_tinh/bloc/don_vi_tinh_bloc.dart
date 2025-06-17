@@ -4,13 +4,12 @@ import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_sta
 import 'package:gemstore_frontend/features/home/don_vi_tinh/don_vi_tinh_repository.dart';
 
 class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
-  DonViTinhBloc(this.donViTinhRepository) : super(DonViTinhInitial()) {
+  DonViTinhBloc(this.donViTinhRepository) : super(DonViTinhStateInitial()) {
     on<DonViTinhEventStart>(_onStart);
-    on<DonViTinhEventAdd>(_onAdd);
+    on<DonViTinhEventCreate>(_onCreate);
     on<DonViTinhEventUpdate>(_onUpdate);
     on<DonViTinhEventDelete>(_onDelete);
     on<DonViTinhEventGetAll>(_onGetAll);
-    on<DonViTinhEventGetById>(_onGetById);
   }
 
   final DonViTinhRepository donViTinhRepository;
@@ -19,14 +18,14 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
     DonViTinhEventStart event,
     Emitter<DonViTinhState> emit,
   ) {
-    emit(DonViTinhInitial());
+    emit(DonViTinhStateInitial());
   }
 
-  void _onAdd(
-    DonViTinhEventAdd event,
+  void _onCreate(
+    DonViTinhEventCreate event,
     Emitter<DonViTinhState> emit,
   ) {
-    // Implement add logic here
+    // Implement create logic here
   }
 
   void _onUpdate(
@@ -48,19 +47,11 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
     Emitter<DonViTinhState> emit,
   ) async {
     try {
-      emit(DonViTinhLoading());
+      emit(DonViTinhStateLoading());
       final data = await donViTinhRepository.getAll();
-      emit(DonViTinhFetchingSuccess(donViTinhRepository.convertToTableRowData(data)));
+      emit(DonViTinhStateUpdated(data));
     } catch (e) {
-      emit(DonViTinhFetchingFailure(e.toString()));
+      emit(DonViTinhStateFailure(e.toString()));
     }
   }
-
-  void _onGetById(
-    DonViTinhEventGetById event,
-    Emitter<DonViTinhState> emit,
-  ) async {
-    
-  }
-
 }
