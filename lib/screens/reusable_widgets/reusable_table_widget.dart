@@ -117,22 +117,6 @@ class _UpdateDialogState extends State<UpdateDialog> {
     }
   }
 
-  // Helper function to get nested value from object
-  dynamic _getNestedValue(Map<String, dynamic> data, String path) {
-    final keys = path.split('.');
-    dynamic current = data;
-    
-    for (final key in keys) {
-      if (current is Map<String, dynamic> && current.containsKey(key)) {
-        current = current[key];
-      } else {
-        return null;
-      }
-    }
-    
-    return current;
-  }
-
   Widget _buildFormField(TableColumn column) {
     if (column.isForeignKey && column.foreignKeyConfig != null) {
       return _buildForeignKeyDropdown(column);
