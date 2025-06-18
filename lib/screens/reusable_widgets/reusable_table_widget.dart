@@ -94,9 +94,9 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   Future<void> _handleUpdate() async {
     if (!widget.formKey.currentState!.validate()) return;
-    
+
     final updatedData = <String, dynamic>{};
-    
+
     for (final column in widget.columns) {
       if (column.isForeignKey && column.foreignKeyConfig != null) {
         final selectedValue = widget.selectedForeignKeys[column.key];
@@ -110,7 +110,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         }
       }
     }
-    
+
     widget.onUpdate(updatedData);
     if (mounted) {
       Navigator.of(context).pop();
@@ -128,22 +128,23 @@ class _UpdateDialogState extends State<UpdateDialog> {
   Widget _buildForeignKeyDropdown(TableColumn column) {
     final config = column.foreignKeyConfig!;
     final selectedValue = widget.selectedForeignKeys[column.key];
-    
+
     return DropdownButtonFormField<Map<String, dynamic>>(
       value: selectedValue,
       decoration: InputDecoration(
         labelText: column.header,
         border: const OutlineInputBorder(),
       ),
-      items: config.options.map((option) {
-        return DropdownMenuItem<Map<String, dynamic>>(
-          value: option,
-          child: Text(
-            config.getDisplayText(option),
-            overflow: TextOverflow.ellipsis,
-          ),
-        );
-      }).toList(),
+      items:
+          config.options.map((option) {
+            return DropdownMenuItem<Map<String, dynamic>>(
+              value: option,
+              child: Text(
+                config.getDisplayText(option),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
       onChanged: (value) {
         setState(() {
           widget.selectedForeignKeys[column.key] = value;
@@ -159,10 +160,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
   }
 
   Widget _buildTextFormField(TableColumn column) {
-    final controller = widget.controllers[column.key]!;
-    
     return TextFormField(
-      controller: controller,
+      controller: widget.controllers[column.key],
       decoration: InputDecoration(
         labelText: column.header,
         border: const OutlineInputBorder(),
@@ -256,10 +255,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             },
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: _handleUpdate,
-            child: const Text('Update'),
-          ),
+          ElevatedButton(onPressed: _handleUpdate, child: const Text('Update')),
         ],
       ),
     );
@@ -271,7 +267,8 @@ class ReusableTableWidget extends StatefulWidget {
   final String title;
   final List<TableRowData> data;
   final List<TableColumn> columns;
-  final Function(TableRowData updatedData, Map<String, dynamic> newData)? onUpdate;
+  final Function(TableRowData updatedData, Map<String, dynamic> newData)?
+  onUpdate;
   final Function(String id)? onDelete;
   final double? height;
   final EdgeInsets? padding;
@@ -298,7 +295,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
   dynamic _getNestedValue(Map<String, dynamic> data, String path) {
     final keys = path.split('.');
     dynamic current = data;
-    
+
     for (final key in keys) {
       if (current is Map<String, dynamic> && current.containsKey(key)) {
         current = current[key];
@@ -306,7 +303,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
         return null;
       }
     }
-    
+
     return current;
   }
 
@@ -326,12 +323,13 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
           } else {
             currentValue = rowData.data[column.key];
           }
-          
+
           if (currentValue != null && currentValue is Map<String, dynamic>) {
             // Find matching option in foreign key config
             final matchingOption = column.foreignKeyConfig!.options.firstWhere(
-              (option) => option[column.foreignKeyConfig!.valueKey] == 
-                          currentValue[column.foreignKeyConfig!.valueKey],
+              (option) =>
+                  option[column.foreignKeyConfig!.valueKey] ==
+                  currentValue[column.foreignKeyConfig!.valueKey],
               orElse: () => column.foreignKeyConfig!.options.first,
             );
             selectedForeignKeys[column.key] = matchingOption;
@@ -340,12 +338,15 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
           // Regular text field
           String currentValue = '';
           if (column.nestedPath != null) {
-            final nestedValue = _getNestedValue(rowData.data, column.nestedPath!);
+            final nestedValue = _getNestedValue(
+              rowData.data,
+              column.nestedPath!,
+            );
             currentValue = nestedValue?.toString() ?? '';
           } else {
             currentValue = rowData.data[column.key]?.toString() ?? '';
           }
-          
+
           controllers[column.key] = TextEditingController(text: currentValue);
         }
       }
@@ -354,22 +355,23 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => UpdateDialog(
-        title: widget.title,
-        id: rowData.id,
-        columns: widget.columns.where((col) => col.editable).toList(),
-        controllers: controllers,
-        selectedForeignKeys: selectedForeignKeys,
-        formKey: formKey,
-        onUpdate: (updatedData) {
-          if (widget.onUpdate != null) {
-            widget.onUpdate!(rowData, updatedData);
-          }
-        },
-      ),
-    ).whenComplete(() {
-      // Always dispose controllers when dialog is completely closed
-      Future.microtask(() {
+      builder:
+          (dialogContext) => UpdateDialog(
+            title: widget.title,
+            id: rowData.id,
+            columns: widget.columns.where((col) => col.editable).toList(),
+            controllers: controllers,
+            selectedForeignKeys: selectedForeignKeys,
+            formKey: formKey,
+            onUpdate: (updatedData) {
+              if (widget.onUpdate != null) {
+                widget.onUpdate!(rowData, updatedData);
+              }
+            },
+          ),
+    ).then((_) {
+      // Đảm bảo chỉ dispose sau khi dialog đã bị huỷ hoàn toàn
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         for (final controller in controllers.values) {
           controller.dispose();
         }
@@ -382,32 +384,33 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: const Text('Bạn có chắc chắn muốn xóa mục này không?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Hủy'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('Xác nhận xóa'),
+            content: const Text('Bạn có chắc chắn muốn xóa mục này không?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  if (widget.onDelete != null && mounted) {
+                    widget.onDelete!(id);
+                  }
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Xóa'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              if (widget.onDelete != null && mounted) {
-                widget.onDelete!(id);
-              }
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildCell(TableColumn column, TableRowData rowData, bool isEditing) {
     dynamic value;
-    
+
     if (column.key == 'id') {
       value = rowData.id;
     } else if (column.nestedPath != null) {
@@ -424,7 +427,9 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
     }
 
     // Handle foreign key display
-    if (column.isForeignKey && column.foreignKeyConfig != null && value is Map<String, dynamic>) {
+    if (column.isForeignKey &&
+        column.foreignKeyConfig != null &&
+        value is Map<String, dynamic>) {
       final displayText = column.foreignKeyConfig!.getDisplayText(value);
       return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -523,112 +528,125 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                       bottomRight: Radius.circular(8),
                     ),
                   ),
-                  child: widget.data.isEmpty
-                      ? const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Text(
-                              'No data available',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                  child:
+                      widget.data.isEmpty
+                          ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Text(
+                                'No data available',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      : ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: widget.data.length,
-                          itemBuilder: (context, index) {
-                            final rowData = widget.data[index];
+                          )
+                          : ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: widget.data.length,
+                            itemBuilder: (context, index) {
+                              final rowData = widget.data[index];
 
-                            return IntrinsicHeight(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: index.isEven
-                                      ? Colors.white
-                                      : Colors.grey[50],
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.grey[200]!,
-                                      width: 0.5,
+                              return IntrinsicHeight(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        index.isEven
+                                            ? Colors.white
+                                            : Colors.grey[50],
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[200]!,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    ...widget.columns.map(
-                                      (column) => Expanded(
-                                        flex: column.width?.toInt() ?? 1,
-                                        child: Container(
-                                          alignment: Alignment.centerLeft,
-                                          child: _buildCell(
-                                            column,
-                                            rowData,
-                                            false,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      ...widget.columns.map(
+                                        (column) => Expanded(
+                                          flex: column.width?.toInt() ?? 1,
+                                          child: Container(
+                                            alignment: Alignment.centerLeft,
+                                            child: _buildCell(
+                                              column,
+                                              rowData,
+                                              false,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    if (widget.showActions)
-                                      SizedBox(
-                                        width: 120,
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () =>
-                                                      _showUpdateDialog(rowData),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(8.0),
-                                                    child: Icon(
-                                                      Icons.edit,
-                                                      color: Colors.blue,
-                                                      size: 20,
+                                      if (widget.showActions)
+                                        SizedBox(
+                                          width: 120,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap:
+                                                        () => _showUpdateDialog(
+                                                          rowData,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.all(
+                                                        8.0,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        color: Colors.blue,
+                                                        size: 20,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () =>
-                                                      _deleteRow(rowData.id),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(8.0),
-                                                    child: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                      size: 20,
+                                                const SizedBox(width: 4),
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap:
+                                                        () => _deleteRow(
+                                                          rowData.id,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.all(
+                                                        8.0,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                        size: 20,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
                 ),
               ),
             ],

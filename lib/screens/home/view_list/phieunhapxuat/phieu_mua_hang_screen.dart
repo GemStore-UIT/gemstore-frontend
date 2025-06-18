@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/config/money_format.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
@@ -34,7 +35,19 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     ),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
     TableColumn(key: 'date', header: 'Ngày lập', width: 2),
-    TableColumn(key: 'total', header: 'Tổng tiền', width: 2),
+    TableColumn(key: 'total', header: 'Tổng tiền', width: 2, 
+      customWidget: (value) => SizedBox(
+        height: 40,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            MoneyFormat.format(value),
+            style: const TextStyle(fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    ),
   ];
   bool _isLoading = false;
   final List<Map<String, dynamic>> _listSanPham = [];

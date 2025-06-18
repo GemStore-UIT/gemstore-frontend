@@ -16,7 +16,7 @@ class DonViTinhScreen extends StatefulWidget {
 
 class _DonViTinhScreenState extends State<DonViTinhScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 3),
+    TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 2, editable: false),
     TableColumn(key: 'name', header: 'Đơn vị tính', width: 2),
   ];
   bool _isLoading = false;
@@ -27,9 +27,7 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
   }
 
   void _showAddUnitDialog() {
-    final TextEditingController idController = TextEditingController();
     final TextEditingController unitNameController = TextEditingController();
-
 
     showDialog(
       context: context,
@@ -40,14 +38,6 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: idController,
-                  decoration: InputDecoration(
-                    labelText: 'Mã đơn vị tính',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
                 TextField(
                   controller: unitNameController,
                   decoration: InputDecoration(
@@ -65,9 +55,7 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _onAddDonViTinhScreen(
-                  unitNameController.text,
-                );
+                _onAddDonViTinh(unitNameController.text);
                 Navigator.of(context).pop();
               },
               child: Text('Thêm'),
@@ -80,44 +68,43 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocConsumer<DonViTinhBloc, DonViTinhState>(
-        listener: (context, state) {
-          setState(() {
-            _isLoading = state is DonViTinhStateLoading;
-          });
-        },
-        builder: (context, state) {
-          return Stack(
-            children: [
-              ReusableTableWidget(
-                  title: 'Đơn vị tính',
-                  data: DonViTinh.convertToTableRowData(widget.data),
-                  columns: _columns,
-                  onUpdate: _onUpdateDonViTinhScreen,
-                  onDelete: _onDeleteDonViTinhScreen,
+    return BlocConsumer<DonViTinhBloc, DonViTinhState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is DonViTinhStateLoading;
+        });
+      },
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.white,
+              body: ReusableTableWidget(
+                title: 'Đơn vị tính',
+                data: DonViTinh.convertToTableRowData(widget.data),
+                columns: _columns,
+                onUpdate: _onUpdateDonViTinh,
+                onDelete: _onDeleteDonViTinh,
+              ),
+              floatingActionButton: FloatingActionButton.extended(
+                onPressed: _showAddUnitDialog,
+                icon: Icon(Icons.add),
+                label: Text('Thêm đơn vị tính'),
+                tooltip: 'Thêm đơn vị tính',
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            if (_isLoading)
+              Container(
+                color: Colors.black12,
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
-              // Loading overlay
-              if (_isLoading)
-                Container(
-                  color: Colors.black12,
-                  child: Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddUnitDialog,
-        icon: Icon(Icons.add),
-        label: Text('Thêm đơn vị tính'),
-        tooltip: 'Thêm đơn vị tính',
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+              ),
+          ],
+        );
+      }
     );
   }
 
@@ -126,16 +113,23 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
     super.dispose();
   }
 
-  dynamic _onUpdateDonViTinhScreen(TableRowData row, Map<String, dynamic> updatedData) {  }
+  dynamic _onUpdateDonViTinh(
+    TableRowData row,
+    Map<String, dynamic> updatedData,
+  ) {
+    final String id = row.id;
+    final String tenDonVi = updatedData['name'] ?? '';
 
+    context.read<DonViTinhBloc>().add(
+      DonViTinhEventUpdate(maDonVi: id, tenDonVi: tenDonVi),
+    );
+  }
 
-  void _onDeleteDonViTinhScreen(String id) {
+  void _onDeleteDonViTinh(String id) {
     context.read<DonViTinhBloc>().add(DonViTinhEventDelete(maDonVi: id));
   }
 
-  void _onAddDonViTinhScreen(String tenDonVi) {
-    context.read<DonViTinhBloc>().add(
-      DonViTinhEventCreate(tenDonVi: tenDonVi),
-    );
+  void _onAddDonViTinh(String tenDonVi) {
+    context.read<DonViTinhBloc>().add(DonViTinhEventCreate(tenDonVi: tenDonVi));
   }
 }
