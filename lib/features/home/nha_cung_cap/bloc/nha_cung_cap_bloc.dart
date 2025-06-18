@@ -24,22 +24,40 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
   void _onCreate(
     NhaCungCapEventCreate event,
     Emitter<NhaCungCapState> emit,
-  ) {
-    // Implement create logic here
+  ) async {
+    emit(NhaCungCapStateLoading());
+    try {
+      await nhaCungCapRepository.create(event.tenNCC, event.diaChi, event.sdt);
+      add(NhaCungCapEventGetAll());
+    } catch (error) {
+      emit(NhaCungCapStateFailure(error.toString()));
+    }
   }
 
   void _onUpdate(
     NhaCungCapEventUpdate event,
     Emitter<NhaCungCapState> emit,
-  ) {
-    // Implement update logic here
+  ) async {
+    emit(NhaCungCapStateLoading());
+    try {
+      await nhaCungCapRepository.update(event.nhaCungCap);
+      add(NhaCungCapEventGetAll());
+    } catch (error) {
+      emit(NhaCungCapStateFailure(error.toString()));
+    }
   }
 
   void _onDelete(
     NhaCungCapEventDelete event,
     Emitter<NhaCungCapState> emit,
-  ) {
-    // Implement delete logic here
+  ) async {
+    emit(NhaCungCapStateLoading());
+    try {
+      await nhaCungCapRepository.delete(event.maNCC);
+      add(NhaCungCapEventGetAll());
+    } catch (error) {
+      emit(NhaCungCapStateFailure(error.toString()));
+    }
   }
 
   void _onGetAll(

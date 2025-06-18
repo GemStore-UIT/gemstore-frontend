@@ -9,13 +9,56 @@ class NhaCungCapApi {
   Future<List<NhaCungCap>> getAll() async {
     try {
       final response = await dio.get('/api/nhacungcap');
-      if (response.statusCode == 200) {
         return NhaCungCap.fromJsonList(response.data);
-      } else {
-        throw Exception(response.statusCode);
-      }
     } catch (e) {
       throw Exception(e);
+    }
+  }
+
+  Future<void> create(String tenNCC, String diaChi, String sdt) async {
+    try {
+      await dio.post('/api/nhacungcap', data: {
+        'tenNCC': tenNCC,
+        'diaChi': diaChi,
+        'sdt': sdt,
+      });
+    } catch (e) {
+      throw Exception('API create failed: $e');
+    }
+  }
+
+  Future<void> update(NhaCungCap nhacungcap) async {
+    try {
+      await dio.post(
+        '/api/nhacungcap',
+        data: {
+          'maNCC': nhacungcap.maNCC,
+          'tenNCC': nhacungcap.tenNCC,
+          'diaChi': nhacungcap.diaChi,
+          'sdt': nhacungcap.sdt,
+        },
+      );
+    } catch (e) {
+      throw Exception('API update failed: $e');
+    }
+  }
+
+  Future<void> delete(String maNCC) async {
+    try {
+      final response = await dio.delete(
+        '/api/nhacungcap/$maNCC',
+        options: Options(validateStatus: (status) => true),
+      );
+
+      if (response.statusCode == 409) {
+        throw Exception(
+          'Không thể xóa nhà cung cấp này vì nó đang được sử dụng.',
+        );
+      } else if (response.statusCode != 200) {
+        throw Exception('Xóa thất bại với mã lỗi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('API delete failed: $e');
     }
   }
 }
