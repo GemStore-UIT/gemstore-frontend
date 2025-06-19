@@ -1,16 +1,17 @@
+import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuMuaHang {
   String soPhieuMH;
   String ngayLap;
-  String tenNhaCungCap;
+  NhaCungCap nhaCungCap;
   int tongTien;
-  List<SanPhamMua> chiTiet;
+  List<ChiTietPhieuMuaHang> chiTiet;
 
   PhieuMuaHang({
     required this.soPhieuMH,
     required this.ngayLap,
-    required this.tenNhaCungCap,
+    required this.nhaCungCap,
     required this.tongTien,
     required this.chiTiet,
   });
@@ -19,11 +20,12 @@ class PhieuMuaHang {
     return PhieuMuaHang(
       soPhieuMH: json['soPhieuMH'],
       ngayLap: json['ngayLap'],
-      tenNhaCungCap: json['tenNhaCungCap'],
+      nhaCungCap: NhaCungCap.fromJson(json['nhaCungCap']),
       tongTien: json['tongTien'],
-      chiTiet: (json['chiTiet'] as List)
-          .map((item) => SanPhamMua.fromJson(item))
-          .toList(),
+      chiTiet:
+          (json['chiTiet'] as List)
+              .map((item) => ChiTietPhieuMuaHang.fromJson(item))
+              .toList(),
     );
   }
 
@@ -31,7 +33,7 @@ class PhieuMuaHang {
     return {
       'soPhieuMH': soPhieuMH,
       'ngayLap': ngayLap,
-      'tenNhaCungCap': tenNhaCungCap,
+      'nhaCungCap': nhaCungCap.toJson(),
       'tongTien': tongTien,
       'chiTiet': chiTiet.map((item) => item.toJson()).toList(),
     };
@@ -48,30 +50,31 @@ class PhieuMuaHang {
       return TableRowData(
         id: phieu.soPhieuMH,
         data: {
-          'name': phieu.tenNhaCungCap,
+          'name': phieu.nhaCungCap.tenNCC,
           'date': phieu.ngayLap,
           'total': phieu.tongTien,
+          'details': phieu.chiTiet.map((item) => item.toJson()).toList(),
         },
       );
     }).toList();
   }
 }
 
-class SanPhamMua {
+class ChiTietPhieuMuaHang {
   String maSanPham;
   String tenSanPham;
   int soLuong;
   int thanhTien;
 
-  SanPhamMua({
+  ChiTietPhieuMuaHang({
     required this.maSanPham,
     required this.tenSanPham,
     required this.soLuong,
     required this.thanhTien,
   });
 
-  factory SanPhamMua.fromJson(Map<String, dynamic> json) {
-    return SanPhamMua(
+  factory ChiTietPhieuMuaHang.fromJson(Map<String, dynamic> json) {
+    return ChiTietPhieuMuaHang(
       maSanPham: json['maSanPham'],
       tenSanPham: json['tenSanPham'],
       soLuong: json['soLuong'],

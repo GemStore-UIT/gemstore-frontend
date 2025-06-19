@@ -26,14 +26,35 @@ class PhieuMuaHangScreen extends StatefulWidget {
 }
 
 class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
-  final List<TableColumn> _columns = [
+  late List<TableColumn> _columns;
+  bool _isLoading = false;
+  final List<Map<String, dynamic>> _listSanPham = [];
+  final List<Map<String, dynamic>> _listNhaCungCap = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _listSanPham.addAll(
+      widget.listSanPham.map((sp) => sp.toJson()).toList(),
+    );
+    _listNhaCungCap.addAll(
+      widget.listNhaCungCap.map((ncc) => ncc.toJson()).toList(),
+    );
+    _columns = [
     TableColumn(
       key: 'id',
       header: 'Mã phiếu mua hàng',
       width: 3,
       editable: false,
     ),
-    TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 3),
+    TableColumn(key: 'name', header: 'Nhà cung cấp', width: 3, 
+      isForeignKey: true,
+      foreignKeyConfig: ForeignKeyConfig(
+        options: _listNhaCungCap,
+        valueKey: 'maNCC',
+        displayKey: 'tenNCC',
+      ),
+    ),
     TableColumn(key: 'date', header: 'Ngày lập', width: 2),
     TableColumn(key: 'total', header: 'Tổng tiền', width: 2, 
       customWidget: (value) => SizedBox(
@@ -49,19 +70,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
       ),
     ),
   ];
-  bool _isLoading = false;
-  final List<Map<String, dynamic>> _listSanPham = [];
-  final List<Map<String, dynamic>> _listNhaCungCap = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _listSanPham.addAll(
-      widget.listSanPham.map((sp) => sp.toJson()).toList(),
-    );
-    _listNhaCungCap.addAll(
-      widget.listNhaCungCap.map((ncc) => ncc.toJson()).toList(),
-    );
+  
   }
 
   void _showAddPhieuMuaHangDialog() {
@@ -97,6 +106,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
                 columns: _columns,
                 onUpdate: _onUpdatePhieuMuaHang,
                 onDelete: _onDeletePhieuMuaHang,
+                haveDetails: true,
               ),
               floatingActionButton: FloatingActionButton.extended(
                 onPressed: _showAddPhieuMuaHangDialog,
@@ -128,7 +138,25 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   dynamic _onUpdatePhieuMuaHang(
     TableRowData row,
     Map<String, dynamic> updatedData,
-  ) {}
+  ) {
+    final String id = row.id;
+    final String ngayLap = updatedData['date'] ?? '';
+    final Map<String, dynamic> nhaCungCap = updatedData['name'];
+    final String tongTien = updatedData['total'] ?? 0;
+    final List<Map<String, dynamic>> sanPhamMua = updatedData['details'] ?? [];
+
+    context.read<PhieuMuaHangBloc>().add(
+      PhieuMuaHangEventUpdate(
+        phieuMuaHang: PhieuMuaHang(
+          soPhieuMH: id,
+          ngayLap: ngayLap,
+          nhaCungCap: NhaCungCap.fromJson(nhaCungCap),
+          tongTien: int.tryParse(tongTien.toString()) ?? 0,
+          chiTiet: sanPhamMua.map((item) => ChiTietPhieuMuaHang.fromJson(item)).toList(),
+        ),
+      ),
+    );
+  }
 
   void _onDeletePhieuMuaHang(String id) {
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventDelete(maPhieu: id));
