@@ -13,4 +13,28 @@ class NhaCungCapRepository {
       throw Exception('Failed to load nhà cung cấp: $e');
     }
   }
+
+  Future<void> create(String tenNCC, String diaChi, String sdt) async {
+    try {
+      await nhaCungCapApi.create(tenNCC, diaChi, sdt);
+    } catch (e) {
+      throw Exception('Repository create failed: $e');
+    }
+  }
+
+  Future<void> update(NhaCungCap nhaCungCap) async {
+    try {
+      await nhaCungCapApi.update(nhaCungCap);
+    } catch (e) {
+      throw Exception('Repository update failed: $e');
+    }
+  }
+
+  Future<void> delete(String maNCC) async {
+    try {
+      await nhaCungCapApi.delete(maNCC);
+    } catch (e) {
+      throw Exception('Repository delete failed: $e');
+    }
+  }
 }

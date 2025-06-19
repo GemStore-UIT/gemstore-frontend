@@ -13,4 +13,28 @@ class DonViTinhRepository {
       throw Exception('Failed to load đơn vị tính: $e');
     }
   }
+
+  Future<void> create(String tenDonVi) async {
+    try {
+      await donViTinhApi.create(tenDonVi);
+    } catch (e) {
+      throw Exception('Repository create failed: $e');
+    }
+  }
+
+  Future<void> update(String maDonVi, String tenDonVi) async {
+    try {
+      await donViTinhApi.update(maDonVi, tenDonVi);
+    } catch (e) {
+      throw Exception('Repository update failed: $e');
+    }
+  }
+
+  Future<void> delete(String maDonVi) async {
+    try {
+      await donViTinhApi.delete(maDonVi);
+    } catch (e) {
+      throw Exception('Repository delete failed: $e');
+    }
+  }
 }

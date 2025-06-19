@@ -14,32 +14,47 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
 
   final DonViTinhRepository donViTinhRepository;
 
-  void _onStart(
-    DonViTinhEventStart event,
-    Emitter<DonViTinhState> emit,
-  ) {
+  void _onStart(DonViTinhEventStart event, Emitter<DonViTinhState> emit) {
     emit(DonViTinhStateInitial());
   }
 
   void _onCreate(
     DonViTinhEventCreate event,
     Emitter<DonViTinhState> emit,
-  ) {
-    // Implement create logic here
+  ) async {
+    emit(DonViTinhStateLoading());
+    try {
+      await donViTinhRepository.create(event.tenDonVi);
+      add(DonViTinhEventGetAll());
+    } catch (error) {
+      emit(DonViTinhStateFailure(error.toString()));
+    }
   }
 
   void _onUpdate(
     DonViTinhEventUpdate event,
     Emitter<DonViTinhState> emit,
-  ) {
-    // Implement update logic here
+  ) async {
+    emit(DonViTinhStateLoading());
+    try {
+      await donViTinhRepository.update(event.maDonVi, event.tenDonVi);
+      add(DonViTinhEventGetAll());
+    } catch (error) {
+      emit(DonViTinhStateFailure(error.toString()));
+    }
   }
 
   void _onDelete(
     DonViTinhEventDelete event,
     Emitter<DonViTinhState> emit,
-  ) {
-    // Implement delete logic here
+  ) async {
+    emit(DonViTinhStateLoading());
+    try {
+      await donViTinhRepository.delete(event.maDonVi);
+      add(DonViTinhEventGetAll());
+    } catch (error) {
+      emit(DonViTinhStateFailure(error.toString()));
+    }
   }
 
   void _onGetAll(

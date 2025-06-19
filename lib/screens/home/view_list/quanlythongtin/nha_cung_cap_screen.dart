@@ -4,6 +4,8 @@ import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_b
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class NhaCungCapScreen extends StatefulWidget {
@@ -19,8 +21,9 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     TableColumn(
       key: 'id',
       header: 'Mã nhà cung cấp',
-      width: 2,
+      width: 1,
       editable: false,
+      customWidget: (value) => FormatColumnData.formatId(value),
     ),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),
@@ -44,72 +47,13 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   }
 
   void _showAddSupplierDialog() {
-    final TextEditingController idController = TextEditingController();
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController addressController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thêm nhà cung cấp mới'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: idController,
-                  decoration: InputDecoration(
-                    labelText: 'Mã nhà cung cấp',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Tên nhà cung cấp',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: addressController,
-                  decoration: InputDecoration(
-                    labelText: 'Địa chỉ',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 2,
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    labelText: 'Số điện thoại',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.phone,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _onAddNhaCungCap(
-                  nameController.text,
-                  addressController.text,
-                  phoneController.text,
-                );
-              },
-              child: Text('Thêm'),
-            ),
-          ],
+      builder: (context) {
+        return QlttCreateDialog(
+          title: 'Thêm nhà cung cấp',
+          columns: _columns,
+          onCreate: _onAddNhaCungCap,
         );
       },
     );
@@ -117,43 +61,43 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocConsumer<NhaCungCapBloc, NhaCungCapState>(
-        listener: (context, state) {
-          setState(() {
-            _isLoading = state is NhaCungCapStateLoading;
-          });
-        },
-        builder: (context, state) {
-          return Stack(
-            children: [
-              ReusableTableWidget(
-                  title: 'Nhà Cung Cấp',
-                  data: NhaCungCap.convertToTableRowData(widget.data),
-                  columns: _columns,
-                  onUpdate: _onUpdateNhaCungCap,
-                  onDelete: _onDeleteNhaCungCap,
+    return BlocConsumer<NhaCungCapBloc, NhaCungCapState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is NhaCungCapStateLoading;
+        });
+      },
+      builder: (context, state) {
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.white,
+              body: ReusableTableWidget(
+                title: 'Nhà Cung Cấp',
+                data: NhaCungCap.convertToTableRowData(widget.data),
+                columns: _columns,
+                onUpdate: _onUpdateNhaCungCap,
+                onDelete: _onDeleteNhaCungCap,
+              ),
+              floatingActionButton: FloatingActionButton.extended(
+                onPressed: _showAddSupplierDialog,
+                icon: Icon(Icons.add),
+                label: Text('Thêm nhà cung cấp'),
+                tooltip: 'Thêm nhà cung cấp',
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            if (_isLoading)
+              Container(
+                color: Colors.black12,
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
-              // Loading overlay
-              if (_isLoading)
-                Container(
-                  color: Colors.black12,
-                  child: Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddSupplierDialog,
-        icon: Icon(Icons.add),
-        label: Text('Thêm NCC'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -165,15 +109,35 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
   dynamic _onUpdateNhaCungCap(
     TableRowData row,
     Map<String, dynamic> updatedData,
-  ) {}
+  ) {
+    final String id = row.id;
+    final String name = updatedData['name'] ?? '';
+    final String address = updatedData['address'] ?? '';
+    final String phone = updatedData['phone'] ?? '';
+
+    context.read<NhaCungCapBloc>().add(
+      NhaCungCapEventUpdate(
+        nhaCungCap: NhaCungCap(
+          maNCC: id,
+          tenNCC: name,
+          diaChi: address,
+          sdt: phone,
+        ),
+      ),
+    );
+  }
 
   void _onDeleteNhaCungCap(String id) {
     context.read<NhaCungCapBloc>().add(NhaCungCapEventDelete(maNCC: id));
   }
 
-  void _onAddNhaCungCap(String tenNCC, String diaChi, String sdt) {
+  void _onAddNhaCungCap(Map<String, dynamic> newData) {
     context.read<NhaCungCapBloc>().add(
-      NhaCungCapEventCreate(tenNCC: tenNCC, diaChi: diaChi, sdt: sdt),
+      NhaCungCapEventCreate(
+        tenNCC: newData['name'],
+        diaChi: newData['address'],
+        sdt: newData['phone'],
+      ),
     );
   }
 }

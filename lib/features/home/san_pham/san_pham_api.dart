@@ -9,11 +9,7 @@ class SanPhamApi {
   Future<List<SanPham>> getAllSanPham() async {
     try {
       final response = await dio.get('/api/sanpham');
-      if (response.statusCode == 200) {
-        return SanPham.fromJsonList(response.data);
-      } else {
-        throw Exception('API failed to load products');
-      }
+      return SanPham.fromJsonList(response.data);
     } catch (e) {
       throw Exception('API failed to load products: $e');
     }
@@ -26,39 +22,47 @@ class SanPhamApi {
     required int tonKho,
   }) async {
     try {
-      final response = await dio.post('/api/sanpham', data: {
-        'ten_san_pham': tenSanPham,
-        'loai_san_pham': loaiSanPham,
-        'don_gia': donGia,
-        'ton_kho': tonKho,
-      });
-      if (response.statusCode != 201) {
-        throw Exception('API failed to create product');
-      }
+      await dio.post(
+        '/api/sanpham',
+        data: {
+          'tenSanPham': tenSanPham,
+          'loaiSanPham': loaiSanPham,
+          'donGia': donGia,
+          'tonKho': tonKho,
+        },
+      );
     } catch (e) {
       throw Exception('API failed to create product: $e');
     }
   }
 
-  Future<void> delete(String maSanPham) async {
+  Future<void> update(SanPham sanPham) async {
     try {
-      final response = await dio.delete('/api/sanpham/$maSanPham');
-      if (response.statusCode != 204) {
-        throw Exception('API failed to delete product');
-      }
+      await dio.post(
+        '/api/sanpham',
+        data: sanPham.toJson(),
+      );
     } catch (e) {
-      throw Exception('API failed to delete product: $e');
+      throw Exception('API failed to update product: $e');
     }
   }
 
-  Future<void> update(SanPham sanPham) async {
+  Future<void> delete(String maSP) async {
     try {
-      final response = await dio.put('/api/sanpham/${sanPham.maSanPham}', data: sanPham.toJson());
-      if (response.statusCode != 200) {
-        throw Exception('API failed to update product');
+      final response = await dio.delete(
+        '/api/sanpham/$maSP',
+        options: Options(validateStatus: (status) => true),
+      );
+
+      if (response.statusCode == 409) {
+        throw Exception(
+          'Không thể xóa sản phẩm này vì nó đang được sử dụng.',
+        );
+      } else if (response.statusCode != 200) {
+        throw Exception('Xóa thất bại với mã lỗi: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('API failed to update product: $e');
+      throw Exception('API delete failed: $e');
     }
   }
 }
