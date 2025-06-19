@@ -31,12 +31,7 @@ class NhaCungCapApi {
     try {
       await dio.post(
         '/api/nhacungcap',
-        data: {
-          'maNCC': nhacungcap.maNCC,
-          'tenNCC': nhacungcap.tenNCC,
-          'diaChi': nhacungcap.diaChi,
-          'sdt': nhacungcap.sdt,
-        },
+        data: nhacungcap.toJson(),
       );
     } catch (e) {
       throw Exception('API update failed: $e');

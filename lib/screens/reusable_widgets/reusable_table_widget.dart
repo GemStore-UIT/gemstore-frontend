@@ -324,12 +324,14 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
             currentValue = rowData.data[column.key];
           }
 
-          if (currentValue != null && currentValue is Map<String, dynamic>) {
+          if (currentValue != null) {
+            // Log the current value for debugging
+            print("Current value for ${column.header}: $currentValue");
             // Find matching option in foreign key config
             final matchingOption = column.foreignKeyConfig!.options.firstWhere(
               (option) =>
-                  option[column.foreignKeyConfig!.valueKey] ==
-                  currentValue[column.foreignKeyConfig!.valueKey],
+                  option[column.foreignKeyConfig!.displayKey] ==
+                  currentValue,
               orElse: () => column.foreignKeyConfig!.options.first,
             );
             selectedForeignKeys[column.key] = matchingOption;
