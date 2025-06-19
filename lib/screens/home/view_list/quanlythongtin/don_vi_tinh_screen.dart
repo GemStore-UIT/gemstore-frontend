@@ -4,6 +4,7 @@ import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_blo
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
 import 'package:gemstore_frontend/models/don_vi_tinh.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class DonViTinhScreen extends StatefulWidget {
@@ -27,40 +28,13 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
   }
 
   void _showAddUnitDialog() {
-    final TextEditingController unitNameController = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thêm đơn vị tính mới'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: unitNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Tên đơn vị tính',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _onAddDonViTinh(unitNameController.text);
-                Navigator.of(context).pop();
-              },
-              child: Text('Thêm'),
-            ),
-          ],
+      builder: (context) {
+        return QlttCreateDialog(
+          title: 'Thêm đơn vị tính',
+          columns: _columns,
+          onCreate: _onAddDonViTinh,
         );
       },
     );
@@ -129,7 +103,7 @@ class _DonViTinhScreenState extends State<DonViTinhScreen> {
     context.read<DonViTinhBloc>().add(DonViTinhEventDelete(maDonVi: id));
   }
 
-  void _onAddDonViTinh(String tenDonVi) {
-    context.read<DonViTinhBloc>().add(DonViTinhEventCreate(tenDonVi: tenDonVi));
+  void _onAddDonViTinh(Map<String, dynamic> newData) {
+    context.read<DonViTinhBloc>().add(DonViTinhEventCreate(tenDonVi: newData['name']));
   }
 }

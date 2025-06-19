@@ -5,6 +5,7 @@ import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_state.dart';
 import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 import 'package:gemstore_frontend/models/loai_san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class LoaiSanPhamScreen extends StatefulWidget {
@@ -55,62 +56,13 @@ class _LoaiSanPhamScreenState extends State<LoaiSanPhamScreen> {
   }
 
   void _showAddProductTypeDialog() {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController unitController = TextEditingController();
-    final TextEditingController profitController = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thêm loại sản phẩm mới'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Tên loại sản phẩm',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: unitController,
-                  decoration: InputDecoration(
-                    labelText: 'Đơn vị tính',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: profitController,
-                  decoration: InputDecoration(
-                    labelText: 'Lợi nhuận',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // _onAddLoaiSanPham(
-                //   nameController.text,
-                //   unitController.text,
-                //   profitController.text,
-                // );
-                Navigator.of(context).pop();
-              },
-              child: Text('Thêm'),
-            ),
-          ],
+      builder: (context) {
+        return QlttCreateDialog(
+          title: 'Loại Sản Phẩm',
+          columns: _columns,
+          onCreate: _onAddLoaiSanPham,
         );
       },
     );
@@ -188,12 +140,12 @@ class _LoaiSanPhamScreenState extends State<LoaiSanPhamScreen> {
     context.read<LoaiSanPhamBloc>().add(LoaiSanPhamEventDelete(maLSP: id));
   }
 
-  void _onAddLoaiSanPham(String tenLSP, DonViTinh donViTinh, String loiNhuan) {
+  void _onAddLoaiSanPham(Map<String, dynamic> newData) {
     context.read<LoaiSanPhamBloc>().add(
       LoaiSanPhamEventCreate(
-        tenLSP: tenLSP,
-        donViTinh: donViTinh.toJson(),
-        loiNhuan: double.tryParse(loiNhuan) ?? 0.0,
+        tenLSP: newData['name'] ?? '',
+        donViTinh: newData['unit'] ?? '',
+        loiNhuan: double.tryParse(newData['profit'] ?? '0.0') ?? 0.0,
       ),
     );
   }
