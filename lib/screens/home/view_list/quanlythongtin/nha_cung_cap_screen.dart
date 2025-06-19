@@ -4,6 +4,7 @@ import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_b
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -20,8 +21,9 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
     TableColumn(
       key: 'id',
       header: 'Mã nhà cung cấp',
-      width: 2,
+      width: 1,
       editable: false,
+      customWidget: (value) => FormatColumnData.formatId(value),
     ),
     TableColumn(key: 'name', header: 'Tên nhà cung cấp', width: 2),
     TableColumn(key: 'address', header: 'Địa chỉ', width: 3),

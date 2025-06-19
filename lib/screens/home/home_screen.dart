@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
+import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_bloc.dart';
+import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_event.dart';
+import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_state.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_state.dart';
@@ -13,6 +16,7 @@ import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_bloc.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_state.dart';
+import 'package:gemstore_frontend/models/loai_dich_vu.dart';
 import 'package:gemstore_frontend/models/loai_san_pham.dart';
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
@@ -23,6 +27,7 @@ import 'package:gemstore_frontend/models/san_pham.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/error_dialog.dart';
@@ -49,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NhaCungCap> _nhaCungCaps = [];
   List<DonViTinh> _donViTinhs = [];
   List<LoaiSanPham> _loaiSanPhams = [];
+  List<LoaiDichVu> _loaiDichVus = [];
   List<PhieuMuaHang> _phieuMuaHangs = [];
   List<SanPham> _sanPhams = [];
 
@@ -105,6 +111,17 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             } else if (state is LoaiSanPhamStateFailure) {
               _handleError("Lỗi loại sản phẩm: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<LoaiDichVuBloc, LoaiDichVuState>(
+          listener: (context, state) {
+            if (state is LoaiDichVuStateUpdated) {
+              setState(() {
+                _loaiDichVus = state.data;
+              });
+            } else if (state is LoaiDichVuStateFailure) {
+              _handleError("Lỗi loại dịch vụ: ${state.error}");
             }
           },
         ),
@@ -518,21 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return LoaiSanPhamScreen(data: _loaiSanPhams, 
           listDonViTinh: _donViTinhs);
       case 'service_type_management':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.miscellaneous_services,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Loại dịch vụ Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
-        );
+        return LoaiDichVuScreen(data: _loaiDichVus);
       case 'sales_invoice':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -600,6 +603,7 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<NhaCungCapBloc>().add(NhaCungCapEventGetAll());
     context.read<DonViTinhBloc>().add(DonViTinhEventGetAll());
     context.read<LoaiSanPhamBloc>().add(LoaiSanPhamEventGetAll());
+    context.read<LoaiDichVuBloc>().add(LoaiDichVuEventGetAll());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
     context.read<SanPhamBloc>().add(SanPhamEventGetAll());
   }

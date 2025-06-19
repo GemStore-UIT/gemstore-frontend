@@ -462,7 +462,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -471,6 +471,46 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
           padding: widget.padding,
           child: Column(
             children: [
+              // Count display at top right
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        border: Border.all(color: Colors.blue[200]!),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.format_list_numbered,
+                            size: 16,
+                            color: Colors.blue[700],
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Số lượng: ${widget.data.length}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // Header
               Container(
                 decoration: BoxDecoration(
@@ -484,6 +524,26 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                 child: IntrinsicHeight(
                   child: Row(
                     children: [
+                      // STT column header
+                      SizedBox(
+                        width: 60,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(color: Colors.grey[300]!),
+                            ),
+                          ),
+                          child: const Text(
+                            'STT',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
                       ...widget.columns.map(
                         (column) => Expanded(
                           flex: column.width?.toInt() ?? 1,
@@ -527,125 +587,142 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                       bottomRight: Radius.circular(8),
                     ),
                   ),
-                  child:
-                      widget.data.isEmpty
-                          ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20.0),
-                              child: Text(
-                                'No data available',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
+                  child: widget.data.isEmpty
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text(
+                              'No data available',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
                             ),
-                          )
-                          : ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            itemCount: widget.data.length,
-                            itemBuilder: (context, index) {
-                              final rowData = widget.data[index];
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: widget.data.length,
+                          itemBuilder: (context, index) {
+                            final rowData = widget.data[index];
 
-                              return IntrinsicHeight(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color:
-                                        index.isEven
-                                            ? Colors.white
-                                            : Colors.grey[50],
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.grey[200]!,
-                                        width: 0.5,
-                                      ),
+                            return IntrinsicHeight(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: index.isEven
+                                      ? Colors.white
+                                      : Colors.grey[50],
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.grey[200]!,
+                                      width: 0.5,
                                     ),
                                   ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      ...widget.columns.map(
-                                        (column) => Expanded(
-                                          flex: column.width?.toInt() ?? 1,
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: _buildCell(
-                                              column,
-                                              rowData,
-                                              false,
-                                            ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    // STT column
+                                    SizedBox(
+                                      width: 60,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            right: BorderSide(
+                                                color: Colors.grey[300]!),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${index + 1}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ),
-                                      if (widget.showActions)
-                                        SizedBox(
-                                          width: 120,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: InkWell(
-                                                    onTap:
-                                                        () => _showUpdateDialog(
-                                                          rowData,
-                                                        ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                    child: const Padding(
-                                                      padding: EdgeInsets.all(
-                                                        8.0,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.edit,
-                                                        color: Colors.blue,
-                                                        size: 20,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: InkWell(
-                                                    onTap:
-                                                        () => _deleteRow(
-                                                          rowData.id,
-                                                        ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                    child: const Padding(
-                                                      padding: EdgeInsets.all(
-                                                        8.0,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.delete,
-                                                        color: Colors.red,
-                                                        size: 20,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                    ),
+                                    ...widget.columns.map(
+                                      (column) => Expanded(
+                                        flex: column.width?.toInt() ?? 1,
+                                        child: Container(
+                                          alignment: Alignment.centerLeft,
+                                          child: _buildCell(
+                                            column,
+                                            rowData,
+                                            false,
                                           ),
                                         ),
-                                    ],
-                                  ),
+                                      ),
+                                    ),
+                                    if (widget.showActions)
+                                      SizedBox(
+                                        width: 120,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () =>
+                                                      _showUpdateDialog(
+                                                    rowData,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    20,
+                                                  ),
+                                                  child: const Padding(
+                                                    padding: EdgeInsets.all(
+                                                      8.0,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.edit,
+                                                      color: Colors.blue,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () => _deleteRow(
+                                                    rowData.id,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    20,
+                                                  ),
+                                                  child: const Padding(
+                                                    padding: EdgeInsets.all(
+                                                      8.0,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ),
             ],
