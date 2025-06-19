@@ -26,7 +26,7 @@ class _QlttCreateDialogState extends State<QlttCreateDialog> {
     super.initState();
     _controllers = {
       for (var column in widget.columns)
-        if (column.key != 'id' && !(column.isForeignKey))
+        if (column.editable && !(column.isForeignKey))
           column.key: TextEditingController(),
     };
     _dropdownValues = {
@@ -96,7 +96,7 @@ class _QlttCreateDialogState extends State<QlttCreateDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: widget.columns.where((column) => column.key != 'id').map((column) {
+                    children: widget.columns.where((column) => column.editable).map((column) {
                       if (column.isForeignKey) {
                         final options = column.foreignKeyConfig?.options ?? [];
                         return Padding(

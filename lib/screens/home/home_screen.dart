@@ -20,6 +20,7 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_san_pham_screen.dart';
@@ -563,17 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       case 'product_list':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inventory_2, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Danh sách sản phẩm Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
-        );
+        return SanPhamScreen(data: _sanPhams, listLoaiSanPham: _loaiSanPhams);
       case 'reports':
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,

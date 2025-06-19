@@ -1,4 +1,5 @@
 import 'package:gemstore_frontend/models/loai_san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class SanPham {
   String maSanPham;
@@ -37,5 +38,21 @@ class SanPham {
       'donGia': donGia,
       'tonKho': tonKho,
     };
+  }
+
+  static List<TableRowData> convertToTableRowData(List<SanPham> data) {
+    return data.map((sp) {
+      return TableRowData(
+        id: sp.maSanPham,
+        data: {
+          'name': sp.tenSanPham,
+          'productType': sp.loaiSanPham.tenLSP,
+          'unit': sp.loaiSanPham.donViTinh.tenDonVi,
+          'price': sp.donGia.toString(),
+          'quantity': sp.tonKho.toString(),
+        },
+      );
+    }).toList();
+
   }
 }
