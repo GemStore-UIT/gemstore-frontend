@@ -9,6 +9,9 @@ import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_s
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_state.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_state.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_state.dart';
@@ -22,9 +25,11 @@ import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
+import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_ban_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
@@ -56,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LoaiSanPham> _loaiSanPhams = [];
   List<LoaiDichVu> _loaiDichVus = [];
   List<PhieuMuaHang> _phieuMuaHangs = [];
+  List<PhieuBanHang> _phieuBanHangs = [];
   List<SanPham> _sanPhams = [];
 
   @override
@@ -78,6 +84,17 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             } else if (state is PhieuMuaHangStateFailure) {
               _handleError("Lỗi phiếu mua hàng: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<PhieuBanHangBloc, PhieuBanHangState>(
+          listener: (context, state) {
+            if (state is PhieuBanHangStateUpdated) {
+              setState(() {
+                _phieuBanHangs = state.data;
+              });
+            } else if (state is PhieuBanHangStateFailure) {
+              _handleError("Lỗi phiếu bán hàng: ${state.error}");
             }
           },
         ),
@@ -537,16 +554,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'service_type_management':
         return LoaiDichVuScreen(data: _loaiDichVus);
       case 'sales_invoice':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Phiếu bán hàng Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return PhieuBanHangScreen(
+          data: _phieuBanHangs,
+          listSanPham: _sanPhams,
         );
       case 'purchase_invoice':
         return PhieuMuaHangScreen(
@@ -605,6 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<LoaiSanPhamBloc>().add(LoaiSanPhamEventGetAll());
     context.read<LoaiDichVuBloc>().add(LoaiDichVuEventGetAll());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
+    context.read<PhieuBanHangBloc>().add(PhieuBanHangEventGetAll());
     context.read<SanPhamBloc>().add(SanPhamEventGetAll());
   }
 }

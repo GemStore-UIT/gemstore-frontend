@@ -297,8 +297,9 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                       selectedProduct['loaiSanPham']['tenLSP'];
                                   donViTinhSP =
                                       selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
-                                  donGiaMuaSP =
-                                      selectedProduct['donGia'].toString();
+                                  donGiaMuaSP = widget.listNhaCungCap != null
+                                      ? selectedProduct['donGia'].toString()
+                                      : (selectedProduct['donGia'] * (100 + (selectedProduct['loaiSanPham']['loiNhuan'] ?? 0)) / 100).toString();
                                 });
                               },
                             ),

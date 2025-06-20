@@ -83,8 +83,11 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
           maSanPham: sanPham['maSanPham'] ?? '',
           tenSanPham: sanPham['tenSanPham'] ?? '',
           donGia: sanPham['donGia'] ?? 0,
+          loiNhuan: sanPham['loaiSanPham']['loiNhuan'] ?? 0,
           soLuong: 1,
-          thanhTien: sanPham['donGia'] ?? 0,
+          thanhTien: widget.listNhaCungCap == null
+              ? (sanPham['donGia'] * (100 + (sanPham['loaiSanPham']['loiNhuan'] ?? 0)) / 100).toInt()
+              : sanPham['donGia'] ?? 0,
         ),
       );
       _sanPhamControllers.add(TextEditingController());
@@ -146,7 +149,11 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 12, color: Colors.grey[600]),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 12,
+                        color: Colors.grey[600],
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         Format.dateFormat(widget.ngayLap),
@@ -187,7 +194,7 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                 controller: _nguoiGiaoDichController,
                 decoration: const InputDecoration(labelText: 'Khách hàng'),
               ),
-            const SizedBox(height: 16),            
+            const SizedBox(height: 16),
             const Divider(),
             ..._sanPhamMuaBanList.map(
               (item) => Padding(
@@ -227,8 +234,12 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                             setState(() {
                               item.maSanPham = selected['maSanPham'];
                               item.tenSanPham = selected['tenSanPham'];
+                              item.loiNhuan =
+                                  selected['loaiSanPham']['loiNhuan'];
                               item.donGia = selected['donGia'] ?? 0;
-                              item.thanhTien = item.donGia * item.soLuong;
+                              item.updateThanhTien(
+                                widget.listNhaCungCap == null,
+                              );
                             });
                           }
                         },
@@ -250,7 +261,9 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                         onChanged: (value) {
                           setState(() {
                             item.soLuong = int.tryParse(value) ?? 1;
-                            item.thanhTien = item.donGia * item.soLuong;
+                            item.updateThanhTien(
+                              widget.listNhaCungCap == null,
+                            );
                           });
                         },
                       ),
@@ -324,6 +337,7 @@ class SanPhamMuaBan {
   String maSanPham;
   String tenSanPham;
   int donGia;
+  double loiNhuan;
   int soLuong;
   int thanhTien;
 
@@ -331,6 +345,7 @@ class SanPhamMuaBan {
     required this.maSanPham,
     required this.tenSanPham,
     required this.donGia,
+    required this.loiNhuan,
     required this.soLuong,
     required this.thanhTien,
   });
@@ -345,8 +360,16 @@ class SanPhamMuaBan {
       donGia:
           listSanPham.firstWhere(
             (item) => item['maSanPham'] == json['maSanPham'],
-            orElse: () => {},
           )['donGia'] ??
+          0,
+      loiNhuan:
+          listSanPham.firstWhere(
+            (item) => item['maSanPham'] == json['maSanPham'],
+            orElse:
+                () => {
+                  'loaiSanPham': {'loiNhuan': 0},
+                },
+          )['loaiSanPham']['loiNhuan'] ??
           0,
       soLuong: json['soLuong'],
       thanhTien: json['thanhTien'],
@@ -360,5 +383,13 @@ class SanPhamMuaBan {
       'soLuong': soLuong,
       'thanhTien': thanhTien,
     };
+  }
+
+  int updateThanhTien(bool haveProfit) {
+    if (haveProfit) {
+      return thanhTien = (donGia * ((100 + loiNhuan) / 100) * soLuong).toInt();
+    } else {
+      return thanhTien = donGia * soLuong;
+    }
   }
 }
