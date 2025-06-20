@@ -12,6 +12,9 @@ import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham
 import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_state.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_state.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_state.dart';
@@ -26,10 +29,12 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
 import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
+import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_ban_hang_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_dich_vu_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
@@ -62,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LoaiDichVu> _loaiDichVus = [];
   List<PhieuMuaHang> _phieuMuaHangs = [];
   List<PhieuBanHang> _phieuBanHangs = [];
+  List<PhieuDichVu> _phieuDichVus = [];
   List<SanPham> _sanPhams = [];
 
   @override
@@ -95,6 +101,17 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             } else if (state is PhieuBanHangStateFailure) {
               _handleError("Lỗi phiếu bán hàng: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<PhieuDichVuBloc, PhieuDichVuState>(
+          listener: (context, state) {
+            if (state is PhieuDichVuStateUpdated) {
+              setState(() {
+                _phieuDichVus = state.data;
+              });
+            } else if (state is PhieuDichVuStateError) {
+              _handleError("Lỗi phiếu dịch vụ: ${state.message}");
             }
           },
         ),
@@ -565,16 +582,9 @@ class _HomeScreenState extends State<HomeScreen> {
           listSanPham: _sanPhams,
         );
       case 'service_invoice':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.home_repair_service, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Phiếu dịch vụ Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return PhieuDichVuScreen(
+          data: _phieuDichVus,
+          listLoaiDichVu: _loaiDichVus,
         );
       case 'product_list':
         return SanPhamScreen(data: _sanPhams, listLoaiSanPham: _loaiSanPhams);
@@ -616,6 +626,7 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<LoaiDichVuBloc>().add(LoaiDichVuEventGetAll());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
     context.read<PhieuBanHangBloc>().add(PhieuBanHangEventGetAll());
+    context.read<PhieuDichVuBloc>().add(PhieuDichVuEventGetAll());
     context.read<SanPhamBloc>().add(SanPhamEventGetAll());
   }
 }
