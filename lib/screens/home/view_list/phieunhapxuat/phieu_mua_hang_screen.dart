@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gemstore_frontend/config/money_format.dart';
+import 'package:gemstore_frontend/config/format.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
@@ -68,7 +68,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  MoneyFormat.format(value),
+                  Format.moneyFormat(value),
                   style: const TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -164,27 +164,20 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
 
   void _onUpdatePhieuMuaHang(Map<String, dynamic> updatedData) {
     final String id = updatedData['id'] ?? '';
-    final String ngayLap = updatedData['date'] ?? '';
-    final Map<String, dynamic> nhaCungCap = _listNhaCungCap.firstWhere(
-      (ncc) => ncc['maNCC'] == updatedData['name'],
-      orElse: () => {},
-    );
+    final String nhaCungCap = updatedData['name'] ?? '';
     final List<Map<String, dynamic>> sanPhamMua = updatedData['details'] ?? [];
 
     context.read<PhieuMuaHangBloc>().add(
       PhieuMuaHangEventUpdate(
         phieuMuaHang: PhieuMuaHangUpdateDto(
           soPhieuMH: id,
-          ngayLap: ngayLap,
-          nhaCungCap: NhaCungCap.fromJson(nhaCungCap),
+          nhaCungCap: nhaCungCap,
           chiTiet:
               sanPhamMua
+              
                   .map(
                     (item) => ChiTietPhieuMuaHangUpdateDto(
-                      phieuMuaHang: id,
-                      sanPham: widget.listSanPham.firstWhere(
-                        (sp) => sp.maSanPham == item['maSanPham'],
-                      ),
+                      maSanPham: item['maSanPham'],
                       soLuong: item['soLuong'],
                     ),
                   )

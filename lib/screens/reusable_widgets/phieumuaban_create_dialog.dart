@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/config/money_format.dart';
+import 'package:gemstore_frontend/config/format.dart';
 
 class PhieumuahangCreateDialog extends StatefulWidget {
   final String title;
@@ -333,7 +333,7 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                                 ),
                                               ),
                                               Text(
-                                                'Đơn Giá: ${MoneyFormat.format(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
+                                                'Đơn Giá: ${Format.moneyFormat(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -413,7 +413,7 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                   ),
                                   const Spacer(),
                                   Text(
-                                    'Tổng: ${MoneyFormat.format(_calculateTotal().toInt())}',
+                                    'Tổng: ${Format.moneyFormat(_calculateTotal().toInt())}',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -449,7 +449,7 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                               ),
                                             ),
                                             Text(
-                                              'SL: ${item['soLuong']} ${item['donViTinh']} × ${MoneyFormat.format((item['donGia'] as double).toInt())} = ${MoneyFormat.format((item['thanhTien'] as double).toInt())}',
+                                              'SL: ${item['soLuong']} ${item['donViTinh']} × ${Format.moneyFormat((item['donGia'] as double).toInt())} = ${Format.moneyFormat((item['thanhTien'] as double).toInt())}',
                                             ),
                                           ],
                                         ),

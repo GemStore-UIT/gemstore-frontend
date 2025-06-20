@@ -49,7 +49,7 @@ class PhieuMuaHangApi {
       print('Updating PhieuMuaHang with data: ${updatedData.toJson()}');
 
       await dio.post(
-        '/api/phieumuahang',
+        '/api/phieumuahang/full',
         data: updatedData.toJson(),
       );
     } catch (e) {

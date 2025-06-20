@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemstore_frontend/config/money_format.dart';
+import 'package:gemstore_frontend/config/format.dart';
 
 class PhieumuabanUpdateDialog extends StatefulWidget {
   final String title;
@@ -31,7 +31,6 @@ class PhieumuabanUpdateDialog extends StatefulWidget {
 class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
   late TextEditingController _soPhieuController;
   late TextEditingController _nguoiGiaoDichController;
-  late TextEditingController _ngayLapController;
   List<SanPhamMuaBan> _sanPhamMuaBanList = [];
   List<TextEditingController> _sanPhamControllers = [];
   List<TextEditingController> _soLuongControllers = [];
@@ -43,7 +42,6 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
     _nguoiGiaoDichController = TextEditingController(
       text: widget.nguoiGiaoDich,
     );
-    _ngayLapController = TextEditingController(text: widget.ngayLap);
     _sanPhamMuaBanList =
         widget.chiTiet
             .map((item) => SanPhamMuaBan.fromJson(item, widget.listSanPham))
@@ -65,9 +63,12 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
   void dispose() {
     _soPhieuController.dispose();
     _nguoiGiaoDichController.dispose();
-    _ngayLapController.dispose();
-    _sanPhamControllers.forEach((controller) => controller.dispose());
-    _soLuongControllers.forEach((controller) => controller.dispose());
+    for (var controller in _sanPhamControllers) {
+      controller.dispose();
+    }
+    for (var controller in _soLuongControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -142,6 +143,21 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 12, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                      Text(
+                        Format.dateFormat(widget.ngayLap),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -171,12 +187,8 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                 controller: _nguoiGiaoDichController,
                 decoration: const InputDecoration(labelText: 'Khách hàng'),
               ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _ngayLapController,
-              decoration: const InputDecoration(labelText: 'Ngày lập'),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 16),            
+            const Divider(),
             ..._sanPhamMuaBanList.map(
               (item) => Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
@@ -248,7 +260,7 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
                     Expanded(
                       flex: 3,
                       child: Text(
-                        MoneyFormat.format(item.thanhTien),
+                        Format.moneyFormat(item.thanhTien),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -276,7 +288,7 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
             // add a line and sum for thanhTien
             const Divider(),
             Text(
-              'Tổng tiền: ${MoneyFormat.format(_sanPhamMuaBanList.fold<int>(0, (sum, item) => sum + item.thanhTien))}',
+              'Tổng tiền: ${Format.moneyFormat(_sanPhamMuaBanList.fold<int>(0, (sum, item) => sum + item.thanhTien))}',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
@@ -294,7 +306,7 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
             final updatedData = {
               'id': _soPhieuController.text,
               'name': _nguoiGiaoDichController.text,
-              'date': _ngayLapController.text,
+              'date': widget.ngayLap,
               'details':
                   _sanPhamMuaBanList.map((item) => item.toJson()).toList(),
             };

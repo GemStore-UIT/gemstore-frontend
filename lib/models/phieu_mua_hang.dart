@@ -95,13 +95,11 @@ class ChiTietPhieuMuaHang {
 
 class PhieuMuaHangUpdateDto {
   String soPhieuMH;
-  String ngayLap;
-  NhaCungCap nhaCungCap;
+  String nhaCungCap;
   List<ChiTietPhieuMuaHangUpdateDto> chiTiet;
 
   PhieuMuaHangUpdateDto({
     required this.soPhieuMH,
-    required this.ngayLap,
     required this.nhaCungCap,
     required this.chiTiet,
   });
@@ -109,44 +107,38 @@ class PhieuMuaHangUpdateDto {
   Map<String, dynamic> toJson() {
     return {
       'soPhieuMH': soPhieuMH,
-      'ngayLap': ngayLap,
-      'nhaCungCap': nhaCungCap.toJson(),
+      'nhaCungCap': nhaCungCap,
       'chiTiet': chiTiet.map((item) => item.toJson()).toList(),
     };
   }
 }
 
 class ChiTietPhieuMuaHangUpdateDto {
-  SanPham sanPham;
-  String phieuMuaHang;
+  String maSanPham;
   int soLuong;
 
   ChiTietPhieuMuaHangUpdateDto({
-    required this.sanPham,
-    required this.phieuMuaHang,
+    required this.maSanPham,
     required this.soLuong,
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'sanPham': sanPham.toJson(),
-      'phieuMuaHang': phieuMuaHang,
-      'soLuong': soLuong,
-    };
+    return {'maSanPham': maSanPham, 'soLuong': soLuong};
   }
 
   factory ChiTietPhieuMuaHangUpdateDto.fromJson(Map<String, dynamic> json) {
     return ChiTietPhieuMuaHangUpdateDto(
-      sanPham: SanPham.fromJson(json['sanPham']),
-      phieuMuaHang: json['phieuMuaHang'],
+      maSanPham: json['maSanPham'],
       soLuong: json['soLuong'],
     );
   }
 
-  factory ChiTietPhieuMuaHangUpdateDto.fromJsonNotFull(Map<String, dynamic> json, List<SanPham> sanPhamList) {
+  factory ChiTietPhieuMuaHangUpdateDto.fromJsonNotFull(
+    Map<String, dynamic> json,
+    List<SanPham> sanPhamList,
+  ) {
     return ChiTietPhieuMuaHangUpdateDto(
-      sanPham: sanPhamList.firstWhere((sp) => sp.maSanPham == json['maSanPham']),
-      phieuMuaHang: json['phieuMuaHang'],
+      maSanPham: json['maSanPham'],
       soLuong: json['soLuong'],
     );
   }
