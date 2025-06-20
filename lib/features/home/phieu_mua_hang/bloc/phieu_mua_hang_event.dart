@@ -25,7 +25,7 @@ class PhieuMuaHangEventDelete extends PhieuMuaHangEvent {
 }
 
 class PhieuMuaHangEventUpdate extends PhieuMuaHangEvent {
-  final PhieuMuaHang phieuMuaHang;
+  final PhieuMuaHangUpdateDto phieuMuaHang;
 
   PhieuMuaHangEventUpdate({
     required this.phieuMuaHang,

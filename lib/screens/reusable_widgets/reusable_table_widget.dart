@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieumuaban_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/update_dialog.dart';
 
 // Data model for table rows
@@ -75,7 +76,7 @@ class ReusableTableWidget extends StatefulWidget {
   final EdgeInsets? padding;
   final bool showActions;
   final bool haveDetails;
-  final List<Map<String, dynamic>>? options;
+  final void Function(TableRowData rowData)? showComplexUpdateDialog;
 
   const ReusableTableWidget({
     super.key,
@@ -88,7 +89,7 @@ class ReusableTableWidget extends StatefulWidget {
     this.padding = const EdgeInsets.all(16),
     this.showActions = true,
     this.haveDetails = false,
-    this.options,
+    this.showComplexUpdateDialog,
   });
 
   @override
@@ -113,76 +114,80 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
   }
 
   void _showUpdateDialog(TableRowData rowData) {
-    final formKey = GlobalKey<FormState>();
-    final controllers = <String, TextEditingController>{};
-    final selectedForeignKeys = <String, dynamic>{};
+    if (!widget.haveDetails) {
+      final formKey = GlobalKey<FormState>();
+      final controllers = <String, TextEditingController>{};
+      final selectedForeignKeys = <String, dynamic>{};
 
-    // Initialize controllers and foreign key selections
-    for (final column in widget.columns) {
-      if (column.editable) {
-        if (column.isForeignKey && column.foreignKeyConfig != null) {
-          // Find the current selected foreign key object
-          dynamic currentValue;
-          if (column.nestedPath != null) {
-            currentValue = _getNestedValue(rowData.data, column.nestedPath!);
+      // Initialize controllers and foreign key selections
+      for (final column in widget.columns) {
+        if (column.editable) {
+          if (column.isForeignKey && column.foreignKeyConfig != null) {
+            // Find the current selected foreign key object
+            dynamic currentValue;
+            if (column.nestedPath != null) {
+              currentValue = _getNestedValue(rowData.data, column.nestedPath!);
+            } else {
+              currentValue = rowData.data[column.key];
+            }
+
+            if (currentValue != null) {
+              // Find matching option in foreign key config
+              final matchingOption = column.foreignKeyConfig!.options
+                  .firstWhere(
+                    (option) =>
+                        option[column.foreignKeyConfig!.displayKey] ==
+                        currentValue,
+                    orElse: () => column.foreignKeyConfig!.options.first,
+                  );
+              selectedForeignKeys[column.key] = matchingOption;
+            }
           } else {
-            currentValue = rowData.data[column.key];
-          }
+            // Regular text field
+            String currentValue = '';
+            if (column.nestedPath != null) {
+              final nestedValue = _getNestedValue(
+                rowData.data,
+                column.nestedPath!,
+              );
+              currentValue = nestedValue?.toString() ?? '';
+            } else {
+              currentValue = rowData.data[column.key]?.toString() ?? '';
+            }
 
-          if (currentValue != null) {
-            // Find matching option in foreign key config
-            final matchingOption = column.foreignKeyConfig!.options.firstWhere(
-              (option) =>
-                  option[column.foreignKeyConfig!.displayKey] == currentValue,
-              orElse: () => column.foreignKeyConfig!.options.first,
-            );
-            selectedForeignKeys[column.key] = matchingOption;
+            controllers[column.key] = TextEditingController(text: currentValue);
           }
-        } else {
-          // Regular text field
-          String currentValue = '';
-          if (column.nestedPath != null) {
-            final nestedValue = _getNestedValue(
-              rowData.data,
-              column.nestedPath!,
-            );
-            currentValue = nestedValue?.toString() ?? '';
-          } else {
-            currentValue = rowData.data[column.key]?.toString() ?? '';
-          }
-
-          controllers[column.key] = TextEditingController(text: currentValue);
         }
       }
-    }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (dialogContext) => UpdateDialog(
-            title: widget.title,
-            id: rowData.id,
-            columns: widget.columns.where((col) => col.editable).toList(),
-            controllers: controllers,
-            selectedForeignKeys: selectedForeignKeys,
-            formKey: formKey,
-            onUpdate: (updatedData) {
-              if (widget.onUpdate != null) {
-                widget.onUpdate!(rowData, updatedData);
-              }
-            },
-            options: widget.options,
-            details: rowData.data['details'] ?? {},
-          ),
-    ).then((_) {
-      // Đảm bảo chỉ dispose sau khi dialog đã bị huỷ hoàn toàn
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        for (final controller in controllers.values) {
-          controller.dispose();
-        }
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (dialogContext) => UpdateDialog(
+              title: widget.title,
+              id: rowData.id,
+              columns: widget.columns.where((col) => col.editable).toList(),
+              controllers: controllers,
+              selectedForeignKeys: selectedForeignKeys,
+              formKey: formKey,
+              onUpdate: (updatedData) {
+                if (widget.onUpdate != null) {
+                  widget.onUpdate!(rowData, updatedData);
+                }
+              },
+            ),
+      ).then((_) {
+        // Đảm bảo chỉ dispose sau khi dialog đã bị huỷ hoàn toàn
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          for (final controller in controllers.values) {
+            controller.dispose();
+          }
+        });
       });
-    });
+    } else {
+      widget.showComplexUpdateDialog!(rowData);
+    }
   }
 
   void _deleteRow(String id) {

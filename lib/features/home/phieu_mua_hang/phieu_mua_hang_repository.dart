@@ -18,7 +18,7 @@ class PhieuMuaHangRepository {
     await phieuMuaHangApi.create(maNCC, sanPhamMua);
   }
 
-  Future<void> update(PhieuMuaHang phieuMuaHang) async {
+  Future<void> update(PhieuMuaHangUpdateDto phieuMuaHang) async {
     try {
       await phieuMuaHangApi.update(phieuMuaHang);
     } catch (e) {

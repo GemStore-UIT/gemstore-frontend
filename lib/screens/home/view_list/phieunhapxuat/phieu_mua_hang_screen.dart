@@ -7,7 +7,8 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
-import 'package:gemstore_frontend/screens/reusable_widgets/phieumuahang_create_dialog.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieumuaban_create_dialog.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieumuaban_update_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuMuaHangScreen extends StatefulWidget {
@@ -34,43 +35,47 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
   @override
   void initState() {
     super.initState();
-    _listSanPham.addAll(
-      widget.listSanPham.map((sp) => sp.toJson()).toList(),
-    );
+    _listSanPham.addAll(widget.listSanPham.map((sp) => sp.toJson()).toList());
     _listNhaCungCap.addAll(
       widget.listNhaCungCap.map((ncc) => ncc.toJson()).toList(),
     );
     _columns = [
-    TableColumn(
-      key: 'id',
-      header: 'Mã phiếu mua hàng',
-      width: 3,
-      editable: false,
-    ),
-    TableColumn(key: 'name', header: 'Nhà cung cấp', width: 3, 
-      isForeignKey: true,
-      foreignKeyConfig: ForeignKeyConfig(
-        options: _listNhaCungCap,
-        valueKey: 'maNCC',
-        displayKey: 'tenNCC',
+      TableColumn(
+        key: 'id',
+        header: 'Mã phiếu mua hàng',
+        width: 3,
+        editable: false,
       ),
-    ),
-    TableColumn(key: 'date', header: 'Ngày lập', width: 2),
-    TableColumn(key: 'total', header: 'Tổng tiền', width: 2, 
-      customWidget: (value) => SizedBox(
-        height: 40,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            MoneyFormat.format(value),
-            style: const TextStyle(fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-          ),
+      TableColumn(
+        key: 'name',
+        header: 'Nhà cung cấp',
+        width: 3,
+        isForeignKey: true,
+        foreignKeyConfig: ForeignKeyConfig(
+          options: _listNhaCungCap,
+          valueKey: 'maNCC',
+          displayKey: 'tenNCC',
         ),
       ),
-    ),
-  ];
-  
+      TableColumn(key: 'date', header: 'Ngày lập', width: 2),
+      TableColumn(
+        key: 'total',
+        header: 'Tổng tiền',
+        width: 2,
+        customWidget:
+            (value) => SizedBox(
+              height: 40,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  MoneyFormat.format(value),
+                  style: const TextStyle(fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+      ),
+    ];
   }
 
   void _showAddPhieuMuaHangDialog() {
@@ -87,12 +92,33 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     );
   }
 
+  void _showUpdatePhieuMuaHangDialog(TableRowData row) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PhieumuabanUpdateDialog(
+          title: "Phiếu Mua Hàng",
+          soPhieu: row.id,
+          nguoiGiaoDich:
+              _listNhaCungCap.firstWhere(
+                (ncc) => ncc['tenNCC'] == row.data['name'],
+              )['maNCC'],
+          listNhaCungCap: _listNhaCungCap,
+          ngayLap: row.data['date'] ?? '',
+          chiTiet: row.data['details'] ?? [],
+          listSanPham: _listSanPham,
+          onUpdate: _onUpdatePhieuMuaHang,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<PhieuMuaHangBloc, PhieuMuaHangState>(
       listener: (context, state) {
         setState(() {
-          _isLoading = state is PhieuMuaHangStateLoading;          
+          _isLoading = state is PhieuMuaHangStateLoading;
         });
       },
       builder: (context, state) {
@@ -104,9 +130,10 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
                 title: 'Phiếu Mua Hàng',
                 data: PhieuMuaHang.convertToTableRowData(widget.data),
                 columns: _columns,
-                onUpdate: _onUpdatePhieuMuaHang,
+                onUpdate: null,
                 onDelete: _onDeletePhieuMuaHang,
                 haveDetails: true,
+                showComplexUpdateDialog: _showUpdatePhieuMuaHangDialog,
               ),
               floatingActionButton: FloatingActionButton.extended(
                 onPressed: _showAddPhieuMuaHangDialog,
@@ -135,24 +162,33 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
     super.dispose();
   }
 
-  dynamic _onUpdatePhieuMuaHang(
-    TableRowData row,
-    Map<String, dynamic> updatedData,
-  ) {
-    final String id = row.id;
+  void _onUpdatePhieuMuaHang(Map<String, dynamic> updatedData) {
+    final String id = updatedData['id'] ?? '';
     final String ngayLap = updatedData['date'] ?? '';
-    final Map<String, dynamic> nhaCungCap = updatedData['name'];
-    final String tongTien = updatedData['total'] ?? 0;
+    final Map<String, dynamic> nhaCungCap = _listNhaCungCap.firstWhere(
+      (ncc) => ncc['maNCC'] == updatedData['name'],
+      orElse: () => {},
+    );
     final List<Map<String, dynamic>> sanPhamMua = updatedData['details'] ?? [];
 
     context.read<PhieuMuaHangBloc>().add(
       PhieuMuaHangEventUpdate(
-        phieuMuaHang: PhieuMuaHang(
+        phieuMuaHang: PhieuMuaHangUpdateDto(
           soPhieuMH: id,
           ngayLap: ngayLap,
           nhaCungCap: NhaCungCap.fromJson(nhaCungCap),
-          tongTien: int.tryParse(tongTien.toString()) ?? 0,
-          chiTiet: sanPhamMua.map((item) => ChiTietPhieuMuaHang.fromJson(item)).toList(),
+          chiTiet:
+              sanPhamMua
+                  .map(
+                    (item) => ChiTietPhieuMuaHangUpdateDto(
+                      phieuMuaHang: id,
+                      sanPham: widget.listSanPham.firstWhere(
+                        (sp) => sp.maSanPham == item['maSanPham'],
+                      ),
+                      soLuong: item['soLuong'],
+                    ),
+                  )
+                  .toList(),
         ),
       ),
     );

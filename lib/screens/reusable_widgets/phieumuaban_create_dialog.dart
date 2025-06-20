@@ -4,19 +4,20 @@ import 'package:gemstore_frontend/config/money_format.dart';
 class PhieumuahangCreateDialog extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> listSanPham;
-  final List<Map<String, dynamic>> listNhaCungCap;
+  final List<Map<String, dynamic>>? listNhaCungCap;
   final void Function(String, List<Map<String, dynamic>>) onCreate;
 
   const PhieumuahangCreateDialog({
     super.key,
     required this.title,
     required this.listSanPham,
-    required this.listNhaCungCap,
+    this.listNhaCungCap,
     required this.onCreate,
   });
 
   @override
-  State<PhieumuahangCreateDialog> createState() => _PhieumuahangCreateDialogState();
+  State<PhieumuahangCreateDialog> createState() =>
+      _PhieumuahangCreateDialogState();
 }
 
 class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
@@ -160,75 +161,90 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: selectedNCC,
-                              hint: const Text('Chọn Nhà Cung Cấp'),
-                              decoration: InputDecoration(
-                                labelText: 'Nhà Cung Cấp',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.business),
+                            if (widget.listNhaCungCap != null) ...[
+                              DropdownButtonFormField<String>(
+                                value: selectedNCC,
+                                hint: const Text('Chọn Nhà Cung Cấp'),
+                                decoration: InputDecoration(
+                                  labelText: 'Nhà Cung Cấp',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.business),
+                                ),
+                                items:
+                                    widget.listNhaCungCap!.map((ncc) {
+                                      return DropdownMenuItem<String>(
+                                        value: ncc['maNCC'],
+                                        child: Text(ncc['tenNCC']),
+                                      );
+                                    }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedNCC = value;
+                                  });
+                                },
                               ),
-                              items:
-                                  widget.listNhaCungCap.map((ncc) {
-                                    return DropdownMenuItem<String>(
-                                      value: ncc['maNCC'],
-                                      child: Text(ncc['tenNCC']),
+                              if (selectedNCC != null)
+                                Builder(
+                                  builder: (context) {
+                                    final ncc = widget.listNhaCungCap!
+                                        .firstWhere(
+                                          (n) => n['maNCC'] == selectedNCC,
+                                          orElse: () => {},
+                                        );
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.phone,
+                                                size: 18,
+                                                color: Colors.grey,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                'Số điện thoại: ${ncc['sdt'] ?? ''}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.location_on,
+                                                size: 18,
+                                                color: Colors.grey,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                'Địa chỉ: ${ncc['diaChi'] ?? ''}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     );
-                                  }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedNCC = value;
-                                });
-                              },
-                            ),
-                            if (selectedNCC != null)
-                              Builder(
-                                builder: (context) {
-                                  final ncc = widget.listNhaCungCap.firstWhere(
-                                    (n) => n['maNCC'] == selectedNCC,
-                                    orElse: () => {},
-                                  );
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.phone,
-                                              size: 18,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'Số điện thoại: ${ncc['sdt'] ?? ''}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.location_on,
-                                              size: 18,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'Địa chỉ: ${ncc['diaChi'] ?? ''}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                                  },
+                                ),
+                            ] else
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: 'Tên Khách Hàng',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.person),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedNCC = value;
+                                  });
                                 },
                               ),
                           ],
@@ -277,8 +293,10 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                         (sp) => sp['maSanPham'] == value,
                                         orElse: () => {},
                                       );
-                                  tenLSP = selectedProduct['loaiSanPham']['tenLSP'];
-                                  donViTinhSP = selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
+                                  tenLSP =
+                                      selectedProduct['loaiSanPham']['tenLSP'];
+                                  donViTinhSP =
+                                      selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
                                   donGiaMuaSP =
                                       selectedProduct['donGia'].toString();
                                 });
@@ -341,7 +359,10 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                     ValueListenableBuilder<TextEditingValue>(
                                       valueListenable: soLuongController,
                                       builder: (context, value, child) {
-                                        final isEnabled = value.text.isNotEmpty && int.tryParse(value.text) != null && int.parse(value.text) > 0;
+                                        final isEnabled =
+                                            value.text.isNotEmpty &&
+                                            int.tryParse(value.text) != null &&
+                                            int.parse(value.text) > 0;
                                         return SizedBox(
                                           width: double.infinity,
                                           child: ElevatedButton.icon(

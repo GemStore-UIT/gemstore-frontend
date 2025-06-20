@@ -1,4 +1,5 @@
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
+import 'package:gemstore_frontend/models/san_pham.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuMuaHang {
@@ -89,5 +90,64 @@ class ChiTietPhieuMuaHang {
       'soLuong': soLuong,
       'thanhTien': thanhTien,
     };
+  }
+}
+
+class PhieuMuaHangUpdateDto {
+  String soPhieuMH;
+  String ngayLap;
+  NhaCungCap nhaCungCap;
+  List<ChiTietPhieuMuaHangUpdateDto> chiTiet;
+
+  PhieuMuaHangUpdateDto({
+    required this.soPhieuMH,
+    required this.ngayLap,
+    required this.nhaCungCap,
+    required this.chiTiet,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'soPhieuMH': soPhieuMH,
+      'ngayLap': ngayLap,
+      'nhaCungCap': nhaCungCap.toJson(),
+      'chiTiet': chiTiet.map((item) => item.toJson()).toList(),
+    };
+  }
+}
+
+class ChiTietPhieuMuaHangUpdateDto {
+  SanPham sanPham;
+  String phieuMuaHang;
+  int soLuong;
+
+  ChiTietPhieuMuaHangUpdateDto({
+    required this.sanPham,
+    required this.phieuMuaHang,
+    required this.soLuong,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sanPham': sanPham.toJson(),
+      'phieuMuaHang': phieuMuaHang,
+      'soLuong': soLuong,
+    };
+  }
+
+  factory ChiTietPhieuMuaHangUpdateDto.fromJson(Map<String, dynamic> json) {
+    return ChiTietPhieuMuaHangUpdateDto(
+      sanPham: SanPham.fromJson(json['sanPham']),
+      phieuMuaHang: json['phieuMuaHang'],
+      soLuong: json['soLuong'],
+    );
+  }
+
+  factory ChiTietPhieuMuaHangUpdateDto.fromJsonNotFull(Map<String, dynamic> json, List<SanPham> sanPhamList) {
+    return ChiTietPhieuMuaHangUpdateDto(
+      sanPham: sanPhamList.firstWhere((sp) => sp.maSanPham == json['maSanPham']),
+      phieuMuaHang: json['phieuMuaHang'],
+      soLuong: json['soLuong'],
+    );
   }
 }
