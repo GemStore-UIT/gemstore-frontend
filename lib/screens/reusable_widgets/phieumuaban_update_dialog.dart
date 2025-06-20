@@ -29,7 +29,6 @@ class PhieumuabanUpdateDialog extends StatefulWidget {
 }
 
 class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
-  late TextEditingController _soPhieuController;
   late TextEditingController _nguoiGiaoDichController;
   List<SanPhamMuaBan> _sanPhamMuaBanList = [];
   List<TextEditingController> _sanPhamControllers = [];
@@ -38,7 +37,6 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
   @override
   void initState() {
     super.initState();
-    _soPhieuController = TextEditingController(text: widget.soPhieu);
     _nguoiGiaoDichController = TextEditingController(
       text: widget.nguoiGiaoDich,
     );
@@ -61,7 +59,6 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
 
   @override
   void dispose() {
-    _soPhieuController.dispose();
     _nguoiGiaoDichController.dispose();
     for (var controller in _sanPhamControllers) {
       controller.dispose();
@@ -317,7 +314,7 @@ class _PhieumuabanUpdateDialogState extends State<PhieumuabanUpdateDialog> {
         ElevatedButton(
           onPressed: () {
             final updatedData = {
-              'id': _soPhieuController.text,
+              'id': widget.soPhieu,
               'name': _nguoiGiaoDichController.text,
               'date': widget.ngayLap,
               'details':

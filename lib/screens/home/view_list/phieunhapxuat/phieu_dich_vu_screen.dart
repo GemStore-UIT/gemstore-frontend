@@ -6,6 +6,7 @@ import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_state.dart';
 import 'package:gemstore_frontend/models/loai_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieudichvu_update_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class PhieuDichVuScreen extends StatefulWidget {
@@ -120,20 +121,21 @@ class _PhieuDichVuScreenState extends State<PhieuDichVuScreen> {
   }
 
   void _showUpdatePhieuDichVuDialog(TableRowData row){
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return PhieuDichVuUpdateDialog(
-    //       title: "Phiếu Dịch Vụ",
-    //       soPhieu: row.id,
-    //       nguoiGiaoDich: row.data['name'] ?? '',
-    //       ngayLap: row.data['date'] ?? '',
-    //       chiTiet: row.data['details'] ?? [],
-    //       listDichVu: _listDichVu,
-    //       onUpdate: _onUpdatePhieuDichVu,
-    //     );
-    //   },
-    // );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PhieuDichVuUpdateDialog(
+          title: "Cập nhật phiếu Dịch Vụ",
+          soPhieuDV: row.id,
+          khachhang: row.data['name'] ?? '',
+          sdt: row.data['phone'] ?? '',
+          ngayLap: row.data['date'] ?? '',
+          chiTiet: row.data['details'] ?? [],
+          listLoaiDichVu: _listLoaiDichVu,
+          onUpdate: _onUpdatePhieuDichVu,
+        );
+      },
+    );
   }
 
    @override

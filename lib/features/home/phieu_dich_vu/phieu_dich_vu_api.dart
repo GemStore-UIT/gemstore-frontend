@@ -48,12 +48,20 @@ class PhieuDichVuApi {
     List<Map<String, dynamic>> chiTiet,
   ) async {
     try {
-      await dio.post('/api/phieudichvu/full', data: {
-        'soPhieuDV': soPhieuDV,
-        'khachHang': khachHang,
-        'sdt': sdt,
-        'chiTiet': chiTiet,
-      });
+      // Log the parameters for debugging
+      print(
+        'soPhieuDV:$soPhieuDV, khachHang:$khachHang, sdt:$sdt, chiTiet:$chiTiet',
+      );
+
+      await dio.post(
+        '/api/phieudichvu/full',
+        data: {
+          'soPhieuDV': soPhieuDV,
+          'khachHang': khachHang,
+          'sdt': sdt,
+          'chiTiet': chiTiet,
+        },
+      );
     } catch (e) {
       throw Exception('API Error for update: $e');
     }
