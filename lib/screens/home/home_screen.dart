@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/config/format.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
@@ -32,6 +33,7 @@ import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
 import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/home/view_list/bao_cao_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_ban_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_dich_vu_screen.dart';
@@ -589,16 +591,16 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'product_list':
         return SanPhamScreen(data: _sanPhams, listLoaiSanPham: _loaiSanPhams);
       case 'reports':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.bar_chart, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Báo cáo Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return ReportScreen(
+          chartData: Format.chartDataFormat(
+            _phieuMuaHangs,
+            _phieuBanHangs,
+          ),
+          productData: Format.productDataFormat(
+            _sanPhams,
+            _phieuMuaHangs,
+            _phieuBanHangs,
+          ),
         );
       default:
         return Column(
