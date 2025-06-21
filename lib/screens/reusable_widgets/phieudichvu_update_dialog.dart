@@ -12,6 +12,8 @@ class PhieuDichVuUpdateDialog extends StatefulWidget {
   final List<Map<String, dynamic>> chiTiet;
   final List<Map<String, dynamic>> listLoaiDichVu;
   final Function(Map<String, dynamic>) onUpdate;
+  final DateTime currentDate;
+  final int soNgayGiaoToiDa;
 
   const PhieuDichVuUpdateDialog({
     super.key,
@@ -23,6 +25,8 @@ class PhieuDichVuUpdateDialog extends StatefulWidget {
     required this.chiTiet,
     required this.listLoaiDichVu,
     required this.onUpdate,
+    required this.currentDate,
+    required this.soNgayGiaoToiDa,
   });
 
   @override
@@ -361,6 +365,8 @@ class _PhieuDichVuUpdateDialogState extends State<PhieuDichVuUpdateDialog> {
                         child: DateInputFieldWithPicker(
                           controller: _ngayGiaoControllers[index],
                           labelText: 'Ngày giao',
+                          current: widget.currentDate,
+                          soNgayGiaoToiDa: widget.soNgayGiaoToiDa,
                           onDatePicked: (value) {
                             setState(() {
                               dichVu.ngayGiao = value!;

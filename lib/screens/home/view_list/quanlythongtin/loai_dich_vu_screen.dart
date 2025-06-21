@@ -129,8 +129,8 @@ class _LoaiDichVuScreenState extends State<LoaiDichVuScreen> {
   ) {
     final String id = row.id;
     final String name = updatedData['name'] ?? '';
-    final int price = updatedData['price'] ?? 0;
-    final double prepaid = updatedData['prepaid'] ?? 0.0;
+    final int price = int.tryParse(updatedData['price']) ?? 0;
+    final double prepaid = double.tryParse(updatedData['prepaid']) ?? 0.0;
 
     context.read<LoaiDichVuBloc>().add(
       LoaiDichVuEventUpdate(

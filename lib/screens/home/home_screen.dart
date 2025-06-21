@@ -95,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (state is PhieuMuaHangStateUpdated) {
               setState(() {
                 _phieuMuaHangs = state.data;
+                context.read<SanPhamBloc>().add(SanPhamEventGetAll());
               });
             } else if (state is PhieuMuaHangStateFailure) {
               _handleError("Lỗi phiếu mua hàng: ${state.error}");
@@ -118,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (state is PhieuDichVuStateUpdated) {
               setState(() {
                 _phieuDichVus = state.data;
-                context.read<SanPhamBloc>().add(SanPhamEventGetAll());
               });
             } else if (state is PhieuDichVuStateError) {
               _handleError("Lỗi phiếu dịch vụ: ${state.message}");
@@ -611,6 +611,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return PhieuDichVuScreen(
           data: _phieuDichVus,
           listLoaiDichVu: _loaiDichVus,
+          thamSos: _thamSos,
         );
       case 'product_list':
         return SanPhamScreen(data: _sanPhams, listLoaiSanPham: _loaiSanPhams);

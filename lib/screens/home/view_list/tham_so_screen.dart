@@ -6,11 +6,7 @@ class ThamSoScreen extends StatefulWidget {
   final List<ThamSo> thamSoList;
   final Function(List<ThamSo>)? onUpdate; // Callback để cập nhật dữ liệu
 
-  const ThamSoScreen({
-    super.key, 
-    required this.thamSoList,
-    this.onUpdate,
-  });
+  const ThamSoScreen({super.key, required this.thamSoList, this.onUpdate});
 
   @override
   State<ThamSoScreen> createState() => _ThamSoScreenState();
@@ -27,11 +23,19 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
     super.initState();
     // Tạo bản sao của danh sách để có thể chỉnh sửa
     _thamSoList = List.from(widget.thamSoList);
-    
+
     // Khởi tạo controllers cho mỗi tham số
-    _controllers = _thamSoList.map((thamSo) => 
-      TextEditingController(text: thamSo.giaTri.toString())
-    ).toList();
+    _controllers =
+        _thamSoList
+            .map(
+              (thamSo) => TextEditingController(
+                text:
+                    thamSo.tenThamSo == "TiLeTraTruocMacDinh"
+                        ? thamSo.giaTri.toString()
+                        : thamSo.giaTri.toInt().toString(),
+              ),
+            )
+            .toList();
   }
 
   @override
@@ -47,11 +51,11 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
   String _getDisplayName(String tenThamSo) {
     switch (tenThamSo) {
       case 'SoLuongTonToiThieu':
-        return 'Số lượng tồn tối thiểu (sản phẩm)';
+        return 'Số lượng tồn kho ít nhất mà sản phẩm phải có (sản phẩm)';
       case 'TiLeTraTruocMacDinh':
-        return 'Tỷ lệ trả trước mặc định (%)';
+        return 'Tỷ lệ trả trước mặc định của loại dịch vụ (%)';
       case 'SoNgayGiaoToiDa':
-        return 'Số ngày giao hàng tối đa (ngày)';
+        return 'Số ngày giao hàng tối đa trong chi tiết phiếu dịch vụ (ngày)';
       default:
         return tenThamSo;
     }
@@ -76,16 +80,16 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập giá trị';
     }
-    
-    final number = int.tryParse(value);
+
+    final number = double.tryParse(value);
     if (number == null) {
-      return 'Vui lòng nhập số nguyên hợp lệ';
+      return 'Vui lòng nhập số hợp lệ';
     }
-    
+
     if (number <= 0) {
       return 'Giá trị phải lớn hơn 0';
     }
-    
+
     return null;
   }
 
@@ -94,18 +98,18 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
     if (_formKey.currentState!.validate()) {
       // Cập nhật giá trị trong danh sách
       for (int i = 0; i < _thamSoList.length; i++) {
-        _thamSoList[i].giaTri = int.parse(_controllers[i].text).toInt();
+        _thamSoList[i].giaTri = double.tryParse(_controllers[i].text) ?? 0;
       }
-      
+
       // Gọi callback để cập nhật dữ liệu ở parent widget
       if (widget.onUpdate != null) {
         widget.onUpdate!(_thamSoList);
       }
-      
+
       setState(() {
         _isEditing = false;
       });
-      
+
       // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -120,9 +124,9 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
   void _cancelChanges() {
     // Reset controllers về giá trị ban đầu
     for (int i = 0; i < _controllers.length; i++) {
-      _controllers[i].text = widget.thamSoList[i].giaTri.toString();
+      _controllers[i].text = i == 1 ? widget.thamSoList[i].giaTri.toString() : widget.thamSoList[i].giaTri.toInt().toString();
     }
-    
+
     setState(() {
       _isEditing = false;
     });
@@ -165,7 +169,7 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
           itemCount: _thamSoList.length,
           itemBuilder: (context, index) {
             final thamSo = _thamSoList[index];
-            
+
             return Card(
               margin: const EdgeInsets.only(bottom: 12.0),
               child: Padding(
@@ -182,9 +186,9 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
                     const SizedBox(height: 4),
                     Text(
                       _getDisplayName(thamSo.tenThamSo),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 12),
                     if (_isEditing)
@@ -219,7 +223,7 @@ class _ThamSoScreenState extends State<ThamSoScreen> {
                             const Icon(Icons.numbers, color: Colors.grey),
                             const SizedBox(width: 12),
                             Text(
-                              'Giá trị: ${thamSo.giaTri.toInt()} ${_getUnit(thamSo.tenThamSo)}',
+                              'Giá trị: ${thamSo.tenThamSo == "TiLeTraTruocMacDinh" ? thamSo.giaTri.toString() : thamSo.giaTri.toInt().toString()} ${_getUnit(thamSo.tenThamSo)}',
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ],

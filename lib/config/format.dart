@@ -1,5 +1,6 @@
 import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
+import 'package:gemstore_frontend/models/tham_so.dart';
 
 class Format {
   static String moneyFormat(int amount) {
@@ -64,5 +65,26 @@ class Format {
     }
 
     return chartData;
+  }
+
+  static int getSoNgayGiaoToiDa(List<ThamSo> thamSos) {
+    final soNgayGiaoToiDa = thamSos.firstWhere(
+      (thamSo) => thamSo.tenThamSo == 'SoNgayGiaoToiDa',
+    );
+    return soNgayGiaoToiDa.giaTri.toInt();
+  }
+
+  static double getTiLeTraTruocMacDinh(List<ThamSo> thamSos) {
+    final tiLeTraTruocMacDinh = thamSos.firstWhere(
+      (thamSo) => thamSo.tenThamSo == 'TiLeTraTruocMacDinh',
+    );
+    return tiLeTraTruocMacDinh.giaTri;
+  }
+
+  static int getSoLuongTonToiThieu(List<ThamSo> thamSos) {
+    final soLuongTonToiThieu = thamSos.firstWhere(
+      (thamSo) => thamSo.tenThamSo == 'SoLuongTonToiThieu',
+    );
+    return soLuongTonToiThieu.giaTri.toInt();
   }
 }

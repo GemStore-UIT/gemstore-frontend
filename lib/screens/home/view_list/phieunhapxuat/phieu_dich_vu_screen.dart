@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/config/format.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_state.dart';
 import 'package:gemstore_frontend/models/loai_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
+import 'package:gemstore_frontend/models/tham_so.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/phieudichvu_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/phieudichvu_update_dialog.dart';
@@ -13,11 +15,13 @@ import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget
 class PhieuDichVuScreen extends StatefulWidget {
   final List<PhieuDichVu> data;
   final List<LoaiDichVu> listLoaiDichVu;
+  final List<ThamSo> thamSos;
 
   const PhieuDichVuScreen({
     super.key,
     required this.data,
     required this.listLoaiDichVu,
+    required this.thamSos,
   });
 
   @override
@@ -84,6 +88,8 @@ class _PhieuDichVuScreenState extends State<PhieuDichVuScreen> {
           title: "Thêm phiếu Dịch Vụ",
           listLoaiDichVu: _listLoaiDichVu,
           onCreate: _onAddPhieuDichVu,
+          currentDate: DateTime.now(),
+          soNgayGiaoToiDa: Format.getSoNgayGiaoToiDa(widget.thamSos),
         );
       },
     );
@@ -102,6 +108,8 @@ class _PhieuDichVuScreenState extends State<PhieuDichVuScreen> {
           chiTiet: row.data['details'] ?? [],
           listLoaiDichVu: _listLoaiDichVu,
           onUpdate: _onUpdatePhieuDichVu,
+          currentDate: DateTime.parse(row.data['date']),
+          soNgayGiaoToiDa: Format.getSoNgayGiaoToiDa(widget.thamSos),
         );
       },
     );

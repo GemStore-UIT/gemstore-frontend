@@ -6,12 +6,16 @@ class PhieuDichVuCreateDialog extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> listLoaiDichVu;
   final Function(String, String, List<Map<String, dynamic>>) onCreate;
+  final DateTime currentDate;
+  final int soNgayGiaoToiDa;
 
   const PhieuDichVuCreateDialog({
     super.key,
     required this.title,
     required this.listLoaiDichVu,
     required this.onCreate,
+    required this.currentDate,
+    required this.soNgayGiaoToiDa,
   });
 
   @override
@@ -265,6 +269,8 @@ class _PhieuDichVuCreateDialogState extends State<PhieuDichVuCreateDialog> {
                         child: DateInputFieldWithPicker(
                           controller: _ngayGiaoControllers[index],
                           labelText: 'Ngày giao',
+                          current: widget.currentDate,
+                          soNgayGiaoToiDa: widget.soNgayGiaoToiDa,
                           onDatePicked: (value) {
                             setState(() {
                               dichVu.ngayGiao = value!;

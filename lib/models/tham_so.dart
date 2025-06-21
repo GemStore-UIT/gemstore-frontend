@@ -1,6 +1,6 @@
 class ThamSo {
   String tenThamSo;
-  int giaTri;
+  double giaTri;
 
   ThamSo({
     required this.tenThamSo,
@@ -10,7 +10,7 @@ class ThamSo {
   factory ThamSo.fromJson(Map<String, dynamic> json) {
     return ThamSo(
       tenThamSo: json['tenThamSo'],
-      giaTri: json['giaTri'],
+      giaTri: json['giaTri'].toDouble(),
     );
   }
 
