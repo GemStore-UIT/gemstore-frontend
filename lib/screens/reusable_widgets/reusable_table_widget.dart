@@ -135,7 +135,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
       } else {
         _isSearching = true;
         _filteredData = widget.data.where((item) {
-          final searchValue = item.data[widget.searchField]?.toString()?.toLowerCase() ?? '';
+          final searchValue = item.data[widget.searchField]?.toString().toLowerCase() ?? '';
           return searchValue.contains(query.toLowerCase());
         }).toList();
       }
