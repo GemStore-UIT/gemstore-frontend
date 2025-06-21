@@ -22,17 +22,17 @@ flutter run
 ```
 
 # Ngoài lề:
-1. **Kiểm tra flutter sdk**
-Kiểm tra flutter đã được cài đặt đầy đủ và chính xác chưa:
+1. **Kiểm tra flutter sdk**:
+- Kiểm tra flutter đã được cài đặt đầy đủ và chính xác chưa:
 ```bash
 flutter doctor
 ```
-2. **Cài đặt `just`**
-Just giúp chạy ứng dụng một cách đơn giản và tiện lợi hơn. Sau khi cài đặt just có thể kiểm tra phiên bản để xác nhận đã cài chưa (khuyến khích 1.40.0):
+2. **Cài đặt `just`**:
+- Just giúp chạy ứng dụng một cách đơn giản và tiện lợi hơn. Sau khi cài đặt just có thể kiểm tra phiên bản để xác nhận đã cài chưa (khuyến khích 1.40.0):
 ```bash
 just --version
 ```
-  Sau khi đã có just thì có thể khởi động ứng dụng bằng: 
+- Sau khi đã có just thì có thể khởi động ứng dụng bằng: 
 ```bash
 just
 ```
