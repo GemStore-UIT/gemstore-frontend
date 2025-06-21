@@ -48,11 +48,6 @@ class PhieuDichVuApi {
     List<Map<String, dynamic>> chiTiet,
   ) async {
     try {
-      // Log the parameters for debugging
-      print(
-        'soPhieuDV:$soPhieuDV, khachHang:$khachHang, sdt:$sdt, chiTiet:$chiTiet',
-      );
-
       await dio.post(
         '/api/phieudichvu/full',
         data: {

@@ -34,6 +34,10 @@ import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/san_pham/san_pham_api.dart';
 import 'package:gemstore_frontend/features/home/san_pham/san_pham_repository.dart';
+import 'package:gemstore_frontend/features/report/bao_cao_api.dart';
+import 'package:gemstore_frontend/features/report/bao_cao_repository.dart';
+import 'package:gemstore_frontend/features/report/bloc/bao_cao_bloc.dart';
+import 'package:gemstore_frontend/features/report/bloc/bao_cao_event.dart';
 
 void main() {
   runApp(const MyApp());
@@ -69,6 +73,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => SanPhamRepository(SanPhamApi(dio)),
+        ),
+        RepositoryProvider(
+          create: (context) => BaoCaoRepository(BaoCaoApi(dio)),
         ),
       ],
       child: MultiBlocProvider(
@@ -108,6 +115,9 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => SanPhamBloc(context.read<SanPhamRepository>()),
           ),
+          BlocProvider(
+            create: (context) => BaoCaoBloc(context.read<BaoCaoRepository>()),
+          ),
         ],
         child: AppContent(),
       ),
@@ -134,6 +144,7 @@ class _AppContentState extends State<AppContent> {
     context.read<PhieuBanHangBloc>().add(PhieuBanHangEventStart());
     context.read<PhieuDichVuBloc>().add(PhieuDichVuEventStart());
     context.read<SanPhamBloc>().add(SanPhamEventStart());
+    context.read<BaoCaoBloc>().add(BaoCaoEventStart());
   }
 
   @override

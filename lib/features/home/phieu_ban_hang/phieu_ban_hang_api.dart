@@ -46,9 +46,6 @@ class PhieuBanHangApi {
     List<Map<String, dynamic>> sanPhamBan,
   ) async {
     try {
-      // Log the updated data for debugging
-      print('Updating PhieuBanHang with soPhieuBH: $soPhieuBH, khachHang: $khachHang, sanPhamBan: $sanPhamBan');
-
       await dio.post(
         '/api/phieubanhang/full',
         data: {
