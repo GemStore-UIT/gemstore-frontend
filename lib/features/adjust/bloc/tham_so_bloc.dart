@@ -17,7 +17,7 @@ class ThamSoBloc extends Bloc<ThamSoEvent, ThamSoState> {
         final thamSoList = await thamSoRepository.getAll();
         emit(ThamSoStateLoaded(thamSoList));
       } catch (e) {
-        emit(ThamSoStateError('Failed to get all tham so: $e'));
+        emit(ThamSoStateError('- Không thể tải danh sách tham số: Vui lòng kiểm tra kết nối mạng!'));
       }
     });
 
@@ -27,7 +27,7 @@ class ThamSoBloc extends Bloc<ThamSoEvent, ThamSoState> {
         await thamSoRepository.updateThamSo(event.tenThamSo, event.giaTri);
         add(ThamSoEventGetAll());
       } catch (e) {
-        emit(ThamSoStateError('Failed to update tham so: $e'));
+        emit(ThamSoStateError('- Không thể cập nhật tham số: Vui lòng kiểm tra lại cú pháp!'));
       }
     });
   }

@@ -27,7 +27,11 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
       await donViTinhRepository.create(event.tenDonVi);
       add(DonViTinhEventGetAll());
     } catch (error) {
-      emit(DonViTinhStateFailure(error.toString()));
+      emit(
+        DonViTinhStateFailure(
+          "- Không thể tạo đơn vị tính: Vui lòng kiểm tra lại cú pháp!",
+        ),
+      );
     }
   }
 
@@ -40,7 +44,11 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
       await donViTinhRepository.update(event.maDonVi, event.tenDonVi);
       add(DonViTinhEventGetAll());
     } catch (error) {
-      emit(DonViTinhStateFailure(error.toString()));
+      emit(
+        DonViTinhStateFailure(
+          "- Không thể cập nhật đơn vị tính: Vui lòng kiểm tra lại cú pháp!",
+        ),
+      );
     }
   }
 
@@ -53,7 +61,11 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
       await donViTinhRepository.delete(event.maDonVi);
       add(DonViTinhEventGetAll());
     } catch (error) {
-      emit(DonViTinhStateFailure(error.toString()));
+      emit(
+        DonViTinhStateFailure(
+          "- Không thể xóa đơn vị tính: Đơn vị tính có thể đang được sử dụng!",
+        ),
+      );
     }
   }
 
@@ -66,7 +78,11 @@ class DonViTinhBloc extends Bloc<DonViTinhEvent, DonViTinhState> {
       final data = await donViTinhRepository.getAll();
       emit(DonViTinhStateUpdated(data));
     } catch (e) {
-      emit(DonViTinhStateFailure(e.toString()));
+      emit(
+        DonViTinhStateFailure(
+          "- Không thể lấy danh sách đơn vị tính: Vui lòng kiểm tra kết nối mạng!",
+        ),
+      );
     }
   }
 }

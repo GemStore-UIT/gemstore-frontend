@@ -30,7 +30,7 @@ class LoaiSanPhamBloc extends Bloc<LoaiSanPhamEvent, LoaiSanPhamState> {
       await loaiSanPhamRepository.create(event.tenLSP, event.donViTinh, event.loiNhuan);
       add(LoaiSanPhamEventGetAll());
     } catch (error) {
-      emit(LoaiSanPhamStateFailure(error.toString()));
+      emit(LoaiSanPhamStateFailure("- Không thể tạo loại sản phẩm: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -43,7 +43,7 @@ class LoaiSanPhamBloc extends Bloc<LoaiSanPhamEvent, LoaiSanPhamState> {
       await loaiSanPhamRepository.update(event.loaiSanPham);
       add(LoaiSanPhamEventGetAll());
     } catch (error) {
-      emit(LoaiSanPhamStateFailure(error.toString()));
+      emit(LoaiSanPhamStateFailure("- Không thể cập nhật loại sản phẩm: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -56,7 +56,7 @@ class LoaiSanPhamBloc extends Bloc<LoaiSanPhamEvent, LoaiSanPhamState> {
       await loaiSanPhamRepository.delete(event.maLSP);
       add(LoaiSanPhamEventGetAll());
     } catch (error) {
-      emit(LoaiSanPhamStateFailure(error.toString()));
+      emit(LoaiSanPhamStateFailure("- Không thể xóa loại sản phẩm: Loại sản phẩm có thể đang được sử dụng!"));
     }
   }
 
@@ -69,7 +69,7 @@ class LoaiSanPhamBloc extends Bloc<LoaiSanPhamEvent, LoaiSanPhamState> {
       final data = await loaiSanPhamRepository.getAll();
       emit(LoaiSanPhamStateUpdated(data));
     } catch (e) {
-      emit(LoaiSanPhamStateFailure(e.toString()));
+      emit(LoaiSanPhamStateFailure("- Không thể lấy danh sách loại sản phẩm: Vui lòng kiểm tra kết nối mạng!"));
     }
   }
 }

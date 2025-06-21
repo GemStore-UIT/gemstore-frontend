@@ -30,7 +30,7 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
       await nhaCungCapRepository.create(event.tenNCC, event.diaChi, event.sdt);
       add(NhaCungCapEventGetAll());
     } catch (error) {
-      emit(NhaCungCapStateFailure(error.toString()));
+      emit(NhaCungCapStateFailure("- Không thể tạo nhà cung cấp: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -43,7 +43,7 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
       await nhaCungCapRepository.update(event.nhaCungCap);
       add(NhaCungCapEventGetAll());
     } catch (error) {
-      emit(NhaCungCapStateFailure(error.toString()));
+      emit(NhaCungCapStateFailure("- Không thể cập nhật nhà cung cấp: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -56,7 +56,7 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
       await nhaCungCapRepository.delete(event.maNCC);
       add(NhaCungCapEventGetAll());
     } catch (error) {
-      emit(NhaCungCapStateFailure(error.toString()));
+      emit(NhaCungCapStateFailure("- Không thể xóa nhà cung cấp: Nhà cung cấp có thể đang được sử dụng!"));
     }
   }
 
@@ -69,7 +69,7 @@ class NhaCungCapBloc extends Bloc<NhaCungCapEvent, NhaCungCapState> {
       final data = await nhaCungCapRepository.getAll();
       emit(NhaCungCapStateUpdated(data));
     } catch (e) {
-      emit(NhaCungCapStateFailure(e.toString()));
+      emit(NhaCungCapStateFailure("- Không thể lấy danh sách nhà cung cấp: Vui lòng kiểm tra kết nối mạng!"));
     }
   }
 }
