@@ -5,6 +5,7 @@ import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dar
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_state.dart';
 import 'package:gemstore_frontend/models/loai_san_pham.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -30,7 +31,7 @@ class _SanPhamScreenState extends State<SanPhamScreen> {
   void initState() {
     super.initState();
     _columns = [
-      TableColumn(key: 'id', header: 'Mã sản phẩm', width: 1, editable: false),
+      TableColumn(key: 'id', header: 'Mã sản phẩm', width: 1, editable: false, customWidget: (value) => FormatColumnData.formatId(value)),
       TableColumn(key: 'name', header: 'Tên sản phẩm', width: 2),
       TableColumn(
         key: 'productType',
@@ -52,7 +53,7 @@ class _SanPhamScreenState extends State<SanPhamScreen> {
         width: 1,
         editable: false,
       ),
-      TableColumn(key: 'price', header: 'Đơn giá mua vào', width: 2),
+      TableColumn(key: 'price', header: 'Đơn giá mua vào', width: 2, customWidget: (value) => FormatColumnData.formatMoney(int.tryParse(value) ?? 0, Colors.orange)),
       TableColumn(key: 'quantity', header: 'Số lượng tồn kho', width: 1),
     ];
   }

@@ -22,7 +22,7 @@ class FormatColumnData {
         alignment: Alignment.centerLeft,
         child: Text(
           Format.moneyFormat(amount),
-          style: TextStyle(fontSize: 14, color: color),
+          style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.bold),
           overflow: TextOverflow.ellipsis,
         ),
       ),

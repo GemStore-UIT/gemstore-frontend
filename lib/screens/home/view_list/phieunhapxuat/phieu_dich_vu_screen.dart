@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gemstore_frontend/config/format.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_state.dart';
@@ -69,7 +68,7 @@ class _PhieuDichVuScreenState extends State<PhieuDichVuScreen> {
       ),
       TableColumn(
         key: 'status',
-        header: 'Trạng thái',
+        header: 'Trạng thái giao hàng',
         width: 1,
         customWidget: (value) => FormatColumnData.formatStatus(value),
       ),

@@ -84,7 +84,7 @@ class ReusableTableWidget extends StatefulWidget {
     required this.columns,
     required this.onUpdate,
     this.onDelete,
-    this.height = 400,
+    this.height = 500,
     this.padding = const EdgeInsets.all(16),
     this.showActions = true,
     this.haveDetails = false,
