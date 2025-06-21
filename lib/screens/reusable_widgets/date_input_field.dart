@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class DateInputFieldWithPicker extends StatelessWidget {
@@ -8,11 +7,11 @@ class DateInputFieldWithPicker extends StatelessWidget {
   final ValueChanged<DateTime?>? onDatePicked;
 
   const DateInputFieldWithPicker({
-    Key? key,
+    super.key,
     required this.controller,
     required this.labelText,
     this.onDatePicked,
-  }) : super(key: key);
+  });
 
   Future<void> _pickDate(BuildContext context) async {
     // Parse ngày hiện tại trong controller, nếu không parse được thì lấy ngày hôm nay

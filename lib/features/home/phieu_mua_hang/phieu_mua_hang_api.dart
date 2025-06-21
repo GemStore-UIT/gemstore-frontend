@@ -45,9 +45,6 @@ class PhieuMuaHangApi {
 
   Future<void> update(PhieuMuaHangUpdateDto updatedData) async {
     try {
-      // Log the updated data for debugging
-      print('Updating PhieuMuaHang with data: ${updatedData.toJson()}');
-
       await dio.post(
         '/api/phieumuahang/full',
         data: updatedData.toJson(),

@@ -1,7 +1,5 @@
 import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
-import 'package:gemstore_frontend/models/san_pham.dart';
-import 'package:gemstore_frontend/screens/home/view_list/bao_cao_screen.dart';
 
 class Format {
   static String moneyFormat(int amount) {
@@ -15,6 +13,7 @@ class Format {
       final mm = dateTime.minute.toString().padLeft(2, '0');
       final ss = dateTime.second.toString().padLeft(2, '0');
       final dd = dateTime.day.toString().padLeft(2, '0');
+      // ignore: non_constant_identifier_names
       final MM = dateTime.month.toString().padLeft(2, '0');
       final yyyy = dateTime.year.toString();
 
@@ -65,35 +64,5 @@ class Format {
     }
 
     return chartData;
-  }
-
-  static Map<String, List<ProductData>> productDataFormat(
-    List<SanPham> sanPhams,
-    List<PhieuMuaHang> phieuMuaHangs,
-    List<PhieuBanHang> phieuBanHangs,
-  ) {
-    Map<String, List<ProductData>> productData = {
-      'Tháng 5/2025': [
-        ProductData('Sản phẩm A', 100, 0, 0, 100, 'Cái'),
-        ProductData('Sản phẩm B', 50, 0, 0, 50, 'Cái'),
-      ],
-      'Tháng 6/2025': [],
-    };
-
-    // Xử lý từng sản phẩm
-    for (var sanPham in sanPhams) {
-      productData['Tháng 6/2025']!.add(
-        ProductData(
-          sanPham.tenSanPham,
-          sanPham.tonKho,
-          0,
-          0,
-          sanPham.tonKho,
-          sanPham.loaiSanPham.donViTinh.tenDonVi,
-        ),
-      );
-    }
-
-    return productData;
   }
 }

@@ -1,15 +1,16 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/features/report/bloc/bao_cao_bloc.dart';
+import 'package:gemstore_frontend/features/report/bloc/bao_cao_event.dart';
+import 'package:gemstore_frontend/features/report/bloc/bao_cao_state.dart';
 
 class ReportScreen extends StatefulWidget {
   final Map<String, Map<String, double>> chartData;
-  final Map<String, List<ProductData>> productData;
 
-  const ReportScreen({
-    super.key,
-    required this.chartData,
-    required this.productData,
-  });
+  const ReportScreen({super.key, required this.chartData});
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
@@ -17,75 +18,99 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   String selectedMonth = 'Tháng 6/2025';
+  bool _isLoadingProducts = false;
 
   // Dữ liệu mẫu cho dropdown
   List<String> months = [];
+  final Map<String, List<ProductData>> _productData = {};
 
   @override
   void initState() {
     super.initState();
-    // Lấy danh sách các tháng có trong cả chartData và productData
     final chartMonths = widget.chartData.keys.toSet();
-    final productMonths = widget.productData.keys.toSet();
-    months = chartMonths.intersection(productMonths).toList();
-    months.sort(); // Sắp xếp tăng dần theo tên tháng (nếu cần sắp xếp theo thời gian thực, cần xử lý thêm)
+    months = chartMonths.toList();
+    months
+        .sort(); // Sắp xếp tăng dần theo tên tháng (nếu cần sắp xếp theo thời gian thực, cần xử lý thêm)
     selectedMonth = months.first; // Mặc định chọn tháng đầu tiên
+    _getProductData(selectedMonth);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Hàng chứa dropdown và nút xuất báo cáo
-            Row(
+    return BlocConsumer<BaoCaoBloc, BaoCaoState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoadingProducts = state is BaoCaoStateLoading;
+          if (state is BaoCaoStateSuccess) {
+            _productData['Tháng ${state.month}/${state.year}'] = state.data;
+          } else if (state is BaoCaoStateError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Lỗi tải dữ liệu: ${state.message}')),
+            );
+          }
+        });
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          body: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildMonthSelector()),
-                SizedBox(width: 16),
-                _buildExportButton(),
+                // Hàng chứa dropdown và nút xuất báo cáo
+                Row(
+                  children: [
+                    Expanded(child: _buildMonthSelector()),
+                    SizedBox(width: 16),
+                    _buildExportButton(),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                // Layout chính với biểu đồ bên phải
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Phần bên trái - Danh sách sản phẩm
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Chi tiết sản phẩm',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            _isLoadingProducts
+                                ? Expanded(
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                                : Expanded(child: _buildProductList()),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(width: 20),
+
+                      // Phần bên phải - Biểu đồ
+                      Expanded(flex: 1, child: _buildChart()),
+                    ],
+                  ),
+                ),
               ],
             ),
-            SizedBox(height: 20),
-
-            // Layout chính với biểu đồ bên phải
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Phần bên trái - Danh sách sản phẩm
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Chi tiết sản phẩm',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Expanded(child: _buildProductList()),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(width: 20),
-
-                  // Phần bên phải - Biểu đồ
-                  Expanded(flex: 1, child: _buildChart()),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -276,7 +301,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildProductList() {
-    final products = widget.productData[selectedMonth] ?? [];
+    final products = _productData[selectedMonth] ?? [];
 
     if (products.isEmpty) {
       return Center(
@@ -389,7 +414,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.tonDau.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -397,7 +422,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.muaVao.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(Colors.green),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -405,7 +430,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.banRa.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(Colors.red),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -413,7 +438,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.tonCuoi.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -421,7 +446,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.donViTinh,
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -444,8 +469,8 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  TextStyle _cellStyle() {
-    return TextStyle(fontSize: 13, color: Colors.grey[800]);
+  TextStyle _cellStyle(Color? color) {
+    return TextStyle(fontSize: 13, color: color ?? Colors.grey[800]);
   }
 
   Widget _buildExportButton() {
@@ -465,7 +490,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _showExportDialog() {
     final data = widget.chartData[selectedMonth]!;
-    final products = widget.productData[selectedMonth] ?? [];
+    final products = _productData[selectedMonth] ?? [];
 
     showDialog(
       context: context,
@@ -768,13 +793,13 @@ class _ReportScreenState extends State<ReportScreen> {
                     children: [
                       Expanded(
                         flex: 3,
-                        child: Text(product.name, style: _cellStyle()),
+                        child: Text(product.name, style: _cellStyle(null)),
                       ),
                       Expanded(
                         flex: 1,
                         child: Text(
                           product.tonDau.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -782,7 +807,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.muaVao.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -790,7 +815,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.banRa.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -798,7 +823,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.tonCuoi.toString(),
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -806,7 +831,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         flex: 1,
                         child: Text(
                           product.donViTinh,
-                          style: _cellStyle(),
+                          style: _cellStyle(null),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -843,6 +868,36 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   void _exportToExcel() {}
+
+  void _getProductData(String selectedMonth) {
+    final thang = extractMonth(selectedMonth);
+    final nam = extractYear(selectedMonth);
+    if (thang != null && nam != null) {
+      context.read<BaoCaoBloc>().add(BaoCaoEventGet(thang, nam));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Thông tin tháng/năm không hợp lệ')),
+      );
+    }
+  }
+
+  int? extractMonth(String input) {
+    final regex = RegExp(r'Tháng\s+(\d{1,2})/(\d{4})');
+    final match = regex.firstMatch(input.trim());
+    if (match != null) {
+      return int.tryParse(match.group(1)!);
+    }
+    return null;
+  }
+
+  int? extractYear(String input) {
+    final regex = RegExp(r'Tháng\s+(\d{1,2})/(\d{4})');
+    final match = regex.firstMatch(input.trim());
+    if (match != null) {
+      return int.tryParse(match.group(2)!);
+    }
+    return null;
+  }
 }
 
 // Model class cho dữ liệu sản phẩm
@@ -862,4 +917,15 @@ class ProductData {
     this.tonCuoi,
     this.donViTinh,
   );
+
+  factory ProductData.fromJson(Map<String, dynamic> json) {
+    return ProductData(
+      json['tenSanPham'] as String,
+      json['tonDau'] as int,
+      json['muaVao'] as int,
+      json['banRa'] as int,
+      json['tonCuoi'] as int,
+      json['donViTinh'] as String,
+    );
+  }
 }

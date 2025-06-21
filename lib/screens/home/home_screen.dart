@@ -595,12 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
           chartData: Format.chartDataFormat(
             _phieuMuaHangs,
             _phieuBanHangs,
-          ),
-          productData: Format.productDataFormat(
-            _sanPhams,
-            _phieuMuaHangs,
-            _phieuBanHangs,
-          ),
+          )
         );
       default:
         return Column(
