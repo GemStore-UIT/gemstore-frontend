@@ -29,6 +29,7 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
   String? tenLSP;
   String? donViTinhSP;
   String? donGiaMuaSP;
+  int? soLuongHienTai;
 
   List<Map<String, dynamic>> addedItems = [];
   @override
@@ -87,6 +88,7 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
         tenLSP = null;
         donViTinhSP = null;
         donGiaMuaSP = null;
+        soLuongHienTai = null;
         soLuongController.clear();
       });
     }
@@ -297,9 +299,16 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                       selectedProduct['loaiSanPham']['tenLSP'];
                                   donViTinhSP =
                                       selectedProduct['loaiSanPham']['donViTinh']['tenDonVi'];
-                                  donGiaMuaSP = widget.listNhaCungCap != null
-                                      ? selectedProduct['donGia'].toString()
-                                      : (selectedProduct['donGia'] * (100 + (selectedProduct['loaiSanPham']['loiNhuan'] ?? 0)) / 100).toString();
+                                  donGiaMuaSP =
+                                      widget.listNhaCungCap != null
+                                          ? selectedProduct['donGia'].toString()
+                                          : (selectedProduct['donGia'] *
+                                                  (100 +
+                                                      (selectedProduct['loaiSanPham']['loiNhuan'] ??
+                                                          0)) /
+                                                  100)
+                                              .toString();
+                                  soLuongHienTai = selectedProduct['tonKho'] ?? 0;
                                 });
                               },
                             ),
@@ -326,15 +335,15 @@ class _PhieumuahangCreateDialogState extends State<PhieumuahangCreateDialog> {
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                 ),
-                                              ),
+                                              ),                                              
                                               Text(
-                                                'Đơn Vị Tính: $donViTinhSP',
+                                                'Đơn Giá: ${Format.moneyFormat(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                               Text(
-                                                'Đơn Giá: ${Format.moneyFormat(double.tryParse(donGiaMuaSP ?? '0')?.toInt() ?? 0)}',
+                                                'Tồn kho: $soLuongHienTai ${donViTinhSP ?? ''}',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                 ),

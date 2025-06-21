@@ -28,7 +28,7 @@ class PhieuBanHangBloc extends Bloc<PhieuBanHangEvent, PhieuBanHangState> {
       await phieuBanHangRepository.create(event.khachHang, event.sanPhamBan);
       add(PhieuBanHangEventGetAll());
     } catch (e) {
-      emit(PhieuBanHangStateFailure("Lỗi tạo phiếu bán hàng: ${e.toString()}"));
+      emit(PhieuBanHangStateFailure("- Lỗi tạo: Số lượng bán không hợp lệ"));
     }
   }
 
@@ -43,7 +43,7 @@ class PhieuBanHangBloc extends Bloc<PhieuBanHangEvent, PhieuBanHangState> {
     } catch (e) {
       emit(
         PhieuBanHangStateFailure(
-          "Lỗi lấy danh sách phiếu bán hàng: ${e.toString()}",
+          "Lỗi lấy danh sách: ${e.toString()}",
         ),
       );
     }
@@ -58,7 +58,7 @@ class PhieuBanHangBloc extends Bloc<PhieuBanHangEvent, PhieuBanHangState> {
       await phieuBanHangRepository.delete(event.soPhieu);
       add(PhieuBanHangEventGetAll());
     } catch (e) {
-      emit(PhieuBanHangStateFailure("Lỗi xóa phiếu bán hàng: ${e.toString()}"));
+      emit(PhieuBanHangStateFailure("Lỗi xóa: ${e.toString()}"));
     }
   }
 
@@ -77,7 +77,7 @@ class PhieuBanHangBloc extends Bloc<PhieuBanHangEvent, PhieuBanHangState> {
     } catch (e) {
       emit(
         PhieuBanHangStateFailure(
-          "Lỗi cập nhật phiếu bán hàng: ${e.toString()}",
+          "- Lỗi cập nhật: Số lượng bán không hợp lệ",
         ),
       );
     }
