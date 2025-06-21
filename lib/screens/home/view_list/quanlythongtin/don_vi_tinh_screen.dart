@@ -4,6 +4,7 @@ import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_blo
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
 import 'package:gemstore_frontend/models/don_vi_tinh.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -17,7 +18,7 @@ class DonViTinhScreen extends StatefulWidget {
 
 class _DonViTinhScreenState extends State<DonViTinhScreen> {
   final List<TableColumn> _columns = [
-    TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 2, editable: false),
+    TableColumn(key: 'id', header: 'Mã đơn vị tính', width: 2, editable: false, customWidget: (value) => FormatColumnData.formatId(value)),
     TableColumn(key: 'name', header: 'Đơn vị tính', width: 2),
   ];
   bool _isLoading = false;

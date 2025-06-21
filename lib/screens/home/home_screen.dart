@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemstore_frontend/config/format.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
@@ -9,6 +10,12 @@ import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_s
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_state.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_state.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_state.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_bloc.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_event.dart';
 import 'package:gemstore_frontend/features/home/san_pham/bloc/san_pham_state.dart';
@@ -22,9 +29,14 @@ import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_state.dart';
+import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
+import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/home/view_list/bao_cao_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_ban_hang_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_dich_vu_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_mua_hang_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_tinh_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
@@ -56,6 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LoaiSanPham> _loaiSanPhams = [];
   List<LoaiDichVu> _loaiDichVus = [];
   List<PhieuMuaHang> _phieuMuaHangs = [];
+  List<PhieuBanHang> _phieuBanHangs = [];
+  List<PhieuDichVu> _phieuDichVus = [];
   List<SanPham> _sanPhams = [];
 
   @override
@@ -78,6 +92,28 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             } else if (state is PhieuMuaHangStateFailure) {
               _handleError("Lỗi phiếu mua hàng: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<PhieuBanHangBloc, PhieuBanHangState>(
+          listener: (context, state) {
+            if (state is PhieuBanHangStateUpdated) {
+              setState(() {
+                _phieuBanHangs = state.data;
+              });
+            } else if (state is PhieuBanHangStateFailure) {
+              _handleError("Lỗi phiếu bán hàng: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<PhieuDichVuBloc, PhieuDichVuState>(
+          listener: (context, state) {
+            if (state is PhieuDichVuStateUpdated) {
+              setState(() {
+                _phieuDichVus = state.data;
+              });
+            } else if (state is PhieuDichVuStateError) {
+              _handleError("Lỗi phiếu dịch vụ: ${state.message}");
             }
           },
         ),
@@ -145,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Home_Screen',
+                  'Màn hình chính',
                   style: TextStyle(color: Colors.grey[500], fontSize: 16),
                 ),
               ),
@@ -184,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 const Text(
-                                  'Product_name',
+                                  'Cửa hàng đá quý',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w500,
@@ -537,16 +573,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'service_type_management':
         return LoaiDichVuScreen(data: _loaiDichVus);
       case 'sales_invoice':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Phiếu bán hàng Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return PhieuBanHangScreen(
+          data: _phieuBanHangs,
+          listSanPham: _sanPhams,
         );
       case 'purchase_invoice':
         return PhieuMuaHangScreen(
@@ -555,30 +584,23 @@ class _HomeScreenState extends State<HomeScreen> {
           listSanPham: _sanPhams,
         );
       case 'service_invoice':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.home_repair_service, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Phiếu dịch vụ Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return PhieuDichVuScreen(
+          data: _phieuDichVus,
+          listLoaiDichVu: _loaiDichVus,
         );
       case 'product_list':
         return SanPhamScreen(data: _sanPhams, listLoaiSanPham: _loaiSanPhams);
       case 'reports':
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.bar_chart, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'Báo cáo Screen',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-          ],
+        return ReportScreen(
+          chartData: Format.chartDataFormat(
+            _phieuMuaHangs,
+            _phieuBanHangs,
+          ),
+          productData: Format.productDataFormat(
+            _sanPhams,
+            _phieuMuaHangs,
+            _phieuBanHangs,
+          ),
         );
       default:
         return Column(
@@ -605,6 +627,8 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<LoaiSanPhamBloc>().add(LoaiSanPhamEventGetAll());
     context.read<LoaiDichVuBloc>().add(LoaiDichVuEventGetAll());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
+    context.read<PhieuBanHangBloc>().add(PhieuBanHangEventGetAll());
+    context.read<PhieuDichVuBloc>().add(PhieuDichVuEventGetAll());
     context.read<SanPhamBloc>().add(SanPhamEventGetAll());
   }
 }

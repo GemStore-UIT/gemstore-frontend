@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/update_dialog.dart';
 
 // Data model for table rows
 class TableRowData {
@@ -62,206 +63,6 @@ class TableColumn {
 }
 
 // Update Dialog Widget with foreign key support
-class UpdateDialog extends StatefulWidget {
-  final String title;
-  final String id;
-  final List<TableColumn> columns;
-  final Map<String, TextEditingController> controllers;
-  final Map<String, dynamic> selectedForeignKeys;
-  final GlobalKey<FormState> formKey;
-  final void Function(Map<String, dynamic>) onUpdate;
-
-  const UpdateDialog({
-    super.key,
-    required this.title,
-    required this.id,
-    required this.columns,
-    required this.controllers,
-    required this.selectedForeignKeys,
-    required this.formKey,
-    required this.onUpdate,
-  });
-
-  @override
-  State<UpdateDialog> createState() => _UpdateDialogState();
-}
-
-class _UpdateDialogState extends State<UpdateDialog> {
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<void> _handleUpdate() async {
-    if (!widget.formKey.currentState!.validate()) return;
-
-    final updatedData = <String, dynamic>{};
-
-    for (final column in widget.columns) {
-      if (column.isForeignKey && column.foreignKeyConfig != null) {
-        final selectedValue = widget.selectedForeignKeys[column.key];
-        if (selectedValue != null) {
-          updatedData[column.key] = selectedValue;
-        }
-      } else {
-        final controller = widget.controllers[column.key];
-        if (controller != null) {
-          updatedData[column.key] = controller.text;
-        }
-      }
-    }
-
-    widget.onUpdate(updatedData);
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  Widget _buildFormField(TableColumn column) {
-    if (column.isForeignKey && column.foreignKeyConfig != null) {
-      return _buildForeignKeyDropdown(column);
-    } else {
-      return _buildTextFormField(column);
-    }
-  }
-
-  Widget _buildForeignKeyDropdown(TableColumn column) {
-    final config = column.foreignKeyConfig!;
-    final selectedValue = widget.selectedForeignKeys[column.key];
-
-    return DropdownButtonFormField<Map<String, dynamic>>(
-      value: selectedValue,
-      decoration: InputDecoration(
-        labelText: column.header,
-        border: const OutlineInputBorder(),
-      ),
-      items:
-          config.options.map((option) {
-            return DropdownMenuItem<Map<String, dynamic>>(
-              value: option,
-              child: Text(
-                config.getDisplayText(option),
-                overflow: TextOverflow.ellipsis,
-              ),
-            );
-          }).toList(),
-      onChanged: (value) {
-        setState(() {
-          widget.selectedForeignKeys[column.key] = value;
-        });
-      },
-      validator: (value) {
-        if (value == null) {
-          return '${column.header} is required';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildTextFormField(TableColumn column) {
-    return TextFormField(
-      controller: widget.controllers[column.key],
-      decoration: InputDecoration(
-        labelText: column.header,
-        border: const OutlineInputBorder(),
-      ),
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return '${column.header} is required';
-        } else if (column.validator != null) {
-          final isValid = column.validator!(value.trim());
-          if (!isValid) {
-            return '${column.errorMessage}';
-          }
-        }
-        return null;
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      child: AlertDialog(
-        title: Text("Cập nhật ${widget.title}"),
-        content: SingleChildScrollView(
-          child: Form(
-            key: widget.formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mã ${widget.title}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.lock, size: 16, color: Colors.grey[600]),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.id,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Mã ${widget.title} không thể thay đổi',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey[500],
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ...widget.columns.map((column) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: _buildFormField(column),
-                  );
-                }),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(onPressed: _handleUpdate, child: const Text('Update')),
-        ],
-      ),
-    );
-  }
-}
-
 // Main reusable table widget with enhanced foreign key support
 class ReusableTableWidget extends StatefulWidget {
   final String title;
@@ -273,6 +74,8 @@ class ReusableTableWidget extends StatefulWidget {
   final double? height;
   final EdgeInsets? padding;
   final bool showActions;
+  final bool haveDetails;
+  final void Function(TableRowData rowData)? showComplexUpdateDialog;
 
   const ReusableTableWidget({
     super.key,
@@ -281,9 +84,11 @@ class ReusableTableWidget extends StatefulWidget {
     required this.columns,
     required this.onUpdate,
     this.onDelete,
-    this.height = 400,
+    this.height = 500,
     this.padding = const EdgeInsets.all(16),
     this.showActions = true,
+    this.haveDetails = false,
+    this.showComplexUpdateDialog,
   });
 
   @override
@@ -308,74 +113,80 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
   }
 
   void _showUpdateDialog(TableRowData rowData) {
-    final formKey = GlobalKey<FormState>();
-    final controllers = <String, TextEditingController>{};
-    final selectedForeignKeys = <String, dynamic>{};
+    if (!widget.haveDetails) {
+      final formKey = GlobalKey<FormState>();
+      final controllers = <String, TextEditingController>{};
+      final selectedForeignKeys = <String, dynamic>{};
 
-    // Initialize controllers and foreign key selections
-    for (final column in widget.columns) {
-      if (column.editable) {
-        if (column.isForeignKey && column.foreignKeyConfig != null) {
-          // Find the current selected foreign key object
-          dynamic currentValue;
-          if (column.nestedPath != null) {
-            currentValue = _getNestedValue(rowData.data, column.nestedPath!);
+      // Initialize controllers and foreign key selections
+      for (final column in widget.columns) {
+        if (column.editable) {
+          if (column.isForeignKey && column.foreignKeyConfig != null) {
+            // Find the current selected foreign key object
+            dynamic currentValue;
+            if (column.nestedPath != null) {
+              currentValue = _getNestedValue(rowData.data, column.nestedPath!);
+            } else {
+              currentValue = rowData.data[column.key];
+            }
+
+            if (currentValue != null) {
+              // Find matching option in foreign key config
+              final matchingOption = column.foreignKeyConfig!.options
+                  .firstWhere(
+                    (option) =>
+                        option[column.foreignKeyConfig!.displayKey] ==
+                        currentValue,
+                    orElse: () => column.foreignKeyConfig!.options.first,
+                  );
+              selectedForeignKeys[column.key] = matchingOption;
+            }
           } else {
-            currentValue = rowData.data[column.key];
-          }
+            // Regular text field
+            String currentValue = '';
+            if (column.nestedPath != null) {
+              final nestedValue = _getNestedValue(
+                rowData.data,
+                column.nestedPath!,
+              );
+              currentValue = nestedValue?.toString() ?? '';
+            } else {
+              currentValue = rowData.data[column.key]?.toString() ?? '';
+            }
 
-          if (currentValue != null) {
-            // Find matching option in foreign key config
-            final matchingOption = column.foreignKeyConfig!.options.firstWhere(
-              (option) =>
-                  option[column.foreignKeyConfig!.displayKey] == currentValue,
-              orElse: () => column.foreignKeyConfig!.options.first,
-            );
-            selectedForeignKeys[column.key] = matchingOption;
+            controllers[column.key] = TextEditingController(text: currentValue);
           }
-        } else {
-          // Regular text field
-          String currentValue = '';
-          if (column.nestedPath != null) {
-            final nestedValue = _getNestedValue(
-              rowData.data,
-              column.nestedPath!,
-            );
-            currentValue = nestedValue?.toString() ?? '';
-          } else {
-            currentValue = rowData.data[column.key]?.toString() ?? '';
-          }
-
-          controllers[column.key] = TextEditingController(text: currentValue);
         }
       }
-    }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (dialogContext) => UpdateDialog(
-            title: widget.title,
-            id: rowData.id,
-            columns: widget.columns.where((col) => col.editable).toList(),
-            controllers: controllers,
-            selectedForeignKeys: selectedForeignKeys,
-            formKey: formKey,
-            onUpdate: (updatedData) {
-              if (widget.onUpdate != null) {
-                widget.onUpdate!(rowData, updatedData);
-              }
-            },
-          ),
-    ).then((_) {
-      // Đảm bảo chỉ dispose sau khi dialog đã bị huỷ hoàn toàn
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        for (final controller in controllers.values) {
-          controller.dispose();
-        }
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (dialogContext) => UpdateDialog(
+              title: widget.title,
+              id: rowData.id,
+              columns: widget.columns.where((col) => col.editable).toList(),
+              controllers: controllers,
+              selectedForeignKeys: selectedForeignKeys,
+              formKey: formKey,
+              onUpdate: (updatedData) {
+                if (widget.onUpdate != null) {
+                  widget.onUpdate!(rowData, updatedData);
+                }
+              },
+            ),
+      ).then((_) {
+        // Đảm bảo chỉ dispose sau khi dialog đã bị huỷ hoàn toàn
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          for (final controller in controllers.values) {
+            controller.dispose();
+          }
+        });
       });
-    });
+    } else {
+      widget.showComplexUpdateDialog!(rowData);
+    }
   }
 
   void _deleteRow(String id) {
@@ -462,7 +273,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
     );
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -587,142 +398,147 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                       bottomRight: Radius.circular(8),
                     ),
                   ),
-                  child: widget.data.isEmpty
-                      ? const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Text(
-                              'No data available',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                  child:
+                      widget.data.isEmpty
+                          ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Text(
+                                'No data available',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      : ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: widget.data.length,
-                          itemBuilder: (context, index) {
-                            final rowData = widget.data[index];
+                          )
+                          : ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: widget.data.length,
+                            itemBuilder: (context, index) {
+                              final rowData = widget.data[index];
 
-                            return IntrinsicHeight(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: index.isEven
-                                      ? Colors.white
-                                      : Colors.grey[50],
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.grey[200]!,
-                                      width: 0.5,
+                              return IntrinsicHeight(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        index.isEven
+                                            ? Colors.white
+                                            : Colors.grey[50],
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[200]!,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    // STT column
-                                    SizedBox(
-                                      width: 60,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            right: BorderSide(
-                                                color: Colors.grey[300]!),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    ...widget.columns.map(
-                                      (column) => Expanded(
-                                        flex: column.width?.toInt() ?? 1,
-                                        child: Container(
-                                          alignment: Alignment.centerLeft,
-                                          child: _buildCell(
-                                            column,
-                                            rowData,
-                                            false,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    if (widget.showActions)
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // STT column
                                       SizedBox(
-                                        width: 120,
+                                        width: 60,
                                         child: Container(
                                           alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () =>
-                                                      _showUpdateDialog(
-                                                    rowData,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                    20,
-                                                  ),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.all(
-                                                      8.0,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.edit,
-                                                      color: Colors.blue,
-                                                      size: 20,
-                                                    ),
-                                                  ),
-                                                ),
+                                          padding: const EdgeInsets.all(8.0),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              right: BorderSide(
+                                                color: Colors.grey[300]!,
                                               ),
-                                              const SizedBox(width: 4),
-                                              Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () => _deleteRow(
-                                                    rowData.id,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                    20,
-                                                  ),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.all(
-                                                      8.0,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                      size: 20,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                  ],
+                                      ...widget.columns.map(
+                                        (column) => Expanded(
+                                          flex: column.width?.toInt() ?? 1,
+                                          child: Container(
+                                            alignment: Alignment.centerLeft,
+                                            child: _buildCell(
+                                              column,
+                                              rowData,
+                                              false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (widget.showActions)
+                                        SizedBox(
+                                          width: 120,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap:
+                                                        () => _showUpdateDialog(
+                                                          rowData,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.all(
+                                                        8.0,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        color: Colors.blue,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap:
+                                                        () => _deleteRow(
+                                                          rowData.id,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.all(
+                                                        8.0,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
                 ),
               ),
             ],

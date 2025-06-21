@@ -18,6 +18,14 @@ import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_b
 import 'package:gemstore_frontend/features/home/nha_cung_cap/bloc/nha_cung_cap_event.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap_api.dart';
 import 'package:gemstore_frontend/features/home/nha_cung_cap/nha_cung_cap_repository.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/bloc/phieu_ban_hang_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/phieu_ban_hang_api.dart';
+import 'package:gemstore_frontend/features/home/phieu_ban_hang/phieu_ban_hang_repository.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_bloc.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu_event.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/phieu_dich_vu_api.dart';
+import 'package:gemstore_frontend/features/home/phieu_dich_vu/phieu_dich_vu_repository.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_bloc.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_hang_event.dart';
 import 'package:gemstore_frontend/features/home/phieu_mua_hang/phieu_mua_hang_api.dart';
@@ -54,6 +62,12 @@ class MyApp extends StatelessWidget {
           create: (context) => PhieuMuaHangRepository(PhieuMuaHangApi(dio)),
         ),
         RepositoryProvider(
+          create: (context) => PhieuBanHangRepository(PhieuBanHangApi(dio)),
+        ),
+        RepositoryProvider(
+          create: (context) => PhieuDichVuRepository(PhieuDichVuApi(dio)),
+        ),
+        RepositoryProvider(
           create: (context) => SanPhamRepository(SanPhamApi(dio)),
         ),
       ],
@@ -84,6 +98,14 @@ class MyApp extends StatelessWidget {
                     PhieuMuaHangBloc(context.read<PhieuMuaHangRepository>()),
           ),
           BlocProvider(
+            create: (context) =>
+                PhieuBanHangBloc(context.read<PhieuBanHangRepository>()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                PhieuDichVuBloc(context.read<PhieuDichVuRepository>()),
+          ),
+          BlocProvider(
             create: (context) => SanPhamBloc(context.read<SanPhamRepository>()),
           ),
         ],
@@ -109,6 +131,8 @@ class _AppContentState extends State<AppContent> {
     context.read<LoaiSanPhamBloc>().add(LoaiSanPhamEventStart());
     context.read<LoaiDichVuBloc>().add(LoaiDichVuEventStart());
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventStart());
+    context.read<PhieuBanHangBloc>().add(PhieuBanHangEventStart());
+    context.read<PhieuDichVuBloc>().add(PhieuDichVuEventStart());
     context.read<SanPhamBloc>().add(SanPhamEventStart());
   }
 

@@ -42,4 +42,18 @@ class PhieuMuaHangApi {
       throw Exception('Failed to delete phieu mua hang: $e');
     }
   }
+
+  Future<void> update(PhieuMuaHangUpdateDto updatedData) async {
+    try {
+      // Log the updated data for debugging
+      print('Updating PhieuMuaHang with data: ${updatedData.toJson()}');
+
+      await dio.post(
+        '/api/phieumuahang/full',
+        data: updatedData.toJson(),
+      );
+    } catch (e) {
+      throw Exception('Failed to update phieu mua hang: $e');
+    }
+  }
 }

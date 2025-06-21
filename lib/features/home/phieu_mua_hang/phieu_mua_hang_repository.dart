@@ -18,6 +18,14 @@ class PhieuMuaHangRepository {
     await phieuMuaHangApi.create(maNCC, sanPhamMua);
   }
 
+  Future<void> update(PhieuMuaHangUpdateDto phieuMuaHang) async {
+    try {
+      await phieuMuaHangApi.update(phieuMuaHang);
+    } catch (e) {
+      throw Exception('Repository Error: $e');
+    }
+  }
+
   Future<void> delete(String maPhieu) async {
     try {
       await phieuMuaHangApi.delete(maPhieu);

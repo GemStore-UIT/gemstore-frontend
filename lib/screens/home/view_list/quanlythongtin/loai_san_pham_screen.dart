@@ -5,6 +5,7 @@ import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham
 import 'package:gemstore_frontend/features/home/loai_san_pham/bloc/loai_san_pham_state.dart';
 import 'package:gemstore_frontend/models/don_vi_tinh.dart';
 import 'package:gemstore_frontend/models/loai_san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -35,6 +36,7 @@ class _LoaiSanPhamScreenState extends State<LoaiSanPhamScreen> {
         header: 'Mã loại sản phẩm',
         width: 2,
         editable: false,
+        customWidget: (value) => FormatColumnData.formatId(value),
       ),
       TableColumn(key: 'name', header: 'Tên loại sản phẩm', width: 2),
       TableColumn(
@@ -51,7 +53,7 @@ class _LoaiSanPhamScreenState extends State<LoaiSanPhamScreen> {
           displayKey: 'tenDonVi',
         ),
       ),
-      TableColumn(key: 'profit', header: 'Lợi nhuận', width: 1),
+      TableColumn(key: 'profit', header: 'Lợi nhuận', width: 1, customWidget: (value) => FormatColumnData.formatPercentage(value)),
     ];
   }
 

@@ -70,7 +70,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
   ) async {
     try {
       emit(PhieuMuaHangStateLoading());
-      //await phieuMuaHangRepository.update(event.phieuMuaHang);
+      await phieuMuaHangRepository.update(event.phieuMuaHang);
       final data = await phieuMuaHangRepository.getAll();
       emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
