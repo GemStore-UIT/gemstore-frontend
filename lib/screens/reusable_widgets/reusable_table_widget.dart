@@ -49,6 +49,7 @@ class TableColumn {
   final bool isForeignKey;
   final ForeignKeyConfig? foreignKeyConfig;
   final String? nestedPath; // For nested data like "loaiSanPham.tenLSP"
+  final String? defaultData;
 
   TableColumn({
     required this.key,
@@ -61,6 +62,7 @@ class TableColumn {
     this.isForeignKey = false,
     this.foreignKeyConfig,
     this.nestedPath,
+    this.defaultData,
   });
 }
 
@@ -136,10 +138,12 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
         _isSearching = false;
       } else {
         _isSearching = true;
-        _filteredData = widget.data.where((item) {
-          final searchValue = item.data[widget.searchField]?.toString().toLowerCase() ?? '';
-          return searchValue.contains(query.toLowerCase());
-        }).toList();
+        _filteredData =
+            widget.data.where((item) {
+              final searchValue =
+                  item.data[widget.searchField]?.toString().toLowerCase() ?? '';
+              return searchValue.contains(query.toLowerCase());
+            }).toList();
       }
     });
   }
@@ -353,27 +357,26 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tìm kiếm theo ${widget.columns.firstWhere((col) => col.key == widget.searchField).header.toLowerCase()}...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 14,
-                  ),
+                  hintText:
+                      'Tìm kiếm theo ${widget.columns.firstWhere((col) => col.key == widget.searchField).header.toLowerCase()}...',
+                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
                   prefixIcon: Icon(
                     Icons.search,
                     color: Colors.grey[500],
                     size: 20,
                   ),
-                  suffixIcon: _isSearching
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: Colors.grey[600],
-                            size: 20,
-                          ),
-                          onPressed: _clearSearch,
-                          splashRadius: 15,
-                        )
-                      : null,
+                  suffixIcon:
+                      _isSearching
+                          ? IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: Colors.grey[600],
+                              size: 20,
+                            ),
+                            onPressed: _clearSearch,
+                            splashRadius: 15,
+                          )
+                          : null,
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -400,7 +403,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
             children: [
               // Search bar
               _buildSearchBar(),
-              
+
               // Count display at top right
               Container(
                 width: double.infinity,
@@ -442,7 +445,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                       )
                     else
                       const SizedBox(),
-                    
+
                     // Total count
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -562,13 +565,15 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    _isSearching ? Icons.search_off : Icons.inbox,
+                                    _isSearching
+                                        ? Icons.search_off
+                                        : Icons.inbox,
                                     size: 48,
                                     color: Colors.grey[400],
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    _isSearching 
+                                    _isSearching
                                         ? 'Không tìm thấy kết quả nào'
                                         : 'Không có dữ liệu',
                                     style: TextStyle(

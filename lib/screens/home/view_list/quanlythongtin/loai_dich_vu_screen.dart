@@ -4,20 +4,29 @@ import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_b
 import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_event.dart';
 import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_state.dart';
 import 'package:gemstore_frontend/models/loai_dich_vu.dart';
+import 'package:gemstore_frontend/models/tham_so.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
 class LoaiDichVuScreen extends StatefulWidget {
   final List<LoaiDichVu> data;
-  const LoaiDichVuScreen({super.key, required this.data});
+  final List<ThamSo> thamSo;
+
+  const LoaiDichVuScreen({super.key, required this.data, required this.thamSo});
 
   @override
   State<LoaiDichVuScreen> createState() => _LoaiDichVuScreenState();
 }
 
 class _LoaiDichVuScreenState extends State<LoaiDichVuScreen> {
-  final List<TableColumn> _columns = [
+  late List<TableColumn> _columns;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _columns = [
     TableColumn(
       key: 'id',
       header: 'Mã loại dịch vụ',
@@ -47,13 +56,11 @@ class _LoaiDichVuScreenState extends State<LoaiDichVuScreen> {
           (value) =>
               !(double.tryParse(value) == null || double.tryParse(value)! < 0),
       errorMessage: 'Phần trăm trả trước phải lớn hơn hoặc bằng 0',
+      defaultData: widget.thamSo
+          .firstWhere((thamSo) => thamSo.tenThamSo == 'TiLeTraTruocMacDinh')
+          .giaTri.toString(),
     ),
   ];
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   void _showAddLoaiDichVuDialog() {

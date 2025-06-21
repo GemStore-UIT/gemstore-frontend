@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/config/http_client.dart';
 import 'package:gemstore_frontend/config/router.dart';
+import 'package:gemstore_frontend/features/adjust/bloc/tham_so_bloc.dart';
+import 'package:gemstore_frontend/features/adjust/bloc/tham_so_event.dart';
+import 'package:gemstore_frontend/features/adjust/tham_so_api.dart';
+import 'package:gemstore_frontend/features/adjust/tham_so_repository.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/don_vi_tinh_api.dart';
@@ -77,6 +81,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(
           create: (context) => BaoCaoRepository(BaoCaoApi(dio)),
         ),
+        RepositoryProvider(
+          create: (context) => ThamSoRepository(ThamSoApi(dio)),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -118,6 +125,9 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => BaoCaoBloc(context.read<BaoCaoRepository>()),
           ),
+          BlocProvider(
+            create: (context) => ThamSoBloc(context.read<ThamSoRepository>()),
+          ),
         ],
         child: AppContent(),
       ),
@@ -145,6 +155,7 @@ class _AppContentState extends State<AppContent> {
     context.read<PhieuDichVuBloc>().add(PhieuDichVuEventStart());
     context.read<SanPhamBloc>().add(SanPhamEventStart());
     context.read<BaoCaoBloc>().add(BaoCaoEventStart());
+    context.read<ThamSoBloc>().add(ThamSoEventStart());
   }
 
   @override

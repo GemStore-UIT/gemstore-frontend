@@ -29,7 +29,9 @@ class _QlttCreateDialogState extends State<QlttCreateDialog> {
     _controllers = {
       for (var column in widget.columns)
         if (column.editable && !(column.isForeignKey))
-          column.key: TextEditingController(),
+          column.key: column.defaultData != null
+              ? TextEditingController(text: column.defaultData)
+              : TextEditingController(),
     };
     _dropdownValues = {
       for (var column in widget.columns)

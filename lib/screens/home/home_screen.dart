@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemstore_frontend/config/format.dart';
+import 'package:gemstore_frontend/features/adjust/bloc/tham_so_bloc.dart';
+import 'package:gemstore_frontend/features/adjust/bloc/tham_so_event.dart';
+import 'package:gemstore_frontend/features/adjust/bloc/tham_so_state.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_bloc.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_event.dart';
 import 'package:gemstore_frontend/features/home/don_vi_tinh/bloc/don_vi_tinh_state.dart';
@@ -33,6 +36,7 @@ import 'package:gemstore_frontend/models/phieu_ban_hang.dart';
 import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/models/tham_so.dart';
 import 'package:gemstore_frontend/screens/home/view_list/bao_cao_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/danh_sach_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/phieunhapxuat/phieu_ban_hang_screen.dart';
@@ -42,6 +46,7 @@ import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/don_vi_t
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_dich_vu_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/loai_san_pham_screen.dart';
 import 'package:gemstore_frontend/screens/home/view_list/quanlythongtin/nha_cung_cap_screen.dart';
+import 'package:gemstore_frontend/screens/home/view_list/tham_so_screen.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/error_dialog.dart';
 import 'package:go_router/go_router.dart';
 
@@ -71,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PhieuBanHang> _phieuBanHangs = [];
   List<PhieuDichVu> _phieuDichVus = [];
   List<SanPham> _sanPhams = [];
+  List<ThamSo> _thamSos = [];
 
   @override
   void initState() {
@@ -171,6 +177,17 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             } else if (state is SanPhamStateFailure) {
               _handleError("Lỗi sản phẩm: ${state.error}");
+            }
+          },
+        ),
+        BlocListener<ThamSoBloc, ThamSoState>(
+          listener: (context, state) {
+            if (state is ThamSoStateLoaded) {
+              setState(() {
+                _thamSos = state.thamSoList;
+              });
+            } else if (state is ThamSoStateError) {
+              _handleError("Lỗi tham số: ${state.message}");
             }
           },
         ),
@@ -318,6 +335,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                   // Reports Section
                                   _buildMenuItemWithDot('Báo cáo', 'reports'),
+
+                                  const SizedBox(height: 16.0),
+
+                                  // Reports Section
+                                  _buildMenuItemWithDot('Điều chỉnh tham số', 'adjust_parameters'),
                                 ],
                               ),
                             ),
@@ -573,7 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return LoaiSanPhamScreen(data: _loaiSanPhams, 
           listDonViTinh: _donViTinhs);
       case 'service_type_management':
-        return LoaiDichVuScreen(data: _loaiDichVus);
+        return LoaiDichVuScreen(data: _loaiDichVus, thamSo: _thamSos);
       case 'sales_invoice':
         return PhieuBanHangScreen(
           data: _phieuBanHangs,
@@ -599,6 +621,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _phieuBanHangs,
           )
         );
+      case 'adjust_parameters':
+        return ThamSoScreen(thamSoList: _thamSos);
       default:
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -626,5 +650,6 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<PhieuMuaHangBloc>().add(PhieuMuaHangEventGetAll());
     context.read<PhieuBanHangBloc>().add(PhieuBanHangEventGetAll());
     context.read<PhieuDichVuBloc>().add(PhieuDichVuEventGetAll());
+    context.read<ThamSoBloc>().add(ThamSoEventGetAll());
   }
 }
