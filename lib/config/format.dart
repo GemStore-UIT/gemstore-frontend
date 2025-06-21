@@ -24,6 +24,16 @@ class Format {
     }
   }
 
+  static String percentageFormat(String value) {
+    final num? number = num.tryParse(value);
+    if (number == null) return '$value%';
+    // If the value is an integer, format without decimals, else keep original
+    if (number is int || number == number.roundToDouble()) {
+      return '${number.toStringAsFixed(0)}%';
+    }
+    return '$value%';
+  }
+
   static Map<String, Map<String, double>> chartDataFormat(
     List<PhieuMuaHang> phieuMuaHangs,
     List<PhieuBanHang> phieuBanHangs,

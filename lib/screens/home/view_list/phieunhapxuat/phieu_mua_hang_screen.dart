@@ -7,6 +7,7 @@ import 'package:gemstore_frontend/features/home/phieu_mua_hang/bloc/phieu_mua_ha
 import 'package:gemstore_frontend/models/nha_cung_cap.dart';
 import 'package:gemstore_frontend/models/phieu_mua_hang.dart';
 import 'package:gemstore_frontend/models/san_pham.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/phieumuaban_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/phieumuaban_update_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
@@ -45,6 +46,7 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
         header: 'Mã phiếu mua hàng',
         width: 3,
         editable: false,
+        customWidget: (value) => FormatColumnData.formatId(value)
       ),
       TableColumn(
         key: 'name',
@@ -57,23 +59,12 @@ class _PhieuMuaHangScreenState extends State<PhieuMuaHangScreen> {
           displayKey: 'tenNCC',
         ),
       ),
-      TableColumn(key: 'date', header: 'Ngày lập', width: 2),
+      TableColumn(key: 'date', header: 'Ngày lập', width: 2, customWidget: (value) => FormatColumnData.formatDate(value)),
       TableColumn(
         key: 'total',
         header: 'Tổng tiền',
         width: 2,
-        customWidget:
-            (value) => SizedBox(
-              height: 40,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  Format.moneyFormat(value),
-                  style: const TextStyle(fontSize: 14),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
+        customWidget: (value) => FormatColumnData.formatMoney(value, Colors.orange),
       ),
     ];
   }

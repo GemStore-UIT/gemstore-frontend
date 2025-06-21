@@ -4,6 +4,7 @@ import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_b
 import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_event.dart';
 import 'package:gemstore_frontend/features/home/loai_dich_vu/bloc/loai_dich_vu_state.dart';
 import 'package:gemstore_frontend/models/loai_dich_vu.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/qltt_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -22,10 +23,11 @@ class _LoaiDichVuScreenState extends State<LoaiDichVuScreen> {
       header: 'Mã loại dịch vụ',
       width: 2,
       editable: false,
+      customWidget: (value) => FormatColumnData.formatId(value),
     ),
     TableColumn(key: 'name', header: 'Tên loại dịch vụ', width: 2),
-    TableColumn(key: 'price', header: 'Giá', width: 2),
-    TableColumn(key: 'prepaid', header: 'Trả trước', width: 1),
+    TableColumn(key: 'price', header: 'Giá', width: 2, customWidget: (value) => FormatColumnData.formatMoney(value, Colors.orange)),
+    TableColumn(key: 'prepaid', header: 'Trả trước', width: 1, customWidget: (value) => FormatColumnData.formatPercentage(value.toString())),
   ];
   bool _isLoading = false;
 

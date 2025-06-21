@@ -24,15 +24,7 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Báo cáo bán hàng',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.blue[600],
-        foregroundColor: Colors.white,
-        elevation: 2,
-      ),
+      backgroundColor: Colors.grey[100],
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
