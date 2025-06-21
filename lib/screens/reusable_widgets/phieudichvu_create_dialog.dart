@@ -81,6 +81,32 @@ class _PhieuDichVuCreateDialogState extends State<PhieuDichVuCreateDialog> {
     });
   }
 
+  String? _validateKhachHang(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Vui lòng nhập tên khách hàng';
+    }
+    return null;
+  }
+
+  String? _validateSdt(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Vui lòng nhập số điện thoại';
+    }
+    
+    // Remove all non-digit characters for validation
+    String cleanedValue = value.replaceAll(RegExp(r'[^0-9]'), '');
+    
+    if (cleanedValue.length < 10) {
+      return 'Số điện thoại phải có ít nhất 10 chữ số';
+    }
+    
+    if (cleanedValue.length > 15) {
+      return 'Số điện thoại không được vượt quá 15 chữ số';
+    }
+    
+    return null;
+  }
+
   String? _validateSoLuong(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập số lượng';
@@ -137,15 +163,17 @@ class _PhieuDichVuCreateDialogState extends State<PhieuDichVuCreateDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              TextFormField(
                 controller: _khachHangController,
                 decoration: const InputDecoration(labelText: 'Khách hàng'),
+                validator: _validateKhachHang,
               ),
               const SizedBox(height: 8),
-              TextField(
+              TextFormField(
                 controller: _sdtController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(labelText: 'Số điện thoại'),
+                validator: _validateSdt,
               ),
               const SizedBox(height: 16),
               const Divider(),

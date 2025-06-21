@@ -31,7 +31,13 @@ class _SanPhamScreenState extends State<SanPhamScreen> {
   void initState() {
     super.initState();
     _columns = [
-      TableColumn(key: 'id', header: 'Mã sản phẩm', width: 1, editable: false, customWidget: (value) => FormatColumnData.formatId(value)),
+      TableColumn(
+        key: 'id',
+        header: 'Mã sản phẩm',
+        width: 1,
+        editable: false,
+        customWidget: (value) => FormatColumnData.formatId(value),
+      ),
       TableColumn(key: 'name', header: 'Tên sản phẩm', width: 2),
       TableColumn(
         key: 'productType',
@@ -53,8 +59,29 @@ class _SanPhamScreenState extends State<SanPhamScreen> {
         width: 1,
         editable: false,
       ),
-      TableColumn(key: 'price', header: 'Đơn giá mua vào', width: 2, customWidget: (value) => FormatColumnData.formatMoney(int.tryParse(value) ?? 0, Colors.orange)),
-      TableColumn(key: 'quantity', header: 'Số lượng tồn kho', width: 1),
+      TableColumn(
+        key: 'price',
+        header: 'Đơn giá mua vào',
+        width: 2,
+        customWidget:
+            (value) => FormatColumnData.formatMoney(
+              int.tryParse(value) ?? 0,
+              Colors.orange,
+            ),
+        validator:
+            (value) =>
+                !(int.tryParse(value) == null || int.tryParse(value)! < 0),
+        errorMessage: 'Đơn giá mua vào phải lớn hơn hoặc bằng 0',
+      ),
+      TableColumn(
+        key: 'quantity',
+        header: 'Số lượng tồn kho',
+        width: 1,
+        validator:
+            (value) =>
+                !(int.tryParse(value) == null || int.tryParse(value)! < 0),
+        errorMessage: 'Số lượng tồn kho phải lớn hơn hoặc bằng 0',
+      ),
     ];
   }
 
@@ -118,10 +145,7 @@ class _SanPhamScreenState extends State<SanPhamScreen> {
     super.dispose();
   }
 
-  dynamic _onUpdateSanPham(
-    TableRowData row,
-    Map<String, dynamic> updatedData,
-  ) {
+  dynamic _onUpdateSanPham(TableRowData row, Map<String, dynamic> updatedData) {
     final String id = row.id;
     final String tenSP = updatedData['name'] ?? '';
     final Map<String, dynamic> loaiSanPham = updatedData['productType'] ?? {};
