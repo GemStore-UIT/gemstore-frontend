@@ -24,7 +24,7 @@ class SanPhamBloc extends Bloc<SanPhamEvent, SanPhamState> {
       final data = await sanPhamRepository.getAllSanPham();
       emit(SanPhamStateUpdated(data: data));
     } catch (e) {
-      emit(SanPhamStateFailure(error: "Lỗi tải sản phẩm: ${e.toString()}"));
+      emit(SanPhamStateFailure(error: "- Không thể tải danh sách sản phẩm: Vui lòng kiểm tra kết nối mạng!"));
     }
   }
 
@@ -40,7 +40,7 @@ class SanPhamBloc extends Bloc<SanPhamEvent, SanPhamState> {
       final data = await sanPhamRepository.getAllSanPham();
       emit(SanPhamStateUpdated(data: data));
     } catch (e) {
-      emit(SanPhamStateFailure(error: "Lỗi tạo sản phẩm: ${e.toString()}"));
+      emit(SanPhamStateFailure(error: "- Không thể tạo sản phẩm: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -51,7 +51,7 @@ class SanPhamBloc extends Bloc<SanPhamEvent, SanPhamState> {
       final data = await sanPhamRepository.getAllSanPham();
       emit(SanPhamStateUpdated(data: data));
     } catch (e) {
-      emit(SanPhamStateFailure(error: "Lỗi xóa sản phẩm: ${e.toString()}"));
+      emit(SanPhamStateFailure(error: "- Không thể xóa sản phẩm: Sản phẩm có thể đang được sử dụng!"));
     }
   }
 
@@ -62,7 +62,7 @@ class SanPhamBloc extends Bloc<SanPhamEvent, SanPhamState> {
       final data = await sanPhamRepository.getAllSanPham();
       emit(SanPhamStateUpdated(data: data));
     } catch (e) {
-      emit(SanPhamStateFailure(error: "Lỗi cập nhật sản phẩm: ${e.toString()}"));
+      emit(SanPhamStateFailure(error: "- Không thể cập nhật sản phẩm: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 }

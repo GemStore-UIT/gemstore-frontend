@@ -30,7 +30,7 @@ class LoaiDichVuBloc extends Bloc<LoaiDichVuEvent, LoaiDichVuState> {
       final data = await loaiDichVuRepository.getAll();
       emit(LoaiDichVuStateUpdated(data));
     } catch (error) {
-      emit(LoaiDichVuStateFailure(error.toString()));
+      emit(LoaiDichVuStateFailure("- Không thể tải loại dịch vụ: Vui lòng kiểm tra kết nối mạng!"));
     }
   }
 
@@ -43,7 +43,7 @@ class LoaiDichVuBloc extends Bloc<LoaiDichVuEvent, LoaiDichVuState> {
       await loaiDichVuRepository.create(event.tenLDV, event.donGia, event.traTruoc);
       add(LoaiDichVuEventGetAll());
     } catch (error) {
-      emit(LoaiDichVuStateFailure(error.toString()));
+      emit(LoaiDichVuStateFailure("- Không thể tạo loại dịch vụ: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -56,7 +56,7 @@ class LoaiDichVuBloc extends Bloc<LoaiDichVuEvent, LoaiDichVuState> {
       await loaiDichVuRepository.update(event.loaiDichVu);
       add(LoaiDichVuEventGetAll());
     } catch (error) {
-      emit(LoaiDichVuStateFailure(error.toString()));
+      emit(LoaiDichVuStateFailure("- Không thể cập nhật loại dịch vụ: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -69,7 +69,7 @@ class LoaiDichVuBloc extends Bloc<LoaiDichVuEvent, LoaiDichVuState> {
       await loaiDichVuRepository.delete(event.maLDV);
       add(LoaiDichVuEventGetAll());
     } catch (error) {
-      emit(LoaiDichVuStateFailure(error.toString()));
+      emit(LoaiDichVuStateFailure("- Không thể xóa loại dịch vụ: Loại dịch vụ có thể đang được sử dụng!"));
     }
   }
 }

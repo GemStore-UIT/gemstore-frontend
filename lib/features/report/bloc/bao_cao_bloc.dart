@@ -17,7 +17,7 @@ class BaoCaoBloc extends Bloc<BaoCaoEvent, BaoCaoState>{
         final data = await baoCaoRepository.getBaoCao(event.thang, event.nam);
         emit(BaoCaoStateSuccess(event.thang, event.nam, data));
       } catch (e) {
-        emit(BaoCaoStateError(e.toString()));
+        emit(BaoCaoStateError("- Không thể tải báo cáo tháng ${event.thang} năm ${event.nam}: Vui lòng kiểm tra kết nối mạng!"));
       }
     });
   }

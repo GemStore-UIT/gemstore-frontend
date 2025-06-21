@@ -29,7 +29,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       final data = await phieuMuaHangRepository.getAll();
       emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
-      emit(PhieuMuaHangStateFailure("Lỗi tạo phiếu mua hàng: ${e.toString()}"));
+      emit(PhieuMuaHangStateFailure("- Lỗi tạo phiếu mua hàng: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -44,7 +44,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
     } catch (e) {
       emit(
         PhieuMuaHangStateFailure(
-          "Lỗi tải danh sách phiếu mua hàng: ${e.toString()}",
+          "- Lỗi tải danh sách phiếu mua hàng: Vui lòng kiểm tra kết nối mạng!",
         ),
       );
     }
@@ -60,7 +60,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       final data = await phieuMuaHangRepository.getAll();
       emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
-      emit(PhieuMuaHangStateFailure("Lỗi xóa phiếu mua hàng: ${e.toString()}"));
+      emit(PhieuMuaHangStateFailure("- Lỗi xóa phiếu mua hàng: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -74,7 +74,7 @@ class PhieuMuaHangBloc extends Bloc<PhieuMuaHangEvent, PhieuMuaHangState> {
       final data = await phieuMuaHangRepository.getAll();
       emit(PhieuMuaHangStateUpdated(data));
     } catch (e) {
-      emit(PhieuMuaHangStateFailure("Lỗi cập nhật phiếu mua hàng: ${e.toString()}"));
+      emit(PhieuMuaHangStateFailure("- Lỗi cập nhật phiếu mua hàng: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 }

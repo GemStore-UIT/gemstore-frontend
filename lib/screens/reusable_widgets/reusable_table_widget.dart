@@ -534,7 +534,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             child: const Text(
-                              'Actions',
+                              'Điều chỉnh',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

@@ -31,7 +31,7 @@ class PhieuDichVuBloc extends Bloc<PhieuDichVuEvent, PhieuDichVuState>{
       );
       emit(PhieuDichVuStateUpdated(await phieuDichVuRepository.getAll()));
     } catch (e) {
-      emit(PhieuDichVuStateError("Lỗi tạo phiếu dịch vụ: ${e.toString()}"));
+      emit(PhieuDichVuStateError("- Lỗi tạo phiếu dịch vụ: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -42,7 +42,7 @@ class PhieuDichVuBloc extends Bloc<PhieuDichVuEvent, PhieuDichVuState>{
       final data = await phieuDichVuRepository.getAll();
       emit(PhieuDichVuStateUpdated(data));
     } catch (e) {
-      emit(PhieuDichVuStateError("Lỗi lấy danh sách phiếu dịch vụ: ${e.toString()}"));
+      emit(PhieuDichVuStateError("- Lỗi lấy danh sách phiếu dịch vụ: Vui lòng kiểm tra kết nối mạng!"));
     }
   }
 
@@ -53,7 +53,7 @@ class PhieuDichVuBloc extends Bloc<PhieuDichVuEvent, PhieuDichVuState>{
       await phieuDichVuRepository.delete(event.soPhieuDV);
       emit(PhieuDichVuStateUpdated(await phieuDichVuRepository.getAll()));
     } catch (e) {
-      emit(PhieuDichVuStateError("Lỗi xóa phiếu dịch vụ: ${e.toString()}"));
+      emit(PhieuDichVuStateError("- Lỗi xóa phiếu dịch vụ: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 
@@ -69,7 +69,7 @@ class PhieuDichVuBloc extends Bloc<PhieuDichVuEvent, PhieuDichVuState>{
       );
       emit(PhieuDichVuStateUpdated(await phieuDichVuRepository.getAll()));
     } catch (e) {
-      emit(PhieuDichVuStateError("Lỗi cập nhật phiếu dịch vụ: ${e.toString()}"));
+      emit(PhieuDichVuStateError("- Lỗi cập nhật phiếu dịch vụ: Vui lòng kiểm tra lại cú pháp!"));
     }
   }
 }
