@@ -19,7 +19,18 @@ class _ReportScreenState extends State<ReportScreen> {
   String selectedMonth = 'Tháng 6/2025';
 
   // Dữ liệu mẫu cho dropdown
-  List<String> months = ['Tháng 5/2025', 'Tháng 6/2025'];
+  List<String> months = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Lấy danh sách các tháng có trong cả chartData và productData
+    final chartMonths = widget.chartData.keys.toSet();
+    final productMonths = widget.productData.keys.toSet();
+    months = chartMonths.intersection(productMonths).toList();
+    months.sort(); // Sắp xếp tăng dần theo tên tháng (nếu cần sắp xếp theo thời gian thực, cần xử lý thêm)
+    selectedMonth = months.first; // Mặc định chọn tháng đầu tiên
+  }
 
   @override
   Widget build(BuildContext context) {

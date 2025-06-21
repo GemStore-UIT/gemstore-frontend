@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Home_Screen',
+                  'Màn hình chính',
                   style: TextStyle(color: Colors.grey[500], fontSize: 16),
                 ),
               ),
@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 const Text(
-                                  'Product_name',
+                                  'Cửa hàng đá quý',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w500,

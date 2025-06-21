@@ -6,6 +6,7 @@ import 'package:gemstore_frontend/features/home/phieu_dich_vu/bloc/phieu_dich_vu
 import 'package:gemstore_frontend/models/loai_dich_vu.dart';
 import 'package:gemstore_frontend/models/phieu_dich_vu.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/format_column_data.dart';
+import 'package:gemstore_frontend/screens/reusable_widgets/phieudichvu_create_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/phieudichvu_update_dialog.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/reusable_table_widget.dart';
 
@@ -76,17 +77,17 @@ class _PhieuDichVuScreenState extends State<PhieuDichVuScreen> {
   }
 
   void _showAddPhieuDichVuDialog() {
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return PhieuDichVuCreateDialog(
-    //       title: "Thêm Phiếu Dịch Vụ",
-    //       listDichVu: _listDichVu,
-    //       onCreate: _onAddPhieuDichVu,
-    //     );
-    //   },
-    // );
-  }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PhieuDichVuCreateDialog(
+          title: "Thêm phiếu Dịch Vụ",
+          listLoaiDichVu: _listLoaiDichVu,
+          onCreate: _onAddPhieuDichVu,
+        );
+      },
+    );
+  } 
 
   void _showUpdatePhieuDichVuDialog(TableRowData row) {
     showDialog(

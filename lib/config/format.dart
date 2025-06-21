@@ -73,7 +73,10 @@ class Format {
     List<PhieuBanHang> phieuBanHangs,
   ) {
     Map<String, List<ProductData>> productData = {
-      'Tháng 5/2024': [],
+      'Tháng 5/2025': [
+        ProductData('Sản phẩm A', 100, 0, 0, 100, 'Cái'),
+        ProductData('Sản phẩm B', 50, 0, 0, 50, 'Cái'),
+      ],
       'Tháng 6/2025': [],
     };
 
