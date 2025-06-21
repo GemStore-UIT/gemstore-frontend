@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:gemstore_frontend/screens/reusable_widgets/update_dialog.dart';
 
@@ -84,7 +86,7 @@ class ReusableTableWidget extends StatefulWidget {
     required this.columns,
     required this.onUpdate,
     this.onDelete,
-    this.height = 500,
+    this.height = 600,
     this.padding = const EdgeInsets.all(16),
     this.showActions = true,
     this.haveDetails = false,

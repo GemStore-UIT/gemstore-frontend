@@ -244,16 +244,33 @@ class _PhieuDichVuUpdateDialogState extends State<PhieuDichVuUpdateDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
+                TextFormField(
                 controller: _khachHangController,
                 decoration: const InputDecoration(labelText: 'Khách hàng'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                  return 'Vui lòng nhập tên khách hàng';
+                  }
+                  return null;
+                },
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
                 controller: _sdtController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(labelText: 'Số điện thoại'),
-              ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                  return 'Vui lòng nhập số điện thoại';
+                  }
+                  final phone = value.trim();
+                  final phoneReg = RegExp(r'^\d{10,15}$');
+                  if (!phoneReg.hasMatch(phone)) {
+                  return 'Số điện thoại phải là số và từ 10 đến 15 chữ số';
+                  }
+                  return null;
+                },
+                ),
               const SizedBox(height: 16),
               const Divider(),
               ..._dichVuList.asMap().entries.map((entry) {
