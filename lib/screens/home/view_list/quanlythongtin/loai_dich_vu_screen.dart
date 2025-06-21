@@ -26,8 +26,28 @@ class _LoaiDichVuScreenState extends State<LoaiDichVuScreen> {
       customWidget: (value) => FormatColumnData.formatId(value),
     ),
     TableColumn(key: 'name', header: 'Tên loại dịch vụ', width: 2),
-    TableColumn(key: 'price', header: 'Giá', width: 2, customWidget: (value) => FormatColumnData.formatMoney(value, Colors.orange)),
-    TableColumn(key: 'prepaid', header: 'Trả trước', width: 1, customWidget: (value) => FormatColumnData.formatPercentage(value.toString())),
+    TableColumn(
+      key: 'price',
+      header: 'Đơn giá',
+      width: 2,
+      customWidget:
+          (value) => FormatColumnData.formatMoney(value, Colors.orange),
+      validator:
+          (value) =>
+              !(int.tryParse(value) == null || int.tryParse(value)! < 0),
+      errorMessage: 'Đơn giá phải lớn hơn hoặc bằng 0',
+    ),
+    TableColumn(
+      key: 'prepaid',
+      header: 'Phần trăm phải trả trước',
+      width: 2,
+      customWidget:
+          (value) => FormatColumnData.formatPercentage(value.toString()),
+      validator:
+          (value) =>
+              !(double.tryParse(value) == null || double.tryParse(value)! < 0),
+      errorMessage: 'Phần trăm trả trước phải lớn hơn hoặc bằng 0',
+    ),
   ];
   bool _isLoading = false;
 

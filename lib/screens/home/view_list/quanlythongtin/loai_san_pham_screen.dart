@@ -53,7 +53,14 @@ class _LoaiSanPhamScreenState extends State<LoaiSanPhamScreen> {
           displayKey: 'tenDonVi',
         ),
       ),
-      TableColumn(key: 'profit', header: 'Lợi nhuận', width: 1, customWidget: (value) => FormatColumnData.formatPercentage(value)),
+      TableColumn(
+        key: 'profit',
+        header: 'Lợi nhuận',
+        width: 1,
+        customWidget: (value) => FormatColumnData.formatPercentage(value),
+        validator: (value) => !(double.tryParse(value) == null || double.tryParse(value)! < 0),
+        errorMessage: 'Lợi nhuận phải là lớn hơn hoặc bằng 0',
+      ),
     ];
   }
 
