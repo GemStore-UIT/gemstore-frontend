@@ -62,8 +62,7 @@ class TableColumn {
   });
 }
 
-// Update Dialog Widget with foreign key support
-// Main reusable table widget with enhanced foreign key support
+// Main reusable table widget with enhanced foreign key support and search
 class ReusableTableWidget extends StatefulWidget {
   final String title;
   final List<TableRowData> data;
@@ -76,6 +75,7 @@ class ReusableTableWidget extends StatefulWidget {
   final bool showActions;
   final bool haveDetails;
   final void Function(TableRowData rowData)? showComplexUpdateDialog;
+  final String searchField; // Trường để tìm kiếm, mặc định là "name"
 
   const ReusableTableWidget({
     super.key,
@@ -89,6 +89,7 @@ class ReusableTableWidget extends StatefulWidget {
     this.showActions = true,
     this.haveDetails = false,
     this.showComplexUpdateDialog,
+    this.searchField = "name",
   });
 
   @override
@@ -96,6 +97,59 @@ class ReusableTableWidget extends StatefulWidget {
 }
 
 class _ReusableTableWidgetState extends State<ReusableTableWidget> {
+  final TextEditingController _searchController = TextEditingController();
+  List<TableRowData> _filteredData = [];
+  bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredData = widget.data;
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ReusableTableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      _filterData(_searchController.text);
+    }
+  }
+
+  void _onSearchChanged() {
+    _filterData(_searchController.text);
+  }
+
+  void _filterData(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredData = widget.data;
+        _isSearching = false;
+      } else {
+        _isSearching = true;
+        _filteredData = widget.data.where((item) {
+          final searchValue = item.data[widget.searchField]?.toString().toLowerCase() ?? '';
+          return searchValue.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {
+      _filteredData = widget.data;
+      _isSearching = false;
+    });
+  }
+
   // Helper function to get nested value from object
   dynamic _getNestedValue(Map<String, dynamic> data, String path) {
     final keys = path.split('.');
@@ -273,6 +327,66 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
     );
   }
 
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 45,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Tìm kiếm theo ${widget.columns.firstWhere((col) => col.key == widget.searchField).header.toLowerCase()}...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 14,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey[500],
+                    size: 20,
+                  ),
+                  suffixIcon: _isSearching
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: Colors.grey[600],
+                            size: 20,
+                          ),
+                          onPressed: _clearSearch,
+                          splashRadius: 15,
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -282,13 +396,52 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
           padding: widget.padding,
           child: Column(
             children: [
+              // Search bar
+              _buildSearchBar(),
+              
               // Count display at top right
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 8),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Search result info
+                    if (_isSearching)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[50],
+                          border: Border.all(color: Colors.orange[200]!),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.search,
+                              size: 16,
+                              color: Colors.orange[700],
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Tìm thấy: ${_filteredData.length}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.orange[700],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      const SizedBox(),
+                    
+                    // Total count
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -309,7 +462,7 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Số lượng: ${widget.data.length}',
+                            'Tổng số: ${widget.data.length}',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue[700],
@@ -399,24 +552,48 @@ class _ReusableTableWidgetState extends State<ReusableTableWidget> {
                     ),
                   ),
                   child:
-                      widget.data.isEmpty
-                          ? const Center(
+                      _filteredData.isEmpty
+                          ? Center(
                             child: Padding(
-                              padding: EdgeInsets.all(20.0),
-                              child: Text(
-                                'No data available',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    _isSearching ? Icons.search_off : Icons.inbox,
+                                    size: 48,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    _isSearching 
+                                        ? 'Không tìm thấy kết quả nào'
+                                        : 'Không có dữ liệu',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  if (_isSearching) ...[
+                                    const SizedBox(height: 8),
+                                    TextButton.icon(
+                                      onPressed: _clearSearch,
+                                      icon: const Icon(Icons.clear, size: 16),
+                                      label: const Text('Xóa tìm kiếm'),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.blue,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
                           )
                           : ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            itemCount: widget.data.length,
+                            itemCount: _filteredData.length,
                             itemBuilder: (context, index) {
-                              final rowData = widget.data[index];
+                              final rowData = _filteredData[index];
 
                               return IntrinsicHeight(
                                 child: Container(

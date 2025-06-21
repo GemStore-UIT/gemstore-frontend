@@ -146,6 +146,7 @@ class _ReportScreenState extends State<ReportScreen> {
             if (newValue != null) {
               setState(() {
                 selectedMonth = newValue;
+                _getProductData(selectedMonth);
               });
             }
           },
