@@ -31,9 +31,17 @@ class _NhaCungCapScreenState extends State<NhaCungCapScreen> {
       key: 'phone',
       header: 'Số điện thoại',
       width: 1,
-      validator:
-          (value) => !(value.trim().length < 10 || value.trim().length > 15),
-      errorMessage: 'Số điện thoại phải từ 10 đến 15 ký tự',
+      validator: (value) {
+        final trimmed = value.trim();
+        if (!RegExp(r'^\d+$').hasMatch(trimmed)) {
+          return false;
+        }
+        if (trimmed.length < 10 || trimmed.length > 15) {
+          return false;
+        }
+        return true;
+      },
+      errorMessage: 'Số điện thoại phải là số và từ 10 đến 15 chữ số',
     ),
   ];
   bool _isLoading = false;
